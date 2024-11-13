@@ -18,18 +18,17 @@ class ImageNetDataset_val(ImageFolder):
             # self.class_name.append(cls)
             img_cls_dir = os.path.join(self.img_dir, cls)
 
-            for img in glob(os.path.join(img_cls_dir, '*.JPEG')):
+            for img in glob(os.path.join(img_cls_dir, '*.jpeg')):
                 self.img_data.append(img)
                 self.img_labels.append(idx)
-        # print(self.img_data)
+
 
     def __getitem__(self, idx):
         img_path, label = self.img_data[idx], self.img_labels[idx]
         img = PIL.Image.open(img_path).convert('RGB')
         # img.show()
         width, height = img.size
-        img_name = img_path.split('/')[-1].split('.')[0]
-        # print(f'hinfh nef: {img_name}')
+        img_name = img_path.split('\\')[-1].split('.')[0]
         anno_path = os.path.join(self.annotation_dir, img_name+".xml")
         with open(anno_path, 'r') as f:
             file = f.read()
