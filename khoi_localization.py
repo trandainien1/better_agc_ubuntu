@@ -123,8 +123,7 @@ with torch.enable_grad():
         writer.writeheader()
     
         for data in tqdm(validloader):
-            if (num_img == 1):
-                break
+            
             image = data['image'].to(device)
             # image = data['image']
             label = data['label'].to(device)
@@ -134,34 +133,36 @@ with torch.enable_grad():
             
 
             if (args.method == 'better_agcam'):
-                model = model.cuda()
+                # model = model.cuda()
                 prediction, better_agc_heatmap, output_truth = method.generate(image)
+                # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
+                if prediction!=label:
+                    continue
                 # model = model.cpu()
                 # output_truth = output_truth.cpu()
                 # prediction = prediction.cpu()
                 transformed_img = image[0]
                 
                 agc_scores = []
+                
+                for i in range(better_agc_heatmap.size(1)):     # Loop over the first dimension (12)
+                    for j in range(better_agc_heatmap.size(2)): # Loop over the second dimension (12)
+                        tensor_heatmap = transforms.Resize((224, 224))(better_agc_heatmap[0][i][j])
+                        tensor_heatmap = (tensor_heatmap - tensor_heatmap.min())/(tensor_heatmap.max()-tensor_heatmap.min() + 0.0000000000001)
+                        tensor_heatmap = tensor_heatmap.unsqueeze(0).to(device)
+                        # tensor_heatmap = tensor_heatmap.unsqueeze(0).cpu()
+                        
+                        tensor_img = transformed_img.unsqueeze(0).to(device)
+                        # tensor_img = transformed_img.unsqueeze(0).cpu()
 
+                        # model.zero_grad() # Niên: mình forward pass nên không cần zero_grad. Chỉ cần khi mà có loss.backward
+                        m = torch.mul(tensor_img, tensor_heatmap)
+                        with torch.no_grad():
+                          output_mask = model(m)
+                        
+                        agc_score = output_mask[0, prediction.item()] - output_truth[0, prediction.item()]
 
-                with torch.no_grad():
-                    for i in range(better_agc_heatmap.size(1)):     # Loop over the first dimension (12)
-                        for j in range(better_agc_heatmap.size(2)): # Loop over the second dimension (12)
-                            tensor_heatmap = transforms.Resize((224, 224))(better_agc_heatmap[0][i][j])
-                            tensor_heatmap = (tensor_heatmap - tensor_heatmap.min())/(tensor_heatmap.max()-tensor_heatmap.min() + 0.0000000000001)
-                            tensor_heatmap = tensor_heatmap.unsqueeze(0).to(device)
-                            # tensor_heatmap = tensor_heatmap.unsqueeze(0).cpu()
-                            
-                            tensor_img = transformed_img.unsqueeze(0).to(device)
-                            # tensor_img = transformed_img.unsqueeze(0).cpu()
-
-                            # model.zero_grad() # Niên: mình forward pass nên không cần zero_grad. Chỉ cần khi mà có loss.backward
-                            m = torch.mul(tensor_img, tensor_heatmap)
-                            output_mask = model(m)
-                            
-                            agc_score = torch.sum(torch.abs((output_mask - output_truth[:, prediction[0]])))
-                            
-                            agc_scores.append(agc_score.detach().cpu().numpy())
+                        agc_scores.append(agc_score.detach().cpu().numpy())
 
                 masks = better_agc_heatmap[0]
                 
@@ -177,11 +178,11 @@ with torch.enable_grad():
             else:
                 prediction, mask = method.generate(image)
                 mask = mask.reshape(1, 1, 14, 14)
-                
+                # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
+                if prediction!=label:
+                    continue
             
-            # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
-            if prediction!=label:
-                continue
+            
             
             # print(mask.shape)
 
@@ -231,10 +232,7 @@ with torch.enable_grad():
                             'dice': (dice/num_img).item(),
                             'precision': (precision/num_img).item(),
                             'recall': (recall/num_img).item()})
-
-        
-        
-             
+  
 
 print(name)
 print("result==================================================================")
