@@ -9,7 +9,7 @@ class ImageNetDataset_val(ImageFolder):
     def __init__(self, root_dir, transforms=None):
         self.img_dir = os.path.join(root_dir, "Data", "CLS-LOC", "val")
         self.annotation_dir = os.path.join(root_dir, "Annotations", "CLS-LOC", "val")
-        self.classes = os.listdir(self.img_dir)
+        self.classes = sorted(os.listdir(self.img_dir))
         self.transforms = transforms
         self.img_data = []
         self.img_labels = []
@@ -18,7 +18,7 @@ class ImageNetDataset_val(ImageFolder):
             # self.class_name.append(cls)
             img_cls_dir = os.path.join(self.img_dir, cls)
 
-            for img in glob(os.path.join(img_cls_dir, '*.jpeg')):
+            for img in glob(os.path.join(img_cls_dir, '*.JPEG')):
                 self.img_data.append(img)
                 self.img_labels.append(idx)
 
@@ -28,7 +28,7 @@ class ImageNetDataset_val(ImageFolder):
         img = PIL.Image.open(img_path).convert('RGB')
         # img.show()
         width, height = img.size
-        img_name = img_path.split('\\')[-1].split('.')[0]
+        img_name = img_path.split('/')[-1].split('.')[0]
         anno_path = os.path.join(self.annotation_dir, img_name+".xml")
         with open(anno_path, 'r') as f:
             file = f.read()
