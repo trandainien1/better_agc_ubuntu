@@ -135,14 +135,14 @@ with torch.enable_grad():
             
 
             if (args.method == 'better_agcam'):
-                model = model.cuda()
+                # model = model.cuda()
                 prediction, better_agc_heatmap, output_truth = method.generate(image)
                 # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
                 if prediction!=label:
                     continue
-                model = model.cpu()
-                output_truth = output_truth.cpu()
-                prediction = prediction.cpu()
+                # model = model.cpu()
+                # output_truth = output_truth.cpu()
+                # prediction = prediction.cpu()
                 transformed_img = image[0]
                 
                 agc_scores = []
@@ -159,104 +159,58 @@ with torch.enable_grad():
                 cams_loop = []
                 cams_after_generate = []
                 cams_after_resized = []
-                for i in range(better_agc_heatmap.size(1)):     # Loop over the first dimension (12)
-                    for j in range(better_agc_heatmap.size(2)): # Loop over the second dimension (12)
-                        # print(better_agc_heatmap[0][i][j].shape)
-                        cam_head_dau_tien = better_agc_heatmap[0][i][j]
-                        cams_after_generate.append(better_agc_heatmap[0][i][j])
-                        tensor_heatmap = transforms.Resize((224, 224))(better_agc_heatmap[0][i][j])
-                        cams_after_resized.append(tensor_heatmap)
-                        cam_head_dau_tien_resized = tensor_heatmap
-                        # print(tensor_heatmap.shape)
-                        tensor_heatmap = (tensor_heatmap - tensor_heatmap.min())/(tensor_heatmap.max()-tensor_heatmap.min() + 0.0000000000001)
-                        # tensor_heatmap = tensor_heatmap.unsqueeze(0).to(device)
-                        tensor_heatmap = tensor_heatmap.unsqueeze(0).cpu()
+                # for i in range(better_agc_heatmap.size(1)):     # Loop over the first dimension (12)
+                #     for j in range(better_agc_heatmap.size(2)): # Loop over the second dimension (12)
+                #         # print(better_agc_heatmap[0][i][j].shape)
+                #         cam_head_dau_tien = better_agc_heatmap[0][i][j]
+                #         cams_after_generate.append(better_agc_heatmap[0][i][j])
+                #         tensor_heatmap = transforms.Resize((224, 224))(better_agc_heatmap[0][i][j])
+                #         cams_after_resized.append(tensor_heatmap)
+                #         cam_head_dau_tien_resized = tensor_heatmap
+                #         # print(tensor_heatmap.shape)
+                #         tensor_heatmap = (tensor_heatmap - tensor_heatmap.min())/(tensor_heatmap.max()-tensor_heatmap.min() + 0.0000000000001)
+                #         # tensor_heatmap = tensor_heatmap.unsqueeze(0).to(device)
+                #         tensor_heatmap = tensor_heatmap.unsqueeze(0).cpu()
 
-                        cams_loop.append(tensor_heatmap)
+                #         cams_loop.append(tensor_heatmap)
 
-                        loop_heatmap = tensor_heatmap
+                #         loop_heatmap = tensor_heatmap
                         
-                        # tensor_img = transformed_img.unsqueeze(0).to(device)
-                        tensor_img = transformed_img.unsqueeze(0).cpu()
-                        print('loop: ', 'img', tensor_img.shape, 'mask', tensor_heatmap.shape)
-                        # model.zero_grad() # Niên: mình forward pass nên không cần zero_grad. Chỉ cần khi mà có loss.backward
-                        m = torch.mul( tensor_img, tensor_heatmap)
-                        ms.append(m)
-                        print('loop: masked_image', m.shape)
+                #         # tensor_img = transformed_img.unsqueeze(0).to(device)
+                #         tensor_img = transformed_img.unsqueeze(0).cpu()
+                #         print('loop: ', 'img', tensor_img.shape, 'mask', tensor_heatmap.shape)
+                #         # model.zero_grad() # Niên: mình forward pass nên không cần zero_grad. Chỉ cần khi mà có loss.backward
+                #         m = torch.mul( tensor_img, tensor_heatmap)
+                #         ms.append(m)
+                #         print('loop: masked_image', m.shape)
                         
-                        loop_m = m #!
+                #         loop_m = m #!
 
-                        with torch.no_grad():
-                          output_mask = model(m)
+                #         with torch.no_grad():
+                #           output_mask = model(m)
                         
-                        output_mask_loop.append(output_mask)
+                #         output_mask_loop.append(output_mask)
 
-                        print('loop: output masked shape', output_mask.shape)
-                        first_output_mask = output_mask #!
+                #         print('loop: output masked shape', output_mask.shape)
+                #         first_output_mask = output_mask #!
 
                         
-                        agc_score = output_mask[0, prediction.item()] - output_truth[0, prediction.item()]
-                        agc_scores.append(agc_score.detach().cpu().numpy())
+                #         agc_score = output_mask[0, prediction.item()] - output_truth[0, prediction.item()]
+                #         agc_scores.append(agc_score.detach().cpu().numpy())
 
-                agc_scores_loop = agc_scores 
+                # agc_scores_loop = agc_scores 
                     
                     
 
                 # -------------------------- CUDA ------------------------------
-                # tensor_heatmaps = better_agc_heatmap[0]
-                # print('dau tien', tensor_heatmaps.shape)
-                # # tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps[0])
-                # tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
-                # tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
-                # # tensor_heatmaps = F.interpolate(tensor_heatmaps, size=(244, 244), mode='bilinear', align_corners=False)
-                # print('resized', tensor_heatmaps.shape)
-                # # tensor_heatmaps = tensor_heatmaps.cpu()
-
-                # tensor_img = transformed_img.unsqueeze(0)
-                # print('input image', tensor_img.shape)
-                # m = torch.mul(tensor_heatmaps, tensor_img)
-                # print('mask shape: ', m.shape)
-                
-                # with torch.no_grad():
-                #     output_mask = model(m)
-                # print('output maksed', output_mask.shape)
-                # # output_mask = output_mask.cpu()
-
-                # agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
-                # print('score shape: ', agc_scores.shape)
-                # agc_scores = agc_scores.detach().cpu().numpy()
-
-                # masks = better_agc_heatmap[0].cpu()
-
-                # e_x = np.exp(agc_scores - np.max(agc_scores)) 
-                # agc_scores = e_x / e_x.sum(axis=0)
-                # agc_scores = agc_scores.reshape(masks.shape[0], masks.shape[1])
-                
-                # my_cam = (agc_scores[:, :, None, None, None] * masks.detach().cpu().numpy()).sum(axis=(0, 1))
-                
-                # mask = torch.from_numpy(my_cam)
-                # mask = mask.unsqueeze(0)
-
-                # ---------------- CPU ---------------------
-                tensor_heatmaps = better_agc_heatmap[0].detach().clone()
+                tensor_heatmaps = better_agc_heatmap[0]
                 print('dau tien', tensor_heatmaps.shape)
                 # tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps[0])
-                print('Kiem tra cac CAM cua head sau khi generate', torch.sum(tensor_heatmaps))
-                print('Kiem tra cac CAM cua head sau khi generate trong loop', torch.sum(torch.stack(cams_after_generate)))
                 tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
-                print('Kiem tra CAM sau khi reshape trong parallel', torch.sum(tensor_heatmaps))
-                print('Kiem tra CAM thu 13 trong parallel va loop', tensor_heatmaps[12] == cams_after_generate[12])
-                print('Kiem tra CAM dau tien trong parallel va loop', tensor_heatmaps[0] == cams_after_generate[0])
-                # print('check shape cua cam loop', cam_head_dau_tien.shape)
-                # print('check shape cua cam parallel', tensor_heatmaps[0].shape)
-                # print('check cam cua head dau tien', 'giong' if not False in (tensor_heatmaps[0] == cam_head_dau_tien) else 'khong giong')
                 tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
-                print('Kiem tra CAM sau khi resized', tensor_heatmaps[0] == torch.stack(cams_after_resized)[1])
-                # print('check shape cua cam loop sau khi resize', cam_head_dau_tien_resized.shape)
-                # print('check shape cua cam parallel sau khi resize', tensor_heatmaps[0].shape)
-                # print('check cam cua head dau tien sau khi resize', 'giong' if not False in (tensor_heatmaps[0] == cam_head_dau_tien_resized) else 'khong giong')
-                
-                # tensor_heatmaps = (tensor_heatmap - tensor_heatmap.min())/(tensor_heatmap.max()-tensor_heatmap.min() + 0.0000000000001)
+                # tensor_heatmaps = F.interpolate(tensor_heatmaps, size=(244, 244), mode='bilinear', align_corners=False)
+                print('resized', tensor_heatmaps.shape)
+                # tensor_heatmaps = tensor_heatmaps.cpu()
 
                 # Compute min and max along each image
                 min_vals = tensor_heatmaps.amin(dim=(2, 3), keepdim=True)  # Min across width and height
@@ -266,41 +220,95 @@ with torch.enable_grad():
                 tensor_heatmaps = (tensor_heatmaps - min_vals) / (max_vals - min_vals + 1e-7)  # Add small value to avoid division by zero
 
 
-                # tensor_heatmaps = F.interpolate(tensor_heatmaps, size=(244, 244), mode='bilinear', align_corners=False)
-                print('parallel: mask shape', tensor_heatmaps.shape)
-                print('kiem tra truoc khi nhan trong loop', torch.sum(torch.stack(cams_loop)))
-                print('kiem tra truoc khi nhan', torch.sum(tensor_heatmaps))
-                tensor_heatmaps = tensor_heatmaps.cpu()
-                tensor_img = transformed_img.unsqueeze(0).cpu()
-                
+                tensor_img = transformed_img.unsqueeze(0)
+                print('input image', tensor_img.shape)
                 m = torch.mul(tensor_heatmaps, tensor_img)
-                # print('check shape cua masked image trong loop', loop_m[0].shape)
-                # print('check shape cua masked image trong parallel', m[0].shape)
-                # print('check masked image cua loop va parallel co giong nhau khong? ', 'giong' if not False in (m[0] == loop_m[0]) else 'khong giong')
-                # print('co ton tai hay khong? ' 'co ton tai' if loop_m[0] in m else 'khong ton tai') 
-                print('kiem tra sau khi nhan trong loop: ', torch.sum(torch.stack(ms)))
-                print('Kiem tra sau khi nhan', torch.sum(m))
+                print('mask shape: ', m.shape)
+                
                 with torch.no_grad():
                     output_mask = model(m)
-                # print('parallel: output_masked shape: ', output_mask.shape)
-                # print('check shape', output_mask[0].shape, first_output_mask[0].shape)
-                # print('check tensor', output_mask[0] == first_output_mask[0])
-                
-                # print('output maksed', output_mask[0].shape)
-                
-                print('Kiem tra output mask (ket qua co duoc sau khi dua mask vao model): ', torch.sum(output_mask))
-                print('Kiem tra output mask (ket qua co duoc sau khi dua mask vao model trong loop): ', torch.sum(torch.stack(output_mask_loop)))
-                output_mask = output_mask.cpu()
+                print('output maksed', output_mask.shape)
+                # output_mask = output_mask.cpu()
 
-                print('ket qua sau khi 144 cam cua head qua model', output_mask.shape)
-                print('ket qua sau khi dua input image qua model', output_truth.shape)
-                print('ket qua tu hinh anh ban dau theo du doan: ', output_truth[0, prediction.item()])
-                print('ket qua tu 10 cam dau cua head theo du doan: ', output_mask[:10, prediction.item()])
                 agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
-                print('ket qua trung binh tu cac cam cua head sau khi tru: ', torch.mean(agc_scores))
-                # print('score loop shape', len(agc_scores_loop))
-                # print('score shape: ', agc_scores.shape)
+                print('score shape: ', agc_scores.shape)
                 agc_scores = agc_scores.detach().cpu().numpy()
+
+                masks = better_agc_heatmap[0].cpu()
+
+                e_x = np.exp(agc_scores - np.max(agc_scores)) 
+                agc_scores = e_x / e_x.sum(axis=0)
+                agc_scores = agc_scores.reshape(masks.shape[0], masks.shape[1])
+                
+                my_cam = (agc_scores[:, :, None, None, None] * masks.detach().cpu().numpy()).sum(axis=(0, 1))
+                
+                mask = torch.from_numpy(my_cam)
+                mask = mask.unsqueeze(0)
+
+                # ---------------- CPU ---------------------
+                # tensor_heatmaps = better_agc_heatmap[0].detach().clone()
+                # print('dau tien', tensor_heatmaps.shape)
+                # # tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps[0])
+                # print('Kiem tra cac CAM cua head sau khi generate', torch.sum(tensor_heatmaps))
+                # print('Kiem tra cac CAM cua head sau khi generate trong loop', torch.sum(torch.stack(cams_after_generate)))
+                # tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
+                # print('Kiem tra CAM sau khi reshape trong parallel', torch.sum(tensor_heatmaps))
+                # print('Kiem tra CAM thu 13 trong parallel va loop', tensor_heatmaps[12] == cams_after_generate[12])
+                # print('Kiem tra CAM dau tien trong parallel va loop', tensor_heatmaps[0] == cams_after_generate[0])
+                # # print('check shape cua cam loop', cam_head_dau_tien.shape)
+                # # print('check shape cua cam parallel', tensor_heatmaps[0].shape)
+                # # print('check cam cua head dau tien', 'giong' if not False in (tensor_heatmaps[0] == cam_head_dau_tien) else 'khong giong')
+                # tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
+                # print('Kiem tra CAM sau khi resized', tensor_heatmaps[0] == torch.stack(cams_after_resized)[1])
+                # # print('check shape cua cam loop sau khi resize', cam_head_dau_tien_resized.shape)
+                # # print('check shape cua cam parallel sau khi resize', tensor_heatmaps[0].shape)
+                # # print('check cam cua head dau tien sau khi resize', 'giong' if not False in (tensor_heatmaps[0] == cam_head_dau_tien_resized) else 'khong giong')
+                
+                # # tensor_heatmaps = (tensor_heatmap - tensor_heatmap.min())/(tensor_heatmap.max()-tensor_heatmap.min() + 0.0000000000001)
+
+                # # Compute min and max along each image
+                # min_vals = tensor_heatmaps.amin(dim=(2, 3), keepdim=True)  # Min across width and height
+                # max_vals = tensor_heatmaps.amax(dim=(2, 3), keepdim=True)  # Max across width and height
+
+                # # Normalize using min-max scaling
+                # tensor_heatmaps = (tensor_heatmaps - min_vals) / (max_vals - min_vals + 1e-7)  # Add small value to avoid division by zero
+
+
+                # # tensor_heatmaps = F.interpolate(tensor_heatmaps, size=(244, 244), mode='bilinear', align_corners=False)
+                # print('parallel: mask shape', tensor_heatmaps.shape)
+                # print('kiem tra truoc khi nhan trong loop', torch.sum(torch.stack(cams_loop)))
+                # print('kiem tra truoc khi nhan', torch.sum(tensor_heatmaps))
+                # tensor_heatmaps = tensor_heatmaps.cpu()
+                # tensor_img = transformed_img.unsqueeze(0).cpu()
+                
+                # m = torch.mul(tensor_heatmaps, tensor_img)
+                # # print('check shape cua masked image trong loop', loop_m[0].shape)
+                # # print('check shape cua masked image trong parallel', m[0].shape)
+                # # print('check masked image cua loop va parallel co giong nhau khong? ', 'giong' if not False in (m[0] == loop_m[0]) else 'khong giong')
+                # # print('co ton tai hay khong? ' 'co ton tai' if loop_m[0] in m else 'khong ton tai') 
+                # print('kiem tra sau khi nhan trong loop: ', torch.sum(torch.stack(ms)))
+                # print('Kiem tra sau khi nhan', torch.sum(m))
+                # with torch.no_grad():
+                #     output_mask = model(m)
+                # # print('parallel: output_masked shape: ', output_mask.shape)
+                # # print('check shape', output_mask[0].shape, first_output_mask[0].shape)
+                # # print('check tensor', output_mask[0] == first_output_mask[0])
+                
+                # # print('output maksed', output_mask[0].shape)
+                
+                # print('Kiem tra output mask (ket qua co duoc sau khi dua mask vao model): ', torch.sum(output_mask))
+                # print('Kiem tra output mask (ket qua co duoc sau khi dua mask vao model trong loop): ', torch.sum(torch.stack(output_mask_loop)))
+                # output_mask = output_mask.cpu()
+
+                # print('ket qua sau khi 144 cam cua head qua model', output_mask.shape)
+                # print('ket qua sau khi dua input image qua model', output_truth.shape)
+                # print('ket qua tu hinh anh ban dau theo du doan: ', output_truth[0, prediction.item()])
+                # print('ket qua tu 10 cam dau cua head theo du doan: ', output_mask[:10, prediction.item()])
+                # agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
+                # print('ket qua trung binh tu cac cam cua head sau khi tru: ', torch.mean(agc_scores))
+                # # print('score loop shape', len(agc_scores_loop))
+                # # print('score shape: ', agc_scores.shape)
+                # agc_scores = agc_scores.detach().cpu().numpy()
                 # print(agc_scores == agc_scores_loop)
                 # is_exist = False
                 # for score in agc_scores_loop:
