@@ -204,12 +204,12 @@ with torch.enable_grad():
 
                 # -------------------------- CUDA ------------------------------
                 tensor_heatmaps = better_agc_heatmap[0]
-                print('dau tien', tensor_heatmaps.shape)
+                #print('dau tien', tensor_heatmaps.shape)
                 # tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps[0])
                 tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
                 tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
                 # tensor_heatmaps = F.interpolate(tensor_heatmaps, size=(244, 244), mode='bilinear', align_corners=False)
-                print('resized', tensor_heatmaps.shape)
+                #print('resized', tensor_heatmaps.shape)
                 # tensor_heatmaps = tensor_heatmaps.cpu()
 
                 # Compute min and max along each image
@@ -221,17 +221,17 @@ with torch.enable_grad():
 
 
                 tensor_img = transformed_img.unsqueeze(0)
-                print('input image', tensor_img.shape)
+                #print('input image', tensor_img.shape)
                 m = torch.mul(tensor_heatmaps, tensor_img)
-                print('mask shape: ', m.shape)
+                #print('mask shape: ', m.shape)
                 
                 with torch.no_grad():
                     output_mask = model(m)
-                print('output maksed', output_mask.shape)
+                #print('output maksed', output_mask.shape)
                 # output_mask = output_mask.cpu()
 
                 agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
-                print('score shape: ', agc_scores.shape)
+                # print('score shape: ', agc_scores.shape)
                 agc_scores = agc_scores.detach().cpu().numpy()
 
                 masks = better_agc_heatmap[0].cpu()
