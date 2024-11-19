@@ -317,16 +317,16 @@ with torch.enable_grad():
                 #         break
                 # print('Diem khong ton tai?', is_exist)
 
-                masks = better_agc_heatmap[0].cpu()
+                # masks = better_agc_heatmap[0].cpu()
 
-                e_x = np.exp(agc_scores - np.max(agc_scores)) 
-                agc_scores = e_x / e_x.sum(axis=0)
-                agc_scores = agc_scores.reshape(masks.shape[0], masks.shape[1])
+                # e_x = np.exp(agc_scores - np.max(agc_scores)) 
+                # agc_scores = e_x / e_x.sum(axis=0)
+                # agc_scores = agc_scores.reshape(masks.shape[0], masks.shape[1])
                 
-                my_cam = (agc_scores[:, :, None, None, None] * masks.detach().cpu().numpy()).sum(axis=(0, 1))
+                # my_cam = (agc_scores[:, :, None, None, None] * masks.detach().cpu().numpy()).sum(axis=(0, 1))
                 
-                mask = torch.from_numpy(my_cam)
-                mask = mask.unsqueeze(0)
+                # mask = torch.from_numpy(my_cam)
+                # mask = mask.unsqueeze(0)
                 # --------------------------- CPU --------------------------
 
                 
@@ -336,8 +336,6 @@ with torch.enable_grad():
                 # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
                 if prediction!=label:
                     continue
-            
-            
             
             # print(mask.shape)
 
