@@ -126,7 +126,7 @@ with torch.enable_grad():
         writer.writeheader()
     
         for data in tqdm(validloader):
-            if num_img == 1:
+            if num_img == 1000:
                 break
             image = data['image'].to(device)
             # image = data['image']
@@ -222,7 +222,7 @@ with torch.enable_grad():
                 def norm_matrix(act):
                   row_mins=torch.min(act,1).values[:, None]
                   row_maxs=torch.max(act,1).values[:, None] 
-                  act=(act-row_mins)/(row_maxs-row_mins)
+                  act=(act-row_mins)/(row_maxs-row_mins + 0.0000000000001)
                   return act
                 # Step 1: Reshape to (144, 196)
                 tensor_heatmaps = tensor_heatmaps.reshape(144, -1).detach()
@@ -255,12 +255,12 @@ with torch.enable_grad():
                 #print('resized', tensor_heatmaps.shape)
                 # tensor_heatmaps = tensor_heatmaps.cpu()
 
-                # Compute min and max along each image
-                min_vals = tensor_heatmaps.amin(dim=(2, 3), keepdim=True)  # Min across width and height
-                max_vals = tensor_heatmaps.amax(dim=(2, 3), keepdim=True)  # Max across width and height
+                # # Compute min and max along each image
+                # min_vals = tensor_heatmaps.amin(dim=(2, 3), keepdim=True)  # Min across width and height
+                # max_vals = tensor_heatmaps.amax(dim=(2, 3), keepdim=True)  # Max across width and height
 
-                # Normalize using min-max scaling
-                tensor_heatmaps = (tensor_heatmaps - min_vals) / (max_vals - min_vals + 1e-7)  # Add small value to avoid division by zero
+                # # Normalize using min-max scaling
+                # tensor_heatmaps = (tensor_heatmaps - min_vals) / (max_vals - min_vals + 1e-7)  # Add small value to avoid division by zero
 
 
                 tensor_img = transformed_img.unsqueeze(0)
@@ -268,6 +268,7 @@ with torch.enable_grad():
                 m = torch.mul(tensor_heatmaps, tensor_img)
                 #print('mask shape: ', m.shape)
                 
+                print('shape cua input cho mo hinh hoc: ', m.shape)
                 with torch.no_grad():
                     output_mask = model(m)
                 #print('output maksed', output_mask.shape)
@@ -275,18 +276,20 @@ with torch.enable_grad():
 
                 agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
                 # print('score shape: ', agc_scores.shape)
+                agc_scores = torch.sigmoid(agc_scores)
                 agc_scores = agc_scores.detach().cpu().numpy()
 
                 masks = mask_clustering_norm
 
-                e_x = np.exp(agc_scores - np.max(agc_scores)) 
-                agc_scores = e_x / e_x.sum(axis=0)
+                # e_x = np.exp(agc_scores - np.max(agc_scores)) 
+                # agc_scores = e_x / e_x.sum(axis=0)
                 agc_scores = agc_scores.reshape(masks.shape[0], masks.shape[1])
                 
                 my_cam = (agc_scores[:, :, None, None, None] * masks.detach().cpu().numpy()).sum(axis=(0, 1))
                 
                 mask = torch.from_numpy(my_cam)
                 mask = mask.unsqueeze(0)
+                print('shape cua cam: ', mask.shape)
 
                 # ---------------- CPU ---------------------
                 # tensor_heatmaps = better_agc_heatmap[0].detach().clone()
