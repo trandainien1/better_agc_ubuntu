@@ -155,12 +155,12 @@ with torch.enable_grad():
               
                 agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
                 agc_scores = torch.sigmoid(agc_scores)
-                agc_scores = agc_scores.detach().cpu().numpy()
                 agc_scores = agc_scores.reshape(heatmaps.shape[0], heatmaps.shape[1])
-              
-                my_cam = (agc_scores * heatmaps).sum(axis=(0, 1))
+                print('agc_score shape: ', agc_scores.shape)
+                print('heatmaps shape: ', heatmaps.shape)
+                my_cam = (agc_scores.view(12, 12, 1, 1, 1) * heatmaps).sum(axis=(0, 1))
                 
-                mask = torch.from_numpy(my_cam)
+                mask = my_cam
                 mask = mask.unsqueeze(0)
                 
             else:
