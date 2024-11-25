@@ -133,9 +133,6 @@ with torch.enable_grad():
                 if prediction!=label:
                     continue
               
-                transformed_img = image[0]
-                tensor_img = transformed_img.unsqueeze(0)
-              
                 tensor_heatmaps = better_agc_heatmap[0]
                 tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
                 tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
@@ -146,7 +143,7 @@ with torch.enable_grad():
                 # Normalize using min-max scaling
                 tensor_heatmaps = (tensor_heatmaps - min_vals) / (max_vals - min_vals + 1e-7)  # Add small value to avoid division by zero
               
-                m = torch.mul(tensor_heatmaps, tensor_img)
+                m = torch.mul(tensor_heatmaps, image)
                 
                 with torch.no_grad():
                     output_mask = model(m)
@@ -156,10 +153,7 @@ with torch.enable_grad():
                 agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
                 agc_scores = torch.sigmoid(agc_scores)
                 agc_scores = agc_scores.reshape(heatmaps.shape[0], heatmaps.shape[1])
-                print('agc_score shape: ', agc_scores.shape)
-                print('heatmaps shape: ', heatmaps.shape)
                 my_cam = (agc_scores.view(12, 12, 1, 1, 1) * heatmaps).sum(axis=(0, 1))
-                
                 mask = my_cam
                 mask = mask.unsqueeze(0)
                 
