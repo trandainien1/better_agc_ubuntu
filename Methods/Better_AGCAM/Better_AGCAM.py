@@ -52,7 +52,6 @@ class Better_AGCAM:
             loss = output[0, cls_idx]
         loss.backward()
 
-        
         b, h, n, d = self.attn_matrix[0].shape
         # b, h, n, d = self.attn_matrix.shape
         self.head=h
