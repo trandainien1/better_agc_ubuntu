@@ -52,7 +52,7 @@ class Better_AGCAM:
             loss = output[0, cls_idx]
         loss.backward()
 
-        print(f'DEBUG!!!:', self.attn_matrix.shape)
+        
         b, h, n, d = self.attn_matrix[0].shape
         # b, h, n, d = self.attn_matrix.shape
         self.head=h
