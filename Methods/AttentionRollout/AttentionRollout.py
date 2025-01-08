@@ -5,7 +5,6 @@ The implementation is from "https://github.com/jacobgil/vit-explain" by Jacob Gi
 import torch
 
 
-
 def rollout(attentions, discard_ratio, head_fusion, device='cpu'):
     result = torch.eye(attentions[0].size(-1)).to(device)
     with torch.no_grad():
@@ -66,4 +65,5 @@ class VITAttentionRollout:
         with torch.no_grad():
             output = self.model(input)
         _, prediction = torch.max(output, 1)
+        print('[DEBUG] Attention shape', len(self.attentions))
         return prediction, rollout(self.attentions, self.discard_ratio, self.head_fusion, device=self.device)
