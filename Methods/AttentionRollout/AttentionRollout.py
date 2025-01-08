@@ -43,6 +43,7 @@ class VITAttentionRollout:
         self.model = model
         self.head_fusion = head_fusion
         self.discard_ratio = discard_ratio
+        print('[DEBUG] Initialization')
         for name, module in self.model.named_modules():
             if attention_layer_name in name:
                 print('[DEBUG] Foudn attention layer')
