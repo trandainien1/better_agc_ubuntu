@@ -45,6 +45,7 @@ class VITAttentionRollout:
         self.discard_ratio = discard_ratio
         for name, module in self.model.named_modules():
             if attention_layer_name in name:
+                print('[DEBUG] Foudn attention layer')
                 module.register_forward_hook(self.get_attention) 
 
         self.attentions = []
@@ -58,6 +59,8 @@ class VITAttentionRollout:
         with torch.no_grad():
             output = self.model(input_tensor)
         _, prediction = torch.max(output, 1)
+
+
         return prediction, rollout(self.attentions, self.discard_ratio, self.head_fusion)
     
     def generate(self, input, label=None):
@@ -66,4 +69,5 @@ class VITAttentionRollout:
             output = self.model(input)
         _, prediction = torch.max(output, 1)
         print('[DEBUG] Attention shape', len(self.attentions))
+
         return prediction, rollout(self.attentions, self.discard_ratio, self.head_fusion, device=self.device)
