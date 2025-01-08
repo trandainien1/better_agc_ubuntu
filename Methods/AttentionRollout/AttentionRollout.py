@@ -53,9 +53,7 @@ class VITAttentionRollout:
         self.device=device
 
     def get_attention(self, module, input, output):
-        # self.attentions.append(output)
-        print('[UDATED]')
-        self.attentions.append(output[:, :, 0:1, :]) # shape: [batch, num_heads, 1, num_patches] 
+        self.attentions.append(output)
 
     def __call__(self, input_tensor):
         self.attentions = []
