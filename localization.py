@@ -23,6 +23,10 @@ from Methods.AGCAM.AGCAM import AGCAM
 from Methods.LRP.ViT_explanation_generator import LRP
 from Methods.AttentionRollout.AttentionRollout import VITAttentionRollout
 
+# dataset
+from torch.utils.data import Subset
+import pandas as pd
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout'])
 parser.add_argument('--data_root', type=str, required=True)
@@ -95,6 +99,9 @@ validloader = DataLoader(
     shuffle = False,
 )
 
+subset_indices = pd.read_csv('2000idx_ILSVRC2012.csv', header=None)[0].to_numpy()
+subset = Subset(validloader.dataset, subset_indices)
+subset_loader = torch.utils.data.DataLoader(subset, batch_size=1, shuffle=False)
 
 with torch.enable_grad():        
     num_img = 0
@@ -103,7 +110,7 @@ with torch.enable_grad():
     precision = 0.0
     recall = 0.0
     iou = 0.0
-    for data in tqdm(validloader):
+    for data in tqdm(subset_loader):
         image = data['image'].to(device)
         label = data['label'].to(device)
         bnd_box = data['bnd_box'].to(device).squeeze(0)

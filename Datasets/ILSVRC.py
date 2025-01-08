@@ -53,7 +53,14 @@ class ImageNetDataset_val(ImageFolder):
             else:
                 bnd_box = torch.cat((bnd_box, torch.tensor((xmin, ymin, xmax, ymax)).unsqueeze(0)), dim=0)
         # print(bnd_box.shape)
-        sample = {'image': img, 'label': label, 'filename': img_name, 'num_objects': len(objects), 'bnd_box': bnd_box, 'img_path': img_path}
+        sample = {
+            'image': img, 
+            'label': label, 
+            'filename': img_name, 
+            'num_objects': len(objects), 
+            'bnd_box': bnd_box, 
+            'img_path': img_path
+            }
         return sample
 
     def __len__(self):
