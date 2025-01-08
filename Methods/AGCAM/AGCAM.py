@@ -44,7 +44,9 @@ class AGCAM:
 
         # backpropagate the model from the classification output
         self.model.zero_grad()
+        print('[DEBUG]', len(self.attn_matrix))
         output = self.model(input_tensor)
+        print('DEBUG', len(self.attn_matrix))
         _, prediction = torch.max(output, 1)
         self.prediction = prediction  
         if cls_idx==None:                               # generate CAM for a certain class label
