@@ -19,6 +19,7 @@ class AGCAM:
         self.layer_fusion = layer_fusion
         self.attn_matrix = []
         self.grad_attn = []
+        print('[DEBUG] Init')
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
