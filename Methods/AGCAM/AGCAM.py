@@ -23,7 +23,7 @@ class AGCAM:
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
-                module.register_forward_hook(self.get_attn_matrix)
+                    module.register_forward_hook(self.get_attn_matrix)
             if attention_grad_layer in name:
                 module.register_full_backward_hook(self.get_grad_attn)
                 
