@@ -1,6 +1,9 @@
 import torch
 from einops.layers.torch import Reduce, Rearrange
-
+import torchvision.transforms as transforms
+import numpy as np
+import timm 
+import torch.nn.functional as F
 
 class BetterAGC:
     def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum'):
