@@ -404,8 +404,8 @@ class BetterAGC_ver2:
 
         self.gradient = gradient
         self.attn = attn
-        print('[DEBUG] gradient shape: ', self.gradient.shape)
-        print('[DEBUG] attn shape: ', self.attn.shape)
+        # print('[DEBUG] gradient shape: ', self.gradient.shape)
+        # print('[DEBUG] attn shape: ', self.attn.shape)
 
         # aggregation of CAM of all heads and all layers and reshape the final CAM.
         mask = mask[:, :, :, 1:].unsqueeze(0) # * niên: chỗ này thêm 1 ở đầu (ví dụ: (2) -> (1, 2)) và 1: là bỏ token class
@@ -483,8 +483,8 @@ class BetterAGC_ver2:
         # Define the class to explain. If not explicit, use the class predicted by the model
         if class_idx is None:
             class_idx = predicted_class
-            print("class idx", class_idx)
-        print('[DEBUG] head_cams shape: ', head_cams.shape)
+            # print("class idx", class_idx)
+        # print('[DEBUG] head_cams shape: ', head_cams.shape)
         # Generate the saliency map for image x and class_idx
         scores = self.generate_scores(
             image=x,
@@ -492,7 +492,7 @@ class BetterAGC_ver2:
             prediction=predicted_class, output_truth=output_truth
         )
 
-        print('[DEBUG] score shape: ', scores.shape)
+        # print('[DEBUG] score shape: ', scores.shape)
 
         # print("After generate scores: ")
         # print(torch.cuda.memory_allocated()/1024**2)
