@@ -69,6 +69,6 @@ class VITAttentionRollout:
         with torch.no_grad():
             output = self.model(input)
         _, prediction = torch.max(output, 1)
-        print('[DEBUG] Attention shape', len(self.attentions))
+        # print('[DEBUG] Attention shape', len(self.attentions))
 
         return prediction, rollout(self.attentions, self.discard_ratio, self.head_fusion, device=self.device)
