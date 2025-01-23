@@ -22,13 +22,14 @@ from Methods.LRP.ViT_LRP import vit_base_patch16_224 as LRP_vit_base_patch16_224
 from Methods.AGCAM.AGCAM import AGCAM
 from Methods.LRP.ViT_explanation_generator import LRP
 from Methods.AttentionRollout.AttentionRollout import VITAttentionRollout
+from Methods.Better_AGCAM.Better_AGCAM import BetterAGC_plus1
 
 # dataset
 from torch.utils.data import Subset
 import pandas as pd
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout'])
+parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'better_agc_plus_5'])
 parser.add_argument('--data_root', type=str, required=True)
 parser.add_argument('--threshold', type=str, default='0.5')
 args = parser.parse_args()
@@ -88,6 +89,11 @@ elif args.method=="rollout":
     model.load_state_dict(state_dict, strict=True)
     model.eval()
     method = VITAttentionRollout(model, device=device)
+elif args.method=="better_agc_plus_5":
+    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to(device)
+    model.load_state_dict(state_dict, strict=True)
+    model.eval()
+    method = BetterAGC_plus1(model)
 
 name = "The localization score of " + args.method 
 
