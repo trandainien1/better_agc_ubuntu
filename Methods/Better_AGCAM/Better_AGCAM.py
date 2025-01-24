@@ -438,7 +438,7 @@ class BetterAGC_plus1:
     
             agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
             agc_scores = torch.sigmoid(agc_scores)
-            agc_scores += 5
+            agc_scores += 1
 
             agc_scores = agc_scores.reshape(head_cams[0].shape[0], head_cams[0].shape[1])
 

@@ -116,6 +116,7 @@ with torch.enable_grad():
     precision = 0.0
     recall = 0.0
     iou = 0.0
+    
     for data in tqdm(subset_loader):
         image = data['image'].to(device)
         label = data['label'].to(device)
