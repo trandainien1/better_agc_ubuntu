@@ -819,8 +819,7 @@ class BetterAGC_cluster:
         distance = 1 - similarity
 
         # Apply the  AgglomerativeClustering with a given distance_threshold
-        distance_threshold = 0.7
-        cluster = AgglomerativeClustering(n_clusters = None, distance_threshold=distance_threshold,metric='precomputed', linkage='complete') 
+        cluster = AgglomerativeClustering(n_clusters = None, distance_threshold=self.threshold,metric='precomputed', linkage='complete') 
         cluster.fit(distance.cpu())
         cluster_num=len(set(cluster.labels_))
         # print('number of masks after the clustering:'+str(cluster_num))
@@ -828,10 +827,17 @@ class BetterAGC_cluster:
         # Use the sum of a clustering as a representation of the cluster
         cluster_labels=cluster.labels_
         cluster_labels_set=set(cluster_labels)
+        print('[DEBUG] cluster labels: ', cluster_labels_set)
         mask_clustering=torch.zeros((len(cluster_labels_set), 14*14)).cuda()
+        num_mask_clustering =torch.zeros((len(cluster_labels_set), 14*14)).cuda()
         for i in range(len(head_cams)):
             mask_clustering[cluster_labels[i]]+=head_cams[i]
-        
+            num_mask_clustering[cluster_labels[i]] += 1
+
+        # for i in range(len(head_cams)):
+        #     mask_clustering
+
+
         # normalize the masks
         mask_clustering_norm=norm_matrix(mask_clustering).reshape((len(cluster_labels_set), 14, 14))
 
