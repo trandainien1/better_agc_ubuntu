@@ -791,7 +791,7 @@ class BetterAGC_cluster:
             return agc_scores
 
     def generate_saliency(self, head_cams, agc_scores):
-        mask = (agc_scores.view(head_cams.shape[0], head_cams.shape[1], 1, 1, 1) * head_cams).sum(axis=(0, 1))
+        mask = (agc_scores.view(head_cams.shape[0], head_cams.shape[1], 1, 1) * head_cams).sum(axis=(0, 1))
 
         mask = mask.squeeze()
         return mask
