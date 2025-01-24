@@ -758,7 +758,7 @@ class BetterAGC_cluster:
         with torch.no_grad():
             # tensor_heatmaps = head_cams[0]
             # tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
-            tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
+            tensor_heatmaps = transforms.Resize((224, 224))(head_cams)
     
             # Compute min and max along each image
             min_vals = tensor_heatmaps.amin(dim=(2, 3), keepdim=True)  # Min across width and height
