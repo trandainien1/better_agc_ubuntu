@@ -756,8 +756,8 @@ class BetterAGC_cluster:
 
     def generate_scores(self, head_cams, prediction, output_truth, image):
         with torch.no_grad():
-            tensor_heatmaps = head_cams[0]
-            tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
+            # tensor_heatmaps = head_cams[0]
+            # tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
             tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
     
             # Compute min and max along each image
@@ -835,7 +835,7 @@ class BetterAGC_cluster:
         mask_clustering_norm=norm_matrix(mask_clustering).reshape((len(cluster_labels_set), 14, 14))
 
         mask_clustering_norm = mask_clustering_norm.unsqueeze(1)
-        print('[FINSIH CLUSTERING], new masks shape: ', mask_clustering_norm.shape)
+        print('[FINISH CLUSTERING], new masks shape: ', mask_clustering_norm.shape)
         return mask_clustering_norm
 
     def __call__(self, x, class_idx=None):
@@ -859,6 +859,7 @@ class BetterAGC_cluster:
             class_idx = predicted_class
             # print("class idx", class_idx)
 
+        
         head_cams = self.clustering(head_cams)
 
         # Generate the saliency map for image x and class_idx
