@@ -164,7 +164,7 @@ class BetterAGC:
         # print(torch.cuda.memory_allocated()/1024**2)
         # print()
 
-        return predicted_class, saliency_map
+        return predicted_class, saliency_map, head_cams
 
 
 class BetterAGC_softmax:
