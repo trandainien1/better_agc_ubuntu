@@ -853,15 +853,15 @@ class BetterAGC_cluster:
             num_mask_clustering[cluster_labels[i]] += 1
 
 
-        print('[DEBUG]', num_mask_clustering)   
-        print('[BEFORE]', mask_clustering)   
+        # print('[DEBUG]', num_mask_clustering)   
+        # print('[BEFORE]', mask_clustering)   
 
-        old = mask_clustering
+        # old = mask_clustering
 
         # for i in cluster_labels_set:
         #     mask_clustering[i] /= num_mask_clustering[i]
 
-        print('[AFTER]', mask_clustering)
+        # print('[AFTER]', mask_clustering)
 
         # normalize the masks
         mask_clustering_norm=norm_matrix(mask_clustering).reshape((len(cluster_labels_set), 14, 14))
@@ -894,9 +894,10 @@ class BetterAGC_cluster:
             # print("class idx", class_idx)
 
         
-        head_cams = self.clustering(head_cams)
-        print('[[DEBUG]', len(head_cams))
-        # head_cams = self.k_means(head_cams)
+        # head_cams = self.clustering(head_cams)
+        # print('[[DEBUG]', len(head_cams))
+
+        head_cams = self.k_means(head_cams)
 
         # Generate the saliency map for image x and class_idx
         scores = self.generate_scores(
