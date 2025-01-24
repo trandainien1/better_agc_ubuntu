@@ -780,7 +780,7 @@ class BetterAGC_cluster:
             agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
             agc_scores = torch.sigmoid(agc_scores)
     
-            agc_scores = agc_scores.reshape(head_cams[0].shape[0], head_cams[0].shape[1])
+            agc_scores = agc_scores.reshape(head_cams.shape[0], head_cams.shape[1])
 
             del output_mask  # Delete unnecessary variables that are no longer needed
             torch.cuda.empty_cache()  # Clean up cache if necessary
@@ -790,7 +790,7 @@ class BetterAGC_cluster:
             return agc_scores
 
     def generate_saliency(self, head_cams, agc_scores):
-        mask = (agc_scores.view(12, 12, 1, 1, 1) * head_cams[0]).sum(axis=(0, 1))
+        mask = (agc_scores.view(12, 12, 1, 1, 1) * head_cams).sum(axis=(0, 1))
 
         mask = mask.squeeze()
         return mask
