@@ -829,7 +829,7 @@ class BetterAGC_cluster:
         cluster_labels_set=set(cluster_labels)
         # print('[DEBUG] cluster labels: ', cluster_labels_set)
         mask_clustering=torch.zeros((len(cluster_labels_set), 14*14)).cuda()
-        num_mask_clustering =torch.zeros((len(cluster_labels_set), 1).cuda()
+        num_mask_clustering =torch.zeros((len(cluster_labels_set), 1)).cuda()
         for i in range(len(head_cams)):
             mask_clustering[cluster_labels[i]]+=head_cams[i]
             num_mask_clustering[cluster_labels[i]] += 1
