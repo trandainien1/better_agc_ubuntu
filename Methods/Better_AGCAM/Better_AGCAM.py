@@ -834,9 +834,9 @@ class BetterAGC_cluster:
             mask_clustering[cluster_labels[i]]+=head_cams[i]
             num_mask_clustering[cluster_labels[i]] += 1
 
-        # for i in range(len(head_cams)):
-        #     mask_clustering
-
+        for i in cluster_labels_set:
+            mask_clustering[i] /= num_mask_clustering[i]
+        
 
         # normalize the masks
         mask_clustering_norm=norm_matrix(mask_clustering).reshape((len(cluster_labels_set), 14, 14))
