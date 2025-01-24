@@ -673,7 +673,7 @@ class BetterAGC_ver2:
         return predicted_class, saliency_map
     
 class BetterAGC_cluster:
-    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum'):
+    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', thresold=0.7):
         """
         Args:
             model (nn.Module): the Vision Transformer model to be explained
@@ -689,6 +689,7 @@ class BetterAGC_cluster:
         self.layer_fusion = layer_fusion
         self.attn_matrix = []
         self.grad_attn = []
+        self.thresold = thresold
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
@@ -790,7 +791,7 @@ class BetterAGC_cluster:
             return agc_scores
 
     def generate_saliency(self, head_cams, agc_scores):
-        mask = (agc_scores.view(12, 12, 1, 1, 1) * head_cams).sum(axis=(0, 1))
+        mask = (agc_scores.view(head_cams.shape[0], head_cams.shape[1], 1, 1, 1) * head_cams).sum(axis=(0, 1))
 
         mask = mask.squeeze()
         return mask
