@@ -829,18 +829,19 @@ class BetterAGC_cluster:
         cluster_labels_set=set(cluster_labels)
         # print('[DEBUG] cluster labels: ', cluster_labels_set)
         mask_clustering=torch.zeros((len(cluster_labels_set), 14*14)).cuda()
-        num_mask_clustering =torch.zeros((len(cluster_labels_set), 14*14)).cuda()
+        num_mask_clustering =torch.zeros((len(cluster_labels_set), 1).cuda()
         for i in range(len(head_cams)):
             mask_clustering[cluster_labels[i]]+=head_cams[i]
             num_mask_clustering[cluster_labels[i]] += 1
 
 
-        print('[DEBUG]', num_mask_clustering)
+        print('[DEBUG]', num_mask_clustering)   
+        print('[BEFORE]', mask_clustering)   
 
-        # for i in cluster_labels_set:
-        #     mask_clustering[i] /= num_mask_clustering[i]
+        for i in cluster_labels_set:
+            mask_clustering[i] /= num_mask_clustering[i]
 
-        # print('[AFTER]', mask_clustering)
+        print('[AFTER]', mask_clustering)
 
         # normalize the masks
         mask_clustering_norm=norm_matrix(mask_clustering).reshape((len(cluster_labels_set), 14, 14))
