@@ -803,7 +803,8 @@ class BetterAGC_cluster:
 
         # remove CLS token and transpose, shape (n_activations, n_tokens)
         # encoder_activations = encoder_activations[1:].T
-        encoder_activations = encoder_activations.T
+        print('[DEBUG] ', encoder_activations.shape)
+        # encoder_activations = encoder_activations.T
 
         # Create clusters with kmeans
         kmeans = KMeans(n_clusters=30, mode='euclidean', verbose=False)
