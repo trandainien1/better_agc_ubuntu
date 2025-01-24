@@ -813,7 +813,7 @@ class BetterAGC_cluster:
         
         # Compute the pairwise cosine similarity and distance of the ViT masks
          # Step 1: Reshape to (144, 196)
-        head_cams = head_cams.reshape(144, -1).detach()
+        head_cams = norm_matrix(head_cams.reshape(144, -1)).detach()
         
         similarity = get_cos_similar_matrix(head_cams, head_cams)
         distance = 1 - similarity
@@ -840,15 +840,15 @@ class BetterAGC_cluster:
 
         old = mask_clustering
 
-        for i in cluster_labels_set:
-            mask_clustering[i] /= num_mask_clustering[i]
+        # for i in cluster_labels_set:
+        #     mask_clustering[i] /= num_mask_clustering[i]
 
         print('[AFTER]', mask_clustering)
 
         # normalize the masks
         mask_clustering_norm=norm_matrix(mask_clustering).reshape((len(cluster_labels_set), 14, 14))
         old =norm_matrix(old).reshape((len(cluster_labels_set), 14, 14))
-        print('[SAME] ', mask_clustering_norm == old)
+        # print('[SAME] ', mask_clustering_norm == old)
 
         mask_clustering_norm = mask_clustering_norm.unsqueeze(1)
         # print('[FINISH CLUSTERING], new masks shape: ', mask_clustering_norm.shape)
