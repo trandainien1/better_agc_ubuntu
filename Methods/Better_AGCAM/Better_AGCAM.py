@@ -5,6 +5,7 @@ import numpy as np
 import timm 
 import torch.nn.functional as F
 from sklearn.cluster import AgglomerativeClustering
+from fast_pytorch_kmeans import KMeans
 
 
 class BetterAGC:
@@ -796,6 +797,23 @@ class BetterAGC_cluster:
         mask = mask.squeeze()
         return mask
 
+    def k_means(self, encoder_activations):
+        # Squeeze to shape (n_tokens+1, n_activations)
+        # encoder_activations = encoder_activations.squeeze(0)
+
+        # remove CLS token and transpose, shape (n_activations, n_tokens)
+        # encoder_activations = encoder_activations[1:].T
+        encoder_activations = encoder_activations.T
+
+        # Create clusters with kmeans
+        kmeans = KMeans(n_clusters=self.n_masks, mode='euclidean', verbose=self.verbose)
+        kmeans.fit(encoder_activations)
+
+        # Use kmeans centroids as basis for masks
+        raw_masks = kmeans.centroids
+
+        return raw_masks
+
     def clustering(self, head_cams):
         def get_cos_similar_matrix(v1, v2):
             num = torch.mm(v1,torch.transpose(v2, 0, 1)) 
@@ -876,7 +894,8 @@ class BetterAGC_cluster:
             # print("class idx", class_idx)
 
         
-        head_cams = self.clustering(head_cams)
+        # head_cams = self.clustering(head_cams)
+        head_cams = self.k_means(head_cams)
 
         # Generate the saliency map for image x and class_idx
         scores = self.generate_scores(
