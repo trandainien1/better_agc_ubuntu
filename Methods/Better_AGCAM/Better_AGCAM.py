@@ -823,7 +823,7 @@ class BetterAGC_cluster:
         cluster = AgglomerativeClustering(n_clusters = None, distance_threshold=distance_threshold,metric='precomputed', linkage='complete') 
         cluster.fit(distance.cpu())
         cluster_num=len(set(cluster.labels_))
-        print('number of masks after the clustering:'+str(cluster_num))
+        # print('number of masks after the clustering:'+str(cluster_num))
 
         # Use the sum of a clustering as a representation of the cluster
         cluster_labels=cluster.labels_
@@ -836,7 +836,7 @@ class BetterAGC_cluster:
         mask_clustering_norm=norm_matrix(mask_clustering).reshape((len(cluster_labels_set), 14, 14))
 
         mask_clustering_norm = mask_clustering_norm.unsqueeze(1)
-        print('[FINISH CLUSTERING], new masks shape: ', mask_clustering_norm.shape)
+        # print('[FINISH CLUSTERING], new masks shape: ', mask_clustering_norm.shape)
         return mask_clustering_norm
 
     def __call__(self, x, class_idx=None):
