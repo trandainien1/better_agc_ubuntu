@@ -806,7 +806,7 @@ class BetterAGC_cluster:
         encoder_activations = encoder_activations.T
 
         # Create clusters with kmeans
-        kmeans = KMeans(n_clusters=30, mode='euclid30n', verbose=self.verbose)
+        kmeans = KMeans(n_clusters=30, mode='euclidean', verbose=False)
         kmeans.fit(encoder_activations)
 
         # Use kmeans centroids as basis for masks
