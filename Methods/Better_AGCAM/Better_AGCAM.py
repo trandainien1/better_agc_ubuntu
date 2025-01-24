@@ -838,6 +838,8 @@ class BetterAGC_cluster:
         print('[DEBUG]', num_mask_clustering)   
         print('[BEFORE]', mask_clustering)   
 
+        old = mask_clustering
+
         for i in cluster_labels_set:
             mask_clustering[i] /= num_mask_clustering[i]
 
@@ -845,6 +847,8 @@ class BetterAGC_cluster:
 
         # normalize the masks
         mask_clustering_norm=norm_matrix(mask_clustering).reshape((len(cluster_labels_set), 14, 14))
+        old =norm_matrix(old).reshape((len(cluster_labels_set), 14, 14))
+        print('[SAME] ', mask_clustering_norm == old)
 
         mask_clustering_norm = mask_clustering_norm.unsqueeze(1)
         # print('[FINISH CLUSTERING], new masks shape: ', mask_clustering_norm.shape)
