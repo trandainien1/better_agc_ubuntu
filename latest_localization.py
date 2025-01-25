@@ -23,6 +23,8 @@ import Methods.AGCAM.ViT_for_AGCAM as ViT_Ours
 import timm
 
 # dataset
+from Datasets.ILSVRC import ImageNetDataset_val
+
 from torch.utils.data import Subset
 import pandas as pd
 
