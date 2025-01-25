@@ -780,6 +780,7 @@ class BetterAGC_cluster:
     
             agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
             agc_scores = torch.sigmoid(agc_scores)
+            agc_scores += 1
             # print('[DEBUG4]', agc_scores.shape)
     
             # agc_scores = agc_scores.reshape(head_cams.shape[0], head_cams.shape[1])
