@@ -786,8 +786,9 @@ class BetterAGC_cluster:
     
             agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
             agc_scores = torch.sigmoid(agc_scores)
+            print('[DEBUG4]', agc_scores.shape)
     
-            agc_scores = agc_scores.reshape(head_cams.shape[0], head_cams.shape[1])
+            # agc_scores = agc_scores.reshape(head_cams.shape[0], head_cams.shape[1])
 
             del output_mask  # Delete unnecessary variables that are no longer needed
             torch.cuda.empty_cache()  # Clean up cache if necessary
