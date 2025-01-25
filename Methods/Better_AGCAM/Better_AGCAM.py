@@ -760,10 +760,6 @@ class BetterAGC_cluster:
     def generate_scores(self, head_cams, prediction, output_truth, image):
         with torch.no_grad():
             tensor_heatmaps = head_cams
-            tensor_heatmaps = tensor_heatmaps.reshape(self.num_heatmaps, 14, 14)
-            print('[DEBUG1]', tensor_heatmaps.shape)
-            tensor_heatmaps = tensor_heatmaps.unsqueeze(1)
-            print('[DEBUG2]', tensor_heatmaps.shape)
             tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
             print('[DEBUG3]', tensor_heatmaps.shape)
     
@@ -801,9 +797,10 @@ class BetterAGC_cluster:
         print('------------------- [DEBUG GENERATE SALIENCY] --------------')
         print('Head cams shape: ', head_cams.shape)
         print('scores shape', agc_scores.shape)
-        mask = (agc_scores.view(head_cams.shape[0], head_cams.shape[1], 1, 1) * head_cams).sum(axis=(0, 1))
 
-        mask = mask.squeeze()
+        mask = (agc_scores.view(self.num_heatmaps, 1, 1, 1) * head_cams).sum(axis=(0, 1))
+        print('mask shape: ', mask.shape)
+        # mask = mask.squeeze()
         return mask
 
     def k_means(self, encoder_activations):
@@ -825,6 +822,9 @@ class BetterAGC_cluster:
 
         # Use kmeans centroids as basis for masks
         raw_masks = kmeans.centroids
+
+        raw_masks = raw_masks.reshape(self.num_heatmaps, 14, 14)
+        raw_masks = raw_masks.unsqueeze(1)
 
         return raw_masks
 
