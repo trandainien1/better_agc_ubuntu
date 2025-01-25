@@ -764,7 +764,8 @@ class BetterAGC_cluster:
             print('[DEBUG1]', tensor_heatmaps.shape)
             tensor_heatmaps = tensor_heatmaps.unsqueeze(1)
             print('[DEBUG2]', tensor_heatmaps.shape)
-            tensor_heatmaps = transforms.Resize((224, 224))(head_cams)
+            tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
+            print('[DEBUG3]', tensor_heatmaps.shape)
     
             # Compute min and max along each image
             min_vals = tensor_heatmaps.amin(dim=(2, 3), keepdim=True)  # Min across width and height
