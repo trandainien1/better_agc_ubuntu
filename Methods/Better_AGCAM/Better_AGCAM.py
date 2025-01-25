@@ -798,6 +798,9 @@ class BetterAGC_cluster:
             return agc_scores
 
     def generate_saliency(self, head_cams, agc_scores):
+        print('------------------- [DEBUG GENERATE SALIENCY] --------------')
+        print('Head cams shape: ', head_cams.shape)
+        print('scores shape', agc_scores.shape)
         mask = (agc_scores.view(head_cams.shape[0], head_cams.shape[1], 1, 1) * head_cams).sum(axis=(0, 1))
 
         mask = mask.squeeze()
