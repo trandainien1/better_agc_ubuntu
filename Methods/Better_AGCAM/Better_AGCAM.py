@@ -127,8 +127,9 @@ class BetterAGC:
 
     def generate_saliency(self, head_cams, agc_scores):
         mask = (agc_scores.view(12, 12, 1, 1, 1) * head_cams[0]).sum(axis=(0, 1))
-
         mask = mask.squeeze()
+        print('[DEBUG]')
+        print('mask shape:', mask.shape)
         return mask
 
     def __call__(self, x, class_idx=None):
