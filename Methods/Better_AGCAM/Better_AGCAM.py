@@ -674,7 +674,7 @@ class BetterAGC_ver2:
         return predicted_class, saliency_map
     
 class BetterAGC_cluster:
-    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', thresold=0.7):
+    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', thresold=0.7, num_heatmaps=30):
         """
         Args:
             model (nn.Module): the Vision Transformer model to be explained
@@ -691,6 +691,7 @@ class BetterAGC_cluster:
         self.attn_matrix = []
         self.grad_attn = []
         self.thresold = thresold
+        self.num_heatmaps = num_heatmaps
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
@@ -758,8 +759,8 @@ class BetterAGC_cluster:
 
     def generate_scores(self, head_cams, prediction, output_truth, image):
         with torch.no_grad():
-            # tensor_heatmaps = head_cams[0]
-            # tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
+            tensor_heatmaps = head_cams
+            tensor_heatmaps = tensor_heatmaps.reshape(self.num_heatmaps, 1, 14, 14)
             tensor_heatmaps = transforms.Resize((224, 224))(head_cams)
     
             # Compute min and max along each image
@@ -810,7 +811,7 @@ class BetterAGC_cluster:
         # encoder_activations = encoder_activations.T
 
         # Create clusters with kmeans
-        kmeans = KMeans(n_clusters=30, mode='euclidean', verbose=False)
+        kmeans = KMeans(n_clusters=self.num_heatmaps, mode='euclidean', verbose=False)
         kmeans.fit(encoder_activations)
 
         # Use kmeans centroids as basis for masks
@@ -900,6 +901,11 @@ class BetterAGC_cluster:
         
         # head_cams = self.clustering(head_cams)
         # print('[[DEBUG]', len(head_cams))
+
+        print('---------- [BEFORE CLUSTERING] ---------------')
+        print('Number of heatmaps: ', len(head_cams))
+        print('Shape of heatmaps: ', head_cams.shape)
+        print()
 
         head_cams = self.k_means(head_cams)
         print('---------- [AFTER CLUSTERING] ---------------')
