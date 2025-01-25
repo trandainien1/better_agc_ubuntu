@@ -760,7 +760,10 @@ class BetterAGC_cluster:
     def generate_scores(self, head_cams, prediction, output_truth, image):
         with torch.no_grad():
             tensor_heatmaps = head_cams
-            tensor_heatmaps = tensor_heatmaps.reshape(self.num_heatmaps, 1, 14, 14)
+            tensor_heatmaps = tensor_heatmaps.reshape(self.num_heatmaps, 14, 14)
+            print('[DEBUG1]', tensor_heatmaps.shape)
+            tensor_heatmaps = tensor_heatmaps.unsqueeze(1)
+            print('[DEBUG2]', tensor_heatmaps.shape)
             tensor_heatmaps = transforms.Resize((224, 224))(head_cams)
     
             # Compute min and max along each image
