@@ -902,6 +902,10 @@ class BetterAGC_cluster:
         # print('[[DEBUG]', len(head_cams))
 
         head_cams = self.k_means(head_cams)
+        print('---------- [AFTER CLUSTERING] ---------------')
+        print('Number of heatmaps: ', len(head_cams))
+        print('Shape of heatmaps: ', head_cams.shape)
+        print()
 
         # Generate the saliency map for image x and class_idx
         scores = self.generate_scores(
