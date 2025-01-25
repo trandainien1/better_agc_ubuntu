@@ -143,7 +143,7 @@ elif METHOD == 'better_agc_cluster':
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.eval()
-    method = BetterAGC_cluster(model, thresold=0.9)
+    method = BetterAGC_cluster(model, thresold=0.9, num_heatmaps=10)
 elif METHOD == 'lrp':
     model = LRP_vit_base_patch16_224('cuda', num_classes=1000).to('cuda')
     model.load_state_dict(state_dict, strict=True)
