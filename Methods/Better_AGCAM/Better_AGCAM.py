@@ -759,7 +759,7 @@ class BetterAGC_cluster:
         with torch.no_grad():
             tensor_heatmaps = head_cams
             tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
-            print('[DEBUG3]', tensor_heatmaps.shape)
+            # print('[DEBUG3]', tensor_heatmaps.shape)
     
             # Compute min and max along each image
             min_vals = tensor_heatmaps.amin(dim=(2, 3), keepdim=True)  # Min across width and height
@@ -780,7 +780,7 @@ class BetterAGC_cluster:
     
             agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
             agc_scores = torch.sigmoid(agc_scores)
-            print('[DEBUG4]', agc_scores.shape)
+            # print('[DEBUG4]', agc_scores.shape)
     
             # agc_scores = agc_scores.reshape(head_cams.shape[0], head_cams.shape[1])
 
