@@ -36,6 +36,32 @@ from Methods.AttentionRollout.AttentionRollout import VITAttentionRollout
 import csv
 from csv import DictWriter
 
+class csv_utils:
+    def __init__(self, fileName):
+        self.fileName = fileName
+        self.fieldNames = ["label", "pixel_acc", "iou", "dice", "precision", "recall"]
+
+    def writeFieldName(self):
+        with open(self.fileName, "w", newline="") as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames)
+            writer.writeheader()
+            csvfile.close()
+
+    def appendResult(self, img_name, pixel_acc, iou, dice, precision, recall):
+        with open(self.fileName, "a") as csvfile:
+            writer = DictWriter(csvfile, fieldnames=self.fieldNames)
+            writer.writerow(
+                {
+                    "label": img_name,
+                    "pixel_acc": pixel_acc.item(),
+                    "iou": iou.item(),
+                    "dice": dice.item(),
+                    "precision": precision.item(),
+                    "recall": recall.item(),
+                }
+            )
+            csvfile.close()
+
 MODEL = 'vit_base_patch16_224'
 DEVICE = 'cuda'
 device = 'cuda' 
