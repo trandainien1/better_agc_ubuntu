@@ -36,6 +36,11 @@ from Methods.AttentionRollout.AttentionRollout import VITAttentionRollout
 import csv
 from csv import DictWriter
 
+import argparse
+
+parser = argparse.ArgumentParser(description='Generate xai maps')
+parser.add_argument('--method',   type=str, default='agc',                       help='method name')
+
 class csv_utils:
     def __init__(self, fileName):
         self.fileName = fileName
