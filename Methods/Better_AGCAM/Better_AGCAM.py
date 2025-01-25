@@ -127,9 +127,6 @@ class BetterAGC:
 
     def generate_saliency(self, head_cams, agc_scores):
         mask = (agc_scores.view(12, 12, 1, 1, 1) * head_cams[0]).sum(axis=(0, 1))
-        mask = mask.squeeze()
-        print('[DEBUG]')
-        print('mask shape:', mask.shape)
         return mask
 
     def __call__(self, x, class_idx=None):
@@ -795,12 +792,12 @@ class BetterAGC_cluster:
             return agc_scores
 
     def generate_saliency(self, head_cams, agc_scores):
-        print('------------------- [DEBUG GENERATE SALIENCY] --------------')
-        print('Head cams shape: ', head_cams.shape)
-        print('scores shape', agc_scores.shape)
+        # print('------------------- [DEBUG GENERATE SALIENCY] --------------')
+        # print('Head cams shape: ', head_cams.shape)
+        # print('scores shape', agc_scores.shape)
 
         mask = (agc_scores.view(self.num_heatmaps, 1, 1, 1) * head_cams).sum(axis=(0, 1))
-        print('mask shape: ', mask.shape)
+        # print('mask shape: ', mask.shape)
         # mask = mask.squeeze()
         return mask
 
@@ -814,7 +811,7 @@ class BetterAGC_cluster:
 
         encoder_activations = encoder_activations.view(-1, 14 * 14) # -------
 
-        print('[DEBUG] ', encoder_activations.shape)
+        # print('[DEBUG] ', encoder_activations.shape)
         # encoder_activations = encoder_activations.T
 
         # Create clusters with kmeans
@@ -912,16 +909,16 @@ class BetterAGC_cluster:
         # head_cams = self.clustering(head_cams)
         # print('[[DEBUG]', len(head_cams))
 
-        print('---------- [BEFORE CLUSTERING] ---------------')
-        print('Number of heatmaps: ', len(head_cams))
-        print('Shape of heatmaps: ', head_cams.shape)
-        print()
+        # print('---------- [BEFORE CLUSTERING] ---------------')
+        # print('Number of heatmaps: ', len(head_cams))
+        # print('Shape of heatmaps: ', head_cams.shape)
+        # print()
 
         head_cams = self.k_means(head_cams)
-        print('---------- [AFTER CLUSTERING] ---------------')
-        print('Number of heatmaps: ', len(head_cams))
-        print('Shape of heatmaps: ', head_cams.shape)
-        print()
+        # print('---------- [AFTER CLUSTERING] ---------------')
+        # print('Number of heatmaps: ', len(head_cams))
+        # print('Shape of heatmaps: ', head_cams.shape)
+        # print()
 
         # Generate the saliency map for image x and class_idx
         scores = self.generate_scores(
