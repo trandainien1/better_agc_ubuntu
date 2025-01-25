@@ -1,6 +1,5 @@
 # ----------------- ATTENTION PLEASE FILL XAI METHOD YOU WANT TO USE ----------
 # AVAILABLE METHODS: lrp, agc, better_agc, better_agc_plus1, attention rollout
-METHOD = 'agc'
 
 import torch
 import torchvision.transforms as transforms
@@ -40,6 +39,9 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Generate xai maps')
 parser.add_argument('--method',   type=str, default='agc',                       help='method name')
+args = parser.parse_args()
+
+METHOD = args.method
 
 class csv_utils:
     def __init__(self, fileName):
