@@ -2,7 +2,7 @@
 # AVAILABLE METHODS: lrp, agc, better_agc, better_agc_plus1, attention rollout
 METHOD = 'better_agc_cluster'
 
-## import torch
+import torch
 import torchvision.transforms as transforms
 import os
 import numpy as np
