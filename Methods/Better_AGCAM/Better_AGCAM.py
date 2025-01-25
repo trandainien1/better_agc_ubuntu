@@ -811,7 +811,7 @@ class BetterAGC_cluster:
         # encoder_activations = encoder_activations[1:].T
         # Reshape to (144, 196)
 
-        encoder_activations = encoder_activations.view(-1, 14, 14) # -------
+        encoder_activations = encoder_activations.view(-1, 14 * 14) # -------
 
         print('[DEBUG] ', encoder_activations.shape)
         # encoder_activations = encoder_activations.T
