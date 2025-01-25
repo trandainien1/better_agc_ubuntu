@@ -1,6 +1,6 @@
 # ----------------- ATTENTION PLEASE FILL XAI METHOD YOU WANT TO USE ----------
 # AVAILABLE METHODS: lrp, agc, better_agc, better_agc_plus1, attention rollout
-METHOD = 'better_agc_cluster'
+METHOD = 'agc'
 
 import torch
 import torchvision.transforms as transforms
