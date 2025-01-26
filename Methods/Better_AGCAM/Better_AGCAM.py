@@ -1049,6 +1049,7 @@ class BetterAGC_cluster_add_noise:
             noise_to_add = random_whole * masks_inverse
 
             m = torch.mul(tensor_heatmaps, image) + noise_to_add
+            print('[DEBUG]', m.shape)
             # print("After multiply img with mask scores: ")
             # print(torch.cuda.memory_allocated()/1024**2)
 
