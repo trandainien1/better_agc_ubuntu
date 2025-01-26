@@ -25,6 +25,7 @@ class ImageNetDataset_val(ImageFolder):
 
     def __getitem__(self, idx):
         img_path, label = self.img_data[idx], self.img_labels[idx]
+        print('[DEBUG]', img_path)
         img = PIL.Image.open(img_path).convert('RGB')
         # img.show()
         width, height = img.size
