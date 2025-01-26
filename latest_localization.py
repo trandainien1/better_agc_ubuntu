@@ -188,7 +188,7 @@ with torch.enable_grad():
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
 
         if 'better_agc' in METHOD:
-            prediction, saliency_map = method(image)
+            prediction, saliency_map, saliency_maps = method(image)
         else:
             prediction, saliency_map = method.generate(image)
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
@@ -237,6 +237,9 @@ with torch.enable_grad():
             data["filename"][0], pixel_acc_, iou_, dice_, precision_, recall_
         )
 
+        break
+
+
 print(METHOD)
 print("result==================================================================")
 print("number of images: ", num_img)
@@ -246,3 +249,9 @@ print("iou: {:.4f} ".format((iou/num_img).item()))
 print("dice: {:.4f} ".format((dice/num_img).item()))
 print("precision: {:.4f} ".format((precision/num_img).item()))
 print("recall: {:.4f} ".format((recall/num_img).item()))
+
+print('[AFTER CLUSTERING] heatmaps shape', saliency_maps.shape)
+npz_name = args.method
+np.savez(os.path.join('/', npz_name), saliency_maps.cpu().numpy())
+
+print('Saliency maps saved to npz.')
