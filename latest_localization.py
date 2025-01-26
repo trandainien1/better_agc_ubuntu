@@ -194,7 +194,7 @@ with torch.enable_grad():
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
 
         if 'better_agc' in METHOD:
-            prediction, saliency_map, saliency_maps = method(image)
+            prediction, saliency_map = method(image)
         else:
             prediction, saliency_map = method.generate(image)
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
@@ -243,7 +243,7 @@ with torch.enable_grad():
             data["filename"][0], pixel_acc_, iou_, dice_, precision_, recall_
         )
 
-        break
+        # break # --------------- for visualize heatmaps
 
 
 print(METHOD)
@@ -256,10 +256,12 @@ print("dice: {:.4f} ".format((dice/num_img).item()))
 print("precision: {:.4f} ".format((precision/num_img).item()))
 print("recall: {:.4f} ".format((recall/num_img).item()))
 
-print('[AFTER CLUSTERING] heatmaps shape', saliency_maps.shape)
-npz_name = args.method
-        
-# saliencies_maps = torch.stack(saliency_maps) #saliency_maps.shape = [num_images, 1, 224, 224]
-np.savez(os.path.join('npz', npz_name), saliency_maps.detach().cpu().numpy())
+# --------- For visualize heatmap --------------
 
-print('Saliency maps saved to npz.')
+# print('[AFTER CLUSTERING] heatmaps shape', saliency_maps.shape)
+# npz_name = args.method
+        
+# # saliencies_maps = torch.stack(saliency_maps) #saliency_maps.shape = [num_images, 1, 224, 224]
+# np.savez(os.path.join('npz', npz_name), saliency_maps.detach().cpu().numpy())
+
+# print('Saliency maps saved to npz.')
