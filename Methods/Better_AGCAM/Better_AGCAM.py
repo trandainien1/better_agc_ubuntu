@@ -1037,7 +1037,7 @@ class BetterAGC_cluster_add_noise:
             # print("before multiply img with mask: ")
             # print(torch.cuda.memory_allocated()/1024**2)
 
-            print('[DEBUG1]', tensor_heatmaps.shape)
+            # print('[DEBUG1]', tensor_heatmaps.shape)
             # -------------- add noise ------------
             N  = tensor_heatmaps.shape[0]
             H = tensor_heatmaps.shape[2]
@@ -1046,15 +1046,15 @@ class BetterAGC_cluster_add_noise:
             masks_inverse=torch.from_numpy(np.repeat((1-tensor_heatmaps.cpu().numpy())[:, :, np.newaxis,:], 3, axis=2)).cuda()
             masks_inverse = masks_inverse.squeeze(1)
 
-            print('[DEBUG INVERSE MASK]', masks_inverse.shape)
+            # print('[DEBUG INVERSE MASK]', masks_inverse.shape)
             # Generate the random Gaussian noise
             random_whole=torch.randn([N]+list((3,H,W))).cuda()* 0.1
-            print('[DEBUG RANDOM]', random_whole.shape)
+            # print('[DEBUG RANDOM]', random_whole.shape)
             noise_to_add = random_whole * masks_inverse
 
             mask = torch.mul(tensor_heatmaps, image)
-            print('[DEBUG2]', mask.shape)
-            print('[DEBUG3]', noise_to_add.shape)
+            # print('[DEBUG2]', mask.shape)
+            # print('[DEBUG3]', noise_to_add.shape)
             m = mask + noise_to_add
             # print("After multiply img with mask scores: ")
             # print(torch.cuda.memory_allocated()/1024**2)
