@@ -1037,6 +1037,7 @@ class BetterAGC_cluster_add_noise:
             # print("before multiply img with mask: ")
             # print(torch.cuda.memory_allocated()/1024**2)
 
+            print('[DEBUG1]', tensor_heatmaps.shape)
             # -------------- add noise ------------
             N  = tensor_heatmaps.shape[0]
             H = tensor_heatmaps.shape[2]
