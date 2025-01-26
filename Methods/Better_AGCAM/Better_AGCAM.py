@@ -1043,7 +1043,9 @@ class BetterAGC_cluster_add_noise:
             H = tensor_heatmaps.shape[2]
             W = tensor_heatmaps.shape[3]
             # Generate the inverse of masks, i.e., 1-M_i
-            masks_inverse=torch.from_numpy(np.repeat((1-tensor_heatmaps.cpu().numpy())[:, :, np.newaxis,:], 3, axis=2)).cuda()
+            # masks_inverse=torch.from_numpy(np.repeat((1-tensor_heatmaps.cpu().numpy())[:, :, np.newaxis,:], 3, axis=2)).cuda()
+            masks_inverse= 1 - tensor_heatmaps
+
             print('[DEBUG INVERSE MASK]', masks_inverse.shape)
             # Generate the random Gaussian noise
             random_whole=torch.randn([N]+list((3,H,W))).cuda()* 0.1
