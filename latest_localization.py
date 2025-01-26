@@ -253,7 +253,7 @@ print("recall: {:.4f} ".format((recall/num_img).item()))
 print('[AFTER CLUSTERING] heatmaps shape', saliency_maps.shape)
 npz_name = args.method
         
-saliencies_maps = torch.stack(saliency_maps) #saliency_maps.shape = [num_images, 1, 224, 224]
-np.savez(os.path.join('/', npz_name), saliency_maps.cpu().numpy())
+# saliencies_maps = torch.stack(saliency_maps) #saliency_maps.shape = [num_images, 1, 224, 224]
+np.savez(os.path.join('/', npz_name), saliency_maps.detach().cpu().numpy())
 
 print('Saliency maps saved to npz.')
