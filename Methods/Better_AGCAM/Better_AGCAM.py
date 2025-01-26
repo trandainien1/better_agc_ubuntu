@@ -1062,10 +1062,15 @@ class BetterAGC_cluster_add_noise:
             with torch.no_grad():
                 output_mask = self.model(m)
             
+
             # print("After get output from model: ")
             # print(torch.cuda.memory_allocated()/1024**2)
     
-            agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
+            # agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
+            p_mask_with_noise = output_mask[:, prediction.item()]
+            p_x_with_noise = self.model(image + noise_to_add)[0, prediction.item()]
+            class_p = output_truth[0, prediction.item()]
+            agc_scores = p_mask_with_noise - p_x_with_noise + class_p
             agc_scores = torch.sigmoid(agc_scores)
             agc_scores += 1
             # print('[DEBUG4]', agc_scores.shape)
