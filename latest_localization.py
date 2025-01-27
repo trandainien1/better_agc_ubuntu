@@ -144,7 +144,7 @@ elif METHOD == 'better_agc_cluster':
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.eval()
-    method = BetterAGC_cluster(model, num_heatmaps=args.num_heatmaps)
+    method = BetterAGC_cluster(model, num_heatmaps=int(args.num_heatmaps))
 elif METHOD == 'better_agc_cluster_add_noise':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
@@ -247,7 +247,11 @@ with torch.enable_grad():
         # break # --------------- for visualize heatmaps
 
 
-print(METHOD)
+if 'cluster' in METHOD:
+    print(f'{METHOD} - num of heatmaps: {args.num_heatmaps}')
+else:
+    print(METHOD)
+
 print("result==================================================================")
 print("number of images: ", num_img)
 print("Threshold: ", THRESHOLD)
