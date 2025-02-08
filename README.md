@@ -9,7 +9,11 @@ This github is used for localization evaluation of ScoreAGC
 
 Our ScoreAGC is implemented in Methods/Better_AGCAM/Better_AGCAM
 
-# Github references
+## Run this github?
+
+We set up a Kaggle to run it. please refer to this [link](https://www.kaggle.com/code/nientrandai/localization-evaluation)
+
+## Github references
 
 - Special thanks to the following githubs to support our evaluations and references. 
 
