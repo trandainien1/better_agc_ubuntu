@@ -9,6 +9,10 @@ This github is used for localization evaluation of ScoreAGC
 
 Our ScoreAGC is implemented in Methods/Better_AGCAM/Better_AGCAM
 
+## To run this github?
+
+Please refer to this [link](https://github.com/trandainien1/ScoreAGC.git)
+
 ## Github references
 
 - Special thanks to the following githubs to support our evaluations and references. 
