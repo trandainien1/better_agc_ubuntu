@@ -205,7 +205,7 @@ with torch.enable_grad():
 
     if args.load_prediction:
         predictions = torch.tensor(np.load(os.path.join('npz', 'predictions.npz'))['arr_0'])
-        print('[DEBUG] ',  len(predictions))
+        # print('[DEBUG] ',  len(predictions))
         print('Predictions loaded')
 
     for idx, data in enumerate(tqdm(subset_loader)):
@@ -214,8 +214,6 @@ with torch.enable_grad():
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
 
         prediction = predictions[idx].to('cuda')
-        print('DEBUG', label)
-        print('DEBUG', prediction)
         if prediction!=label:
                 continue
 
