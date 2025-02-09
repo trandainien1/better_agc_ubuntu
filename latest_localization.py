@@ -215,7 +215,7 @@ with torch.enable_grad():
             # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
             if prediction!=label:
                 continue
-        print('DEBUG', saliencies_map.shape)
+        print('DEBUG', saliency_map.shape)
         mask = saliency_map.reshape(1, 1, 14, 14)
             
         # Reshape the mask to have the same size with the original input image (224 x 224)
