@@ -206,7 +206,7 @@ with torch.enable_grad():
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
 
         if args.npz_checkpoint:
-            mask = saliencies_maps[idx]
+            mask = saliencies_maps[idx].unsqueeze(0)
         else:
             if 'better_agc' in METHOD or METHOD == 'scoreagc':
                 prediction, saliency_map = method(image)
