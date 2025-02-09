@@ -42,8 +42,8 @@ import argparse
 parser = argparse.ArgumentParser(description='Generate xai maps')
 parser.add_argument('--method',   type=str, default='agc',                       help='method name')
 parser.add_argument('--num_heatmaps',   type=str, default=30,                       help='number of heatmaps after clustering')
-parser.add_argument('--npz_checkpoint',   type=str, default='',                       help='folder path storing heatmaps')
-parser.add_argument('--load_prediction',   type=str, default='true',                       help='load predictions of ViT')
+# parser.add_argument('--npz_checkpoint',   type=str, default='',                       help='folder path storing heatmaps')
+# parser.add_argument('--load_prediction',   type=str, default='true',                       help='load predictions of ViT')
 args = parser.parse_args()
 
 METHOD = args.method
@@ -214,33 +214,26 @@ with torch.enable_grad():
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
 
         prediction = predictions[idx].to('cuda')
-        if prediction!=label:
-            continue
+        i
 
-        if args.npz_checkpoint:
-            saliency_map = saliencies_maps[idx] # [1, 224, 224]
-            mask = saliency_map
+        
+        if 'better_agc' in METHOD or METHOD == 'scoreagc':
+            prediction, saliency_map = method(image) 
         else:
-            if 'better_agc' in METHOD or METHOD == 'scoreagc':
-                prediction, saliency_map = method(image) 
-            else:
-                prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
+            prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
-            # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
-            print('DEBUG', saliency_map.shape)
-            mask = saliency_map.reshape(1, 1, 14, 14) 
-            
-            # Reshape the mask to have the same size with the original input image (224 x 224)
-            # upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
-            
-            upsample = Resize((224, 224), antialias=True) # quantus
-            mask = upsample(mask)
+            if prediction!=label:
+                continue
+        # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
+        mask = saliency_map.reshape(1, 1, 14, 14) 
+        
+        # Reshape the mask to have the same size with the original input image (224 x 224)
+        upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
+        
+        mask = upsample(mask)
 
         # Normalize the heatmap from 0 to 1
         mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
-
-        print(mask)
-        break
 
         # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
         seg_label = box_to_seg(bnd_box).to('cuda')
