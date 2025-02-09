@@ -35,6 +35,8 @@ from Methods.AttentionRollout.AttentionRollout import VITAttentionRollout
 import csv
 from csv import DictWriter
 
+from torchvision.transforms import Resize
+
 import argparse
 
 parser = argparse.ArgumentParser(description='Generate xai maps')
@@ -219,11 +221,14 @@ with torch.enable_grad():
             mask = saliency_map.reshape(1, 1, 14, 14)
             
             # Reshape the mask to have the same size with the original input image (224 x 224)
-            upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
+            # upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
+            
+            upsample = Resize(validset[0][0].shape[-2:], antialias=True) # quantus
+
             mask = upsample(mask)
 
-            # Normalize the heatmap from 0 to 1
-            mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
+        # Normalize the heatmap from 0 to 1
+        mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
 
         # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
         seg_label = box_to_seg(bnd_box).to('cuda')
