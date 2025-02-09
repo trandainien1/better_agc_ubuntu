@@ -236,8 +236,8 @@ with torch.enable_grad():
             upsample = Resize((224, 224), antialias=True) # quantus
             mask = upsample(mask)
 
-            # Normalize the heatmap from 0 to 1
-            mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
+        # Normalize the heatmap from 0 to 1
+        mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
 
         print(mask)
         break
