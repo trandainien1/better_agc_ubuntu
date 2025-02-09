@@ -203,10 +203,6 @@ with torch.enable_grad():
         image = data['image'].to('cuda')
         label = data['label'].to('cuda')
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
-
-        prediction = predictions[idx].to('cuda')
-        i
-
         
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
             prediction, saliency_map = method(image) 
