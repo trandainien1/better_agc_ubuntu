@@ -222,8 +222,8 @@ with torch.enable_grad():
             upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
             mask = upsample(mask)
 
-        # Normalize the heatmap from 0 to 1
-        mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
+            # Normalize the heatmap from 0 to 1
+            mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
 
         # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
         seg_label = box_to_seg(bnd_box).to('cuda')
