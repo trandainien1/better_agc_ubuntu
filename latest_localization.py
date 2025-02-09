@@ -214,6 +214,8 @@ with torch.enable_grad():
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
 
         prediction = predictions[idx].to('cuda')
+        print('DEBUG', label)
+        print('DEBUG', prediction)
         if prediction!=label:
                 continue
 

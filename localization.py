@@ -126,6 +126,7 @@ with torch.enable_grad():
         image = data['image'].to(device)
         label = data['label'].to(device)
         bnd_box = data['bnd_box'].to(device).squeeze(0)
+        
         prediction, mask = method.generate(image)
         predictions.append(prediction)
 
