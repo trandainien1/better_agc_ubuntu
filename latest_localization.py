@@ -15,7 +15,7 @@ import torch.utils.model_zoo as model_zoo
 import torch.nn.functional as F
 #methods    
 from Methods.AGCAM.AGCAM import AGCAM
-from Methods.Better_AGCAM.Better_AGCAM import BetterAGC, BetterAGC_plus1, BetterAGC_ver2, BetterAGC_softmax, BetterAGC_cluster, BetterAGC_cluster_add_noise
+from Methods.Better_AGCAM.Better_AGCAM import BetterAGC, BetterAGC_plus1, BetterAGC_ver2, BetterAGC_softmax, BetterAGC_cluster, BetterAGC_cluster_add_noise, ScoreAGC_no_grad
 #models
 import Methods.AGCAM.ViT_for_AGCAM as ViT_Ours
 
@@ -133,6 +133,12 @@ elif METHOD == 'better_agc_softmax':
     model.load_state_dict(state_dict, strict=True)
     model.eval()
     method = BetterAGC_softmax(model)
+elif METHOD == 'scoreagc_no_grad':
+    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
+    model.load_state_dict(state_dict, strict=True)
+    model.eval()
+    method = ScoreAGC_no_grad(model)
 elif METHOD == 'agc':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
