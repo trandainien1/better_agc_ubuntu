@@ -42,7 +42,8 @@ import argparse
 parser = argparse.ArgumentParser(description='Generate xai maps')
 parser.add_argument('--method',   type=str, default='agc',                       help='method name')
 parser.add_argument('--num_heatmaps',   type=str, default=30,                       help='number of heatmaps after clustering')
-parser.add_argument('--npz_checkpoint',   type=str, default='',                       help='number of heatmaps after clustering')
+parser.add_argument('--npz_checkpoint',   type=str, default='',                       help='folder path storing heatmaps')
+parser.add_argument('--load_prediction',   type=str, default='',                       help='load predictions of ViT')
 args = parser.parse_args()
 
 METHOD = args.method
@@ -202,10 +203,19 @@ with torch.enable_grad():
         saliencies_maps = torch.tensor(np.load(os.path.join('npz', args.npz_checkpoint))['arr_0'])
         print('Method checkpoint loaded.')
 
+    if args.load_prediction:
+        predictions = torch.tensor(np.load(os.path.join('npz', args.npz_checkpoint))['arr_0'])
+        print('[DEBUG] ',  len(predictions))
+        print('Predictions loaded')
+
     for idx, data in enumerate(tqdm(subset_loader)):
         image = data['image'].to('cuda')
         label = data['label'].to('cuda')
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
+
+        prediction = predictions[idx]
+        if prediction!=label:
+                continue
 
         if args.npz_checkpoint:
             mask = saliencies_maps[idx].unsqueeze(0)
@@ -215,8 +225,6 @@ with torch.enable_grad():
             else:
                 prediction, saliency_map = method.generate(image)
             # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
-            if prediction!=label:
-                continue
             
             mask = saliency_map.reshape(1, 1, 14, 14)
             
