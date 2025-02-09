@@ -204,7 +204,7 @@ with torch.enable_grad():
         print('Method checkpoint loaded.')
 
     if args.load_prediction:
-        predictions = torch.tensor(np.load(os.path.join('npz', args.npz_checkpoint))['arr_0'])
+        predictions = torch.tensor(np.load(os.path.join('npz', 'predictions'))['arr_0'])
         print('[DEBUG] ',  len(predictions))
         print('Predictions loaded')
 
