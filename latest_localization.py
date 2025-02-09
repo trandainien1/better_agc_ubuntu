@@ -40,6 +40,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Generate xai maps')
 parser.add_argument('--method',   type=str, default='agc',                       help='method name')
 parser.add_argument('--num_heatmaps',   type=str, default=30,                       help='number of heatmaps after clustering')
+parser.add_argument('--npz_checkpoint',   type=str, default='',                       help='number of heatmaps after clustering')
 args = parser.parse_args()
 
 METHOD = args.method
@@ -195,18 +196,25 @@ with torch.enable_grad():
     csvUtils = csv_utils(export_file)
     csvUtils.writeFieldName()
 
-    for data in tqdm(subset_loader):
+    if args.npz_checkpoint:
+        saliencies_maps = torch.tensor(np.load(os.path.join(args.npz_folder, args.npz_checkpoint))['arr_0'])
+        print('Method checkpoint loaded.')
+
+    for idx, data in enumerate(tqdm(subset_loader)):
         image = data['image'].to('cuda')
         label = data['label'].to('cuda')
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
 
-        if 'better_agc' in METHOD:
-            prediction, saliency_map = method(image)
+        if args.npz_checkpoint:
+            saliency_map = saliencies_maps[idx]
         else:
-            prediction, saliency_map = method.generate(image)
-        # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
-        if prediction!=label:
-            continue
+            if 'better_agc' or 'scoreagc' in METHOD:
+                prediction, saliency_map = method(image)
+            else:
+                prediction, saliency_map = method.generate(image)
+            # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
+            if prediction!=label:
+                continue
         
         mask = saliency_map.reshape(1, 1, 14, 14)
             
