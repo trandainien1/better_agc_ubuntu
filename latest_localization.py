@@ -43,7 +43,7 @@ parser = argparse.ArgumentParser(description='Generate xai maps')
 parser.add_argument('--method',   type=str, default='agc',                       help='method name')
 parser.add_argument('--num_heatmaps',   type=str, default=30,                       help='number of heatmaps after clustering')
 parser.add_argument('--npz_checkpoint',   type=str, default='',                       help='folder path storing heatmaps')
-parser.add_argument('--load_prediction',   type=str, default='',                       help='load predictions of ViT')
+parser.add_argument('--load_prediction',   type=str, default='true',                       help='load predictions of ViT')
 args = parser.parse_args()
 
 METHOD = args.method
