@@ -109,6 +109,8 @@ subset_indices = pd.read_csv('2000idx_ILSVRC2012.csv', header=None)[0].to_numpy(
 subset = Subset(validloader.dataset, subset_indices)
 subset_loader = torch.utils.data.DataLoader(subset, batch_size=1, shuffle=False)
 
+predictions = []
+
 with torch.enable_grad():        
     num_img = 0
     pixel_acc = 0.0
@@ -122,7 +124,8 @@ with torch.enable_grad():
         label = data['label'].to(device)
         bnd_box = data['bnd_box'].to(device).squeeze(0)
         prediction, mask = method.generate(image)
-        
+        predictions.append(prediction)
+
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
         if prediction!=label:
             continue
@@ -163,6 +166,10 @@ with torch.enable_grad():
         iou += iou_
         num_img+=1
              
+predictions = torch.stack(predictions) #saliency_maps.shape = [num_images, 1, 224, 224]
+npz_name = 'predictions'
+np.savez(os.path.join('npz', npz_name), predictions.cpu().numpy())
+print('predictions saved to npz.')
 
 print(name)
 print("result==================================================================")
