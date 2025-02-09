@@ -199,15 +199,6 @@ with torch.enable_grad():
     csvUtils = csv_utils(export_file)
     csvUtils.writeFieldName()
 
-    if args.npz_checkpoint:
-        saliencies_maps = torch.tensor(np.load(os.path.join('npz', args.npz_checkpoint))['arr_0'])
-        print('Method checkpoint loaded.')
-
-    if args.load_prediction:
-        predictions = torch.tensor(np.load(os.path.join('npz', 'predictions.npz'))['arr_0'])
-        # print('[DEBUG] ',  len(predictions))
-        print('Predictions loaded')
-
     for idx, data in enumerate(tqdm(subset_loader)):
         image = data['image'].to('cuda')
         label = data['label'].to('cuda')
