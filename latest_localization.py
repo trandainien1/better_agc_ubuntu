@@ -216,7 +216,7 @@ with torch.enable_grad():
         prediction = predictions[idx].to('cuda')
         if prediction!=label:
             print('YES')
-                continue
+            continue
 
         if args.npz_checkpoint:
             mask = saliencies_maps[idx].unsqueeze(0)
