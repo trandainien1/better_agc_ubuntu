@@ -30,7 +30,7 @@ import pandas as pd
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'better_agc_plus_5'])
-parser.add_argument('--data_root', type=str, required=True)
+# parser.add_argument('--data_root', type=str, required=True)
 parser.add_argument('--threshold', type=str, default='0.5')
 args = parser.parse_args()
 
@@ -57,14 +57,17 @@ THRESHOLD = float(args.threshold)
 
 # Image transform for ImageNet ILSVRC
 transform = transforms.Compose([
-    transforms.Resize((224,224)),
     transforms.ToTensor(),
-    transforms.Normalize([0.5,0.5,0.5], [0.5,0.5,0.5])
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
 
+
 validset = ImageNetDataset_val(
-    root_dir=args.data_root,
+    # root_dir='./ILSVRC',
+    root_dir='/kaggle/input/ilsvrc/ILSVRC',
     transforms=transform,
 )
 
