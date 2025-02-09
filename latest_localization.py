@@ -206,7 +206,7 @@ with torch.enable_grad():
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
 
         if args.npz_checkpoint:
-            saliency_map = saliencies_maps[idx]
+            mask = saliencies_maps[idx]
         else:
             if 'better_agc' or 'scoreagc' in METHOD:
                 prediction, saliency_map = method(image)
@@ -215,12 +215,12 @@ with torch.enable_grad():
             # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
             if prediction!=label:
                 continue
-        print('DEBUG', saliency_map.shape)
-        mask = saliency_map.reshape(1, 1, 14, 14)
             
-        # Reshape the mask to have the same size with the original input image (224 x 224)
-        upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
-        mask = upsample(mask)
+            mask = saliency_map.reshape(1, 1, 14, 14)
+            
+            # Reshape the mask to have the same size with the original input image (224 x 224)
+            upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
+            mask = upsample(mask)
 
         # Normalize the heatmap from 0 to 1
         mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
