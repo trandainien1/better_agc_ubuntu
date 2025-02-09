@@ -9,8 +9,8 @@ class ImageNetDataset_val(ImageFolder):
     def __init__(self, root_dir, transforms=None):
         self.img_dir = os.path.join(root_dir, "Data", "CLS-LOC", "val")
         self.annotation_dir = os.path.join(root_dir, "Annotations", "CLS-LOC", "val")
-        # self.classes = sorted(os.listdir(self.img_dir))
-        self.classes = os.listdir(self.img_dir)
+        self.classes = sorted(os.listdir(self.img_dir))
+        # self.classes = os.listdir(self.img_dir)
         self.transforms = transforms
         self.img_data = []
         self.img_labels = []
