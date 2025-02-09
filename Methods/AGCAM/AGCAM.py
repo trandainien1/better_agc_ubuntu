@@ -78,6 +78,7 @@ class AGCAM:
         mask = Reduce('b l h z p -> b l z p', reduction=self.head_fusion)(mask)
         mask = Reduce('b l z p -> b z p', reduction=self.layer_fusion)(mask)
         mask = Rearrange('b z (h w) -> b z h w', h=self.width, w=self.width)(mask)
+        
         return prediction, mask
 
 
