@@ -197,7 +197,7 @@ with torch.enable_grad():
     csvUtils.writeFieldName()
 
     if args.npz_checkpoint:
-        saliencies_maps = torch.tensor(np.load(os.path.join(args.npz_folder, args.npz_checkpoint))['arr_0'])
+        saliencies_maps = torch.tensor(np.load(os.path.join('npz', args.npz_checkpoint))['arr_0'])
         print('Method checkpoint loaded.')
 
     for idx, data in enumerate(tqdm(subset_loader)):
