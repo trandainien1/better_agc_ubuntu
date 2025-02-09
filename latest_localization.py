@@ -231,9 +231,9 @@ with torch.enable_grad():
             mask = saliency_map.reshape(1, 1, 14, 14) 
             
             # Reshape the mask to have the same size with the original input image (224 x 224)
-            upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
+            # upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
             
-            # upsample = Resize((224, 224), antialias=True) # quantus
+            upsample = Resize((224, 224), antialias=True) # quantus
             mask = upsample(mask)
 
             # Normalize the heatmap from 0 to 1
