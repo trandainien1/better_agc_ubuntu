@@ -219,6 +219,7 @@ with torch.enable_grad():
 
         if args.npz_checkpoint:
             saliency_map = saliencies_maps[idx] # [1, 224, 224]
+            mask = saliency_map
         else:
             if 'better_agc' in METHOD or METHOD == 'scoreagc':
                 prediction, saliency_map = method(image) 
