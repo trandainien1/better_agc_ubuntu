@@ -175,7 +175,7 @@ elif METHOD == 'attention rollout':
     method = VITAttentionRollout(model, device=device)
 elif METHOD == 'chefer2':
     model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
-    method = Chefer2Wrapper(model)
+    method = Chefer2Wrapper(model=model)
 
 print(f"[XAI METHOD]: {METHOD}")
 
