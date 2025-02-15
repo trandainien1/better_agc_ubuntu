@@ -67,8 +67,9 @@ def generate_relevance(model, input, index=None):
     return R[0, 1:]
 
 class Chefer2Wrapper():
-    def __init__(self, **kwargs):
-        self.model = vit_base_patch16_224()
+    def __init__(self, model, **kwargs):
+        # self.model = vit_base_patch16_224()
+        self.model = model
         self.model.eval()
         assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
 
