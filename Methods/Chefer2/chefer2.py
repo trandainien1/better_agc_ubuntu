@@ -68,10 +68,9 @@ def generate_relevance(model, input, index=None):
 
 class Chefer2Wrapper():
     def __init__(self, model, **kwargs):
-        # self.model = vit_base_patch16_224()
-        self.model = model
-        # self.model.eval()
-        # assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
+        self.model = vit_base_patch16_224()
+        self.model.eval()
+        assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
 
         print('[MODEL]')
         print('type:', type(self.model), end='\n\n')
@@ -79,7 +78,7 @@ class Chefer2Wrapper():
         print('[METHOD]')
         print('type:', generate_relevance, end='\n\n')
 
-    def generate(self, x, target=None):
+    def attribute(self, x, target=None):
         with torch.enable_grad():
             saliency_map = generate_relevance(self.model, x, index=target)
             for block in self.model.blocks:
