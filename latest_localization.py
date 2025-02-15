@@ -16,6 +16,7 @@ import torch.nn.functional as F
 #methods    
 from Methods.AGCAM.AGCAM import AGCAM
 from Methods.Better_AGCAM.Better_AGCAM import BetterAGC, BetterAGC_plus1, BetterAGC_ver2, BetterAGC_softmax, BetterAGC_cluster, BetterAGC_cluster_add_noise, ScoreAGC_no_grad
+from Methods.Chefer2.chefer2 import Chefer2Wrapper
 #models
 import Methods.AGCAM.ViT_for_AGCAM as ViT_Ours
 
@@ -161,7 +162,7 @@ elif METHOD == 'better_agc_cluster_add_noise':
     model.load_state_dict(state_dict, strict=True)
     model.eval()
     method = BetterAGC_cluster_add_noise(model, num_heatmaps=30)
-elif METHOD == 'lrp':
+elif METHOD == 'chefer1':
     model = LRP_vit_base_patch16_224('cuda', num_classes=1000).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.eval()
@@ -172,6 +173,11 @@ elif METHOD == 'attention rollout':
     model.load_state_dict(state_dict, strict=True)
     model.eval()
     method = VITAttentionRollout(model, device=device)
+elif METHOD == 'chefer2':
+    model = LRP_vit_base_patch16_224('cuda', num_classes=1000).to('cuda')
+    model.load_state_dict(state_dict, strict=True)
+    model.eval()
+    method = Chefer2Wrapper(model)
 
 print(f"[XAI METHOD]: {METHOD}")
 
