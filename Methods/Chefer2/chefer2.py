@@ -70,7 +70,7 @@ class Chefer2Wrapper():
     def __init__(self, model, **kwargs):
         # self.model = vit_base_patch16_224()
         self.model = model
-        self.model.eval()
+        # self.model.eval()
         # assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
 
         print('[MODEL]')

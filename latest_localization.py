@@ -175,7 +175,7 @@ elif METHOD == 'attention rollout':
     method = VITAttentionRollout(model, device=device)
 elif METHOD == 'chefer2':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model = LRP_vit_base_patch16_224('cuda', num_classes=1000).to('cuda')
+    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.eval()
     method = Chefer2Wrapper(model=model)
