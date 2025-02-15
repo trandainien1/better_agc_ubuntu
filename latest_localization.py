@@ -174,7 +174,10 @@ elif METHOD == 'attention rollout':
     model.eval()
     method = VITAttentionRollout(model, device=device)
 elif METHOD == 'chefer2':
-    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
+    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+    model = LRP_vit_base_patch16_224('cuda', num_classes=1000).to('cuda')
+    model.load_state_dict(state_dict, strict=True)
+    model.eval()
     method = Chefer2Wrapper(model=model)
 
 print(f"[XAI METHOD]: {METHOD}")
