@@ -206,11 +206,12 @@ with torch.enable_grad():
 
     for idx, data in enumerate(tqdm(subset_loader)):
         image = data['image'].to('cuda')
-        label = data['label'].to('cuda')
+        label = data['label']
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
         
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
             prediction, saliency_map = method(image) 
+            label = data['label'].to('cuda')
         else:
             prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
