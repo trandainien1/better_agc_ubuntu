@@ -2,7 +2,7 @@
 import torch
 
 try:
-    from tam.baselines.ViT.ViT_explanation_generator import LRP
+    from tam.baselines.ViT.interpret_methods import InterpretTransformer 
     from tam.baselines.ViT.ViT_new import VisionTransformer, _conv_filter, _cfg
     from tam.baselines.ViT.helpers import load_pretrained
     from timm.models.vision_transformer import default_cfgs as vit_cfgs
@@ -30,7 +30,7 @@ class TAMWrapper:
         self.model = model
         # assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
 
-        self.method = LRP(self.model)
+        self.method = InterpretTransformer(self.model).transition_attention_maps
         self.start_layer = start_layer
         self.steps = steps
         
@@ -42,7 +42,7 @@ class TAMWrapper:
 
     def generate(self, x, target=None):
         with torch.enable_grad():
-            prediction, saliency_map = self.method.generate_LRP(x, index=target, start_layer=self.start_layer, 
+            prediction, saliency_map = self.method(x, index=target, start_layer=self.start_layer, 
                                                     # steps=self.steps
                                                     )
             return prediction[0], saliency_map.reshape(14, 14)
