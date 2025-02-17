@@ -391,7 +391,6 @@ class Baselines:
         else:
             return R[:, 0, 1:]
     
-    
     def generate_genattr(self, input, start_layer=1, index=None, mae=False):
         b = input.shape[0]
         output = self.model(input, register_hook=True)
