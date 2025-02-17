@@ -2,7 +2,7 @@
 import torch
 
 try:
-    from tam.baselines.ViT.interpret_methods import InterpretTransformer 
+    from tam.baselines.ViT.interpret_methods import InterpretTransformer
     from tam.baselines.ViT.ViT_new import VisionTransformer, _conv_filter, _cfg
     from tam.baselines.ViT.helpers import load_pretrained
     from timm.models.vision_transformer import default_cfgs as vit_cfgs
@@ -25,12 +25,11 @@ def vit_base_patch16_224(pretrained=True, model_name="vit_base_patch16_224", pre
 class TAMWrapper:
     def __init__(self, model, start_layer=0, steps=20, **kwargs):
 
-        # self.model = vit_base_patch16_224()
-        # self.model.eval()
-        self.model = model
-        # assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
+        self.model = vit_base_patch16_224()
+        self.model.eval()
+        assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
 
-        self.method = InterpretTransformer(self.model).transition_attention_maps
+        self.method = InterpretTransformer(self.model)
         self.start_layer = start_layer
         self.steps = steps
         
@@ -42,7 +41,5 @@ class TAMWrapper:
 
     def generate(self, x, target=None):
         with torch.enable_grad():
-            prediction, saliency_map = self.method(x, index=target, start_layer=self.start_layer, 
-                                                    # steps=self.steps
-                                                    )
+            prediction, saliency_map = self.method.transition_attention_maps(x, index=target, start_layer=self.start_layer, steps=self.steps)
             return prediction[0], saliency_map.reshape(14, 14)

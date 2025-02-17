@@ -67,7 +67,7 @@ class InterpretTransformer(object):
         
         states = states * W_state
         
-        return states[:, 0, 1:]
+        return index, states[:, 0, 1:]
     
     
     def attribution(self, input, index=None, start_layer=0):
