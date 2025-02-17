@@ -79,7 +79,7 @@ class Chefer2Wrapper():
         print('[METHOD]')
         print('type:', generate_relevance, end='\n\n')
 
-    def attribute(self, x, target=None):
+    def generate(self, x, target=None):
         with torch.enable_grad():
             saliency_map = generate_relevance(self.model, x, index=target)
             for block in self.model.blocks:

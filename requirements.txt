@@ -3,8 +3,7 @@ torch
 torchvision
 numpy == 1.24.3
 tqdm == 4.65.0
-# timm == 0.6.12
-timm
+timm == 0.6.12
 beautifulsoup4 == 4.11.2
 einops == 0.6.0
 h5py == 3.7.0
