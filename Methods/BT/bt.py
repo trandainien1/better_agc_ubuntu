@@ -41,10 +41,10 @@ class BTHWrapper(BTWrapperCommon):
 
     def attribute(self, x, target=None):
         with torch.enable_grad():
-            saliency_map = self.method.generate_ours(x,
+            prediction, saliency_map = self.method.generate_ours(x,
                                                      index=target,
                                                      start_layer=self.start_layer)
-            return saliency_map.reshape(14, 14)
+            return prediction[0], saliency_map.reshape(14, 14)
 
 class BTTWrapper(BTWrapperCommon):
     def __init__(self, model, start_layer=1, **kwargs):

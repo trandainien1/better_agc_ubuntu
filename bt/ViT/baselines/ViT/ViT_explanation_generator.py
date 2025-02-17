@@ -234,7 +234,7 @@ class Baselines:
         elif dino:
             return (R[:, 1:, 1:].mean(axis=1) + R[:, 0, 1:])
         else:
-            return R[:, 0, 1:]
+            return index, R[:, 0, 1:]
     
     
     def generate_ig(self, input, index=None, steps=20, start_layer=6, samples=20, noise=0.2):
