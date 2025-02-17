@@ -38,7 +38,7 @@ class LRP:
         self.model.zero_grad()
         one_hot.backward(retain_graph=True)
 
-        return self.model.relprop(torch.tensor(one_hot_vector).to(input.device), method=method, is_ablation=is_ablation,
+        return index, self.model.relprop(torch.tensor(one_hot_vector).to(input.device), method=method, is_ablation=is_ablation,
                                   start_layer=start_layer, **kwargs)
     
     def generate_attribution(self, input, index=None, start_layer=0, softmax=True, add_residual=False):

@@ -39,9 +39,9 @@ class TAMWrapper:
         print('[METHOD]')
         print('type:', type(self.method), end='\n\n')
 
-    def attribute(self, x, target=None):
+    def generate(self, x, target=None):
         with torch.enable_grad():
-            saliency_map = self.method.generate_LRP(x, index=target, start_layer=self.start_layer, 
+            prediction, saliency_map = self.method.generate_LRP(x, index=target, start_layer=self.start_layer, 
                                                     # steps=self.steps
                                                     )
-            return saliency_map.reshape(14, 14)
+            return prediction[0], saliency_map.reshape(14, 14)

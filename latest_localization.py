@@ -17,6 +17,7 @@ import torch.nn.functional as F
 from Methods.AGCAM.AGCAM import AGCAM
 from Methods.Better_AGCAM.Better_AGCAM import BetterAGC, BetterAGC_plus1, BetterAGC_ver2, BetterAGC_softmax, BetterAGC_cluster, BetterAGC_cluster_add_noise, ScoreAGC_no_grad
 from Methods.Chefer2.chefer2 import Chefer2Wrapper
+from Methods.TAM.tam import TAMWrapper
 #models
 import Methods.AGCAM.ViT_for_AGCAM as ViT_Ours
 
@@ -177,6 +178,11 @@ elif METHOD == 'chefer2':
     model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
     model = model.eval()
     method = Chefer2Wrapper(model=model)
+elif METHOD == 'tam':
+    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
+    model = model.eval()
+    method = TAMWrapper(model=model)
+    
 
 print(f"[XAI METHOD]: {METHOD}")
 
@@ -211,7 +217,6 @@ with torch.enable_grad():
         
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
             prediction, saliency_map = method(image) 
-            # label = data['label'].to('cuda')
         else:
             prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
