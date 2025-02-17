@@ -212,8 +212,8 @@ with torch.enable_grad():
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
             prediction, saliency_map = method(image) 
         else:
-            print('[DEBUG] prediction:', prediction)
             prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
+            print('[DEBUG] prediction:', prediction)
 
             if prediction!=label:
                 continue
