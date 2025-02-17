@@ -17,7 +17,7 @@ class TIS:
                  batch_size=128,
                  tokens_ratio=0.5,
                  normalise=True,
-                 verbose=False,
+                 verbose=True,
                  ablation_study=False,
                  ):
         """
@@ -77,8 +77,8 @@ class TIS:
             # Define the class to explain. If not explicit, use the class predicted by the model
             if class_idx is None:
                 class_idx = predicted_class
-                if self.verbose:
-                    print("class idx", class_idx)
+                # if self.verbose:
+                    # print("class idx", class_idx)
 
             # Generate the masks
             raw_masks = self.generate_raw_masks(encoder_activations)
