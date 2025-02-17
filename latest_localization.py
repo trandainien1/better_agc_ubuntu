@@ -179,8 +179,9 @@ elif METHOD == 'chefer2':
     model = model.eval()
     method = Chefer2Wrapper(model=model)
 elif METHOD == 'tam':
-    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
-    model = model.eval()
+    model = LRP_vit_base_patch16_224('cuda', num_classes=1000).to('cuda')
+    model.load_state_dict(state_dict, strict=True)
+    model.eval()
     method = TAMWrapper(model=model)
     
 
