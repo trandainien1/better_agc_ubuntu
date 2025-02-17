@@ -28,7 +28,7 @@ class TAMWrapper:
         # self.model = vit_base_patch16_224()
         # self.model.eval()
         self.model = model
-        assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
+        # assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
 
         self.method = LRP(self.model)
         self.start_layer = start_layer
