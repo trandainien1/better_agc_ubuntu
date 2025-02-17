@@ -12,6 +12,7 @@ import argparse
 import random
 import torch.utils.model_zoo as model_zoo
 from torch.utils.data import Subset
+import pandas as pd
 
 #datasets
 from Datasets.ILSVRC import ImageNetDataset_val
