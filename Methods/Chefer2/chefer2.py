@@ -65,7 +65,7 @@ def generate_relevance(model, input, index=None):
         cam = avg_heads(cam, grad)
         R += apply_self_attention_rules(R.cuda(), cam.cuda()).detach()
 
-    return R[0, 1:]
+    return output, R[0, 1:]
 
 class Chefer2Wrapper():
     def __init__(self, model, **kwargs):
@@ -81,8 +81,8 @@ class Chefer2Wrapper():
 
     def generate(self, x, target=None):
         with torch.enable_grad():
-            saliency_map = generate_relevance(self.model, x, index=target)
+            prediction, saliency_map = generate_relevance(self.model, x, index=target)
             for block in self.model.blocks:
                 block.attn.attn_gradients = None
                 block.attn.attention_maps = None
-            return saliency_map.reshape(14, 14)
+            return prediction, saliency_map.reshape(14, 14)
