@@ -33,6 +33,7 @@ from Methods.LRP.ViT_LRP import vit_base_patch16_224 as LRP_vit_base_patch16_224
 from Methods.LRP.ViT_explanation_generator import LRP
 
 from Methods.AttentionRollout.AttentionRollout import VITAttentionRollout
+from Methods.TIS.tis import TISWrapper
 
 import csv
 from csv import DictWriter
@@ -185,6 +186,10 @@ elif METHOD == 'tam':
     model.load_state_dict(state_dict, strict=True)
     model.eval()
     method = TAMWrapper(model=model)
+elif METHOD == 'tis':
+    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
+    model = model.eval()
+    method = TISWrapper(model=model)
     
 
 print(f"[XAI METHOD]: {METHOD}")
