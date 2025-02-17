@@ -65,7 +65,7 @@ def generate_relevance(model, input, index=None):
         cam = avg_heads(cam, grad)
         R += apply_self_attention_rules(R.cuda(), cam.cuda()).detach()
 
-    return output, R[0, 1:]
+    return index, R[0, 1:]
 
 class Chefer2Wrapper():
     def __init__(self, model, **kwargs):
