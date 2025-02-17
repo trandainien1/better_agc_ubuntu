@@ -164,6 +164,7 @@ elif METHOD == 'better_agc_cluster_add_noise':
     model.eval()
     method = BetterAGC_cluster_add_noise(model, num_heatmaps=30)
 elif METHOD == 'chefer1':
+    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = LRP_vit_base_patch16_224('cuda', num_classes=1000).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.eval()
@@ -179,6 +180,7 @@ elif METHOD == 'chefer2':
     model = model.eval()
     method = Chefer2Wrapper(model=model)
 elif METHOD == 'tam':
+    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = LRP_vit_base_patch16_224('cuda', num_classes=1000).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.eval()
