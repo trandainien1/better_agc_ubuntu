@@ -125,7 +125,7 @@ subset = Subset(validloader.dataset, subset_indices)
 subset_loader = torch.utils.data.DataLoader(subset, batch_size=1, shuffle=False)
 
 with torch.enable_grad():
-    for data in tqdm(validloader):
+    for data in tqdm(subset_loader):
         image = data['image'].to(device)
         label = data['label'].to(device)
         filename = data['filename']
