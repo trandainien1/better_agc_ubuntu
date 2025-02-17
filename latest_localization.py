@@ -189,6 +189,7 @@ elif METHOD == 'tis':
     model = model.eval()
     method = TISWrapper(model=model)
     
+model = model.to('cuda')
 
 print(f"[XAI METHOD]: {METHOD}")
 

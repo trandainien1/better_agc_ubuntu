@@ -70,7 +70,6 @@ class TIS:
         if x.dim() == 3:
             x = x.unsqueeze(dim=0)
         
-        x = x.cpu()
         with torch.no_grad():
             # First forward pass to recorde encoder activations
             predicted_class, encoder_activations = self.get_encoder_activations(x)
