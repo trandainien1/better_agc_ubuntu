@@ -358,7 +358,7 @@ class Baselines:
             elif dino:
                 return (R[:, 1:, 1:].abs().mean(axis=1)+R[:, 0, 1:].abs())
             else:
-                return R[:, 0, 1:].abs()
+                return index, R[:, 0, 1:].abs()
         
         total_gradients = torch.zeros(b, num_head, num_tokens, num_tokens).cuda()
         for alpha in np.linspace(0, 1, steps):        

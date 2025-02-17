@@ -58,9 +58,9 @@ class BTTWrapper(BTWrapperCommon):
 
     def generate(self, x, target=None):
         with torch.enable_grad():
-            saliency_map = self.method.generate_ours_c(x,
+            prediction, saliency_map = self.method.generate_ours_c(x,
                                                        index=target,
                                                        start_layer=self.start_layer)
-            return saliency_map.reshape(14, 14)
+            return prediction[0], saliency_map.reshape(14, 14)
 
 
