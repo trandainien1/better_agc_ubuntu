@@ -354,9 +354,9 @@ class Baselines:
         
         if ssl:
             if mae:
-                return R[:, 1:, 1:].abs().mean(axis=1)
+                return index, R[:, 1:, 1:].abs().mean(axis=1)
             elif dino:
-                return (R[:, 1:, 1:].abs().mean(axis=1)+R[:, 0, 1:].abs())
+                return index, (R[:, 1:, 1:].abs().mean(axis=1)+R[:, 0, 1:].abs())
             else:
                 return index, R[:, 0, 1:].abs()
         
@@ -385,11 +385,11 @@ class Baselines:
         R = W_state * R.abs()     
         
         if mae:
-            return R[:, 1:, 1:].mean(axis=1)
+            return index, R[:, 1:, 1:].mean(axis=1)
         elif dino:
-            return (R[:, 1:, 1:].mean(axis=1) + R[:, 0, 1:])
+            return index, (R[:, 1:, 1:].mean(axis=1) + R[:, 0, 1:])
         else:
-            return R[:, 0, 1:]
+            return index, R[:, 0, 1:]
     
     def generate_genattr(self, input, start_layer=1, index=None, mae=False):
         b = input.shape[0]
