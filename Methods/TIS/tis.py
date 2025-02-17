@@ -19,7 +19,6 @@ class TISWrapper:
         # print('type:', type(self.method), end='\n\n')
 
     def generate(self, x, target=None):
-        print('[DEBUG] nien ne')
         with torch.enable_grad():
             prediction, saliency_map = self.method(x, class_idx=target)
             return prediction, saliency_map.detach().cpu()

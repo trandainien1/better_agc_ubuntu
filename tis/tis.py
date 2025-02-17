@@ -17,7 +17,7 @@ class TIS:
                  batch_size=128,
                  tokens_ratio=0.5,
                  normalise=True,
-                 verbose=True,
+                 verbose=False,
                  ablation_study=False,
                  ):
         """
