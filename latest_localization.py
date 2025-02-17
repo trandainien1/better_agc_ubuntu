@@ -214,8 +214,8 @@ with torch.enable_grad():
         else:
             prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
-        print('[DEBUG] prediction: ', prediction)
-        print('[DEBUG] label: ', label)
+        # print('[DEBUG] prediction: ', prediction)
+        # print('[DEBUG] label: ', label)
         if prediction!=label:
             continue
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
