@@ -211,7 +211,7 @@ with torch.enable_grad():
         
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
             prediction, saliency_map = method(image) 
-            label = data['label'].to('cuda')
+            # label = data['label'].to('cuda')
         else:
             prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
