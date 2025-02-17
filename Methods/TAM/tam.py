@@ -25,8 +25,9 @@ def vit_base_patch16_224(pretrained=True, model_name="vit_base_patch16_224", pre
 class TAMWrapper:
     def __init__(self, model, start_layer=0, steps=20, **kwargs):
 
-        self.model = vit_base_patch16_224()
-        self.model.eval()
+        # self.model = vit_base_patch16_224()
+        # self.model.eval()
+        self.model = model
         assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
 
         self.method = LRP(self.model)
