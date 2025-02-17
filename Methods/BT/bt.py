@@ -39,7 +39,7 @@ class BTHWrapper(BTWrapperCommon):
         print('[METHOD]')
         print('type:', self.method.generate_ours, end='\n\n')
 
-    def attribute(self, x, target=None):
+    def generate(self, x, target=None):
         with torch.enable_grad():
             prediction, saliency_map = self.method.generate_ours(x,
                                                      index=target,
