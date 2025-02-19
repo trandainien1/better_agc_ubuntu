@@ -211,7 +211,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - Head fusion: mean")
+print(f"[XAI METHOD]: {METHOD} - add noise")
 
 validloader = DataLoader(
     dataset = validset,
