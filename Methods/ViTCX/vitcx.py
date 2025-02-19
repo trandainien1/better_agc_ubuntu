@@ -42,7 +42,7 @@ class ViTCXWrapper:
             else:
                 raise NotImplementedError("Model not supported")
         
-            prediction, saliency = torch.Tensor(ViT_CX(model,
+            saliency = torch.Tensor(ViT_CX(model,
                                            x,
                                            target_layer,
                                            class_idx,
@@ -51,9 +51,10 @@ class ViTCXWrapper:
                                            )
                                     )
             saliency = saliency.detach()
+
             del model
             return prediction, saliency
     def generate(self, x, target=None):
         with torch.enable_grad():
-            prediction, saliency_map = self.exec_method(x, class_idx=target)
-            return prediction, saliency_map.detach().cpu()
+            saliency_map = self.exec_method(x, class_idx=target)
+            return saliency_map.detach().cpu()
