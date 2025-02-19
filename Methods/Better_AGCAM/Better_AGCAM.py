@@ -332,7 +332,7 @@ class BetterAGC_softmax:
 
 
 
-class BetterAGC_plus1:
+class ScoreAGC:
     def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=True):
         """
         Args:

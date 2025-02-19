@@ -15,7 +15,7 @@ import torch.utils.model_zoo as model_zoo
 import torch.nn.functional as F
 #methods    
 from Methods.AGCAM.AGCAM import AGCAM
-from Methods.Better_AGCAM.Better_AGCAM import BetterAGC, BetterAGC_plus1, BetterAGC_ver2, BetterAGC_softmax, BetterAGC_cluster, BetterAGC_cluster_add_noise, ScoreAGC_no_grad, ScoreAGC_head_fusion
+from Methods.Better_AGCAM.Better_AGCAM import BetterAGC, ScoreAGC, BetterAGC_ver2, BetterAGC_softmax, BetterAGC_cluster, BetterAGC_cluster_add_noise, ScoreAGC_no_grad, ScoreAGC_head_fusion
 from Methods.Chefer2.chefer2 import Chefer2Wrapper
 from Methods.TAM.tam import TAMWrapper
 #models
@@ -118,12 +118,12 @@ class_num=1000
 export_file = METHOD + '_results.csv'
 data_file = METHOD + '_sigmoid_data.csv'
 
-if METHOD == 'better_agc_plus1':
+if METHOD == 'scoreagc':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.eval()
-    method = BetterAGC_plus1(model, score_minmax_norm=True, normalize_cam_heads=False)
+    method = ScoreAGC(model, score_minmax_norm=True, normalize_cam_heads=False)
 if METHOD == 'scoreagc_head_fusion':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
