@@ -640,7 +640,7 @@ class ScoreAGC_head_fusion:
         mask = mask.squeeze()
         return mask
 
-    def __call__(self, x, class_idx=None):
+    def generate(self, x, class_idx=None):
 
         # Check that we get only one image
         assert x.dim() == 3 or (x.dim() == 4 and x.shape[0] == 1), "Only one image can be processed at a time"
