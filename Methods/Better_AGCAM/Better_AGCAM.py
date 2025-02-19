@@ -333,7 +333,7 @@ class BetterAGC_softmax:
 
 
 class BetterAGC_plus1:
-    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True):
+    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=False):
         """
         Args:
             model (nn.Module): the Vision Transformer model to be explained
@@ -350,6 +350,7 @@ class BetterAGC_plus1:
         self.attn_matrix = []
         self.grad_attn = []
         self.normalize_cam_heads = normalize_cam_heads
+        self.score_minmax_norm = score_minmax_norm
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
@@ -427,8 +428,7 @@ class BetterAGC_plus1:
                 max_vals = tensor_heatmaps.amax(dim=(2, 3), keepdim=True)  # Max across width and height
                 # Normalize using min-max scaling
                 tensor_heatmaps = (tensor_heatmaps - min_vals) / (max_vals - min_vals + 1e-7)  # Add small value to avoid division by zero
-            else:
-                print('[DEBUG]: NO NORMALIZE CAMS OF HEADS')
+            
             # print("before multiply img with mask: ")
             # print(torch.cuda.memory_allocated()/1024**2)
             m = torch.mul(tensor_heatmaps, image)
@@ -440,9 +440,15 @@ class BetterAGC_plus1:
             
             # print("After get output from model: ")
             # print(torch.cuda.memory_allocated()/1024**2)
-    
+
+            
             agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
-            agc_scores = torch.sigmoid(agc_scores)
+            
+            if self.score_minmax_norm:
+                agc_scores = (agc_scores - agc_scores.min() ) / (agc_scores.max() - agc_scores.min())
+            else:
+                agc_scores = torch.sigmoid(agc_scores)
+            
             agc_scores += 1
 
             agc_scores = agc_scores.reshape(head_cams[0].shape[0], head_cams[0].shape[1])
