@@ -254,9 +254,8 @@ with torch.enable_grad():
         
             mask = upsample(mask)
 
-            print('[DEBUG]', mask.shape)
         else:
-            mask = saliency_map
+            mask = saliency_map.unsqueeze(0).unsqueeze(0)
         # Normalize the heatmap from 0 to 1
         mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
 
