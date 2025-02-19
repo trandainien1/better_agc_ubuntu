@@ -247,12 +247,13 @@ with torch.enable_grad():
         if prediction!=label.item():
             continue
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
-        mask = saliency_map.reshape(1, 1, 14, 14) 
+        if METHOD != 'vitcx':
+            mask = saliency_map.reshape(1, 1, 14, 14) 
         
-        # Reshape the mask to have the same size with the original input image (224 x 224)
-        upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
+            # Reshape the mask to have the same size with the original input image (224 x 224)
+            upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
         
-        mask = upsample(mask)
+            mask = upsample(mask)
 
         # Normalize the heatmap from 0 to 1
         mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
