@@ -240,6 +240,7 @@ with torch.enable_grad():
             prediction, saliency_map = method(image) 
         else:
             prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
+            print('[DEBUG]', saliency_map.shape)
 
         # print('[DEBUG] PREDICTION', prediction)
         # print('[DEBUG] LABEL', label.item())
