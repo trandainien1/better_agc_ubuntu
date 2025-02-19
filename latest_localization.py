@@ -123,7 +123,7 @@ if METHOD == 'better_agc_plus1':
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.eval()
-    method = BetterAGC_plus1(model, normalize_cam_heads=False)
+    method = BetterAGC_plus1(model, score_minmax_norm=True)
 elif METHOD == 'better_agc':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
@@ -205,7 +205,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - no normalize CAM of heads")
+print(f"[XAI METHOD]: {METHOD} - normalize minmax for scores")
 
 validloader = DataLoader(
     dataset = validset,
