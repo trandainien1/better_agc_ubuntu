@@ -90,32 +90,28 @@ validset = ImageNetDataset_val(
 )
 
 # create model and the method
-state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=False, map_location=device)
 class_num=1000
 save_name +="ILSVRC"
 
+state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
+model.load_state_dict(state_dict, strict=True)
+model.eval()
+model = model.to('cuda')
+
 if args.method=="agcam":
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to(device)
-    model.load_state_dict(state_dict, strict=True)
-    model.eval()
     method = AGCAM(model)
     save_name +="_agcam"
 elif args.method=="lrp":
     model = LRP_vit_base_patch16_224(device=device, num_classes=class_num).to(device)
     model.load_state_dict(state_dict, strict=True)
     model.eval()
+    model = model.to('cuda')
     method = LRP(model, device=device)
     save_name+="_lrp"
 elif args.method=="rollout":
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
-    model.load_state_dict(state_dict, strict=True)
-    model.eval()
-    model = model.to('cuda')
     method = VITAttentionRollout(model, device=device)
-
     save_name+='_rollout'
-
 
 print("save the data in ", save_root)
 
