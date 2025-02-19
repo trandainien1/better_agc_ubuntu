@@ -26,6 +26,7 @@ from Methods.LRP.ViT_LRP import vit_base_patch16_224 as LRP_vit_base_patch16_224
 from Methods.AGCAM.AGCAM import AGCAM
 from Methods.LRP.ViT_explanation_generator import LRP
 from Methods.AttentionRollout.AttentionRollout import VITAttentionRollout
+from Methods.TIS.tis import TISWrapper
 
 parser = argparse.ArgumentParser(description='save heatmaps in h5')
 parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout'])
@@ -93,25 +94,35 @@ validset = ImageNetDataset_val(
 class_num=1000
 save_name +="ILSVRC"
 
-state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
-model.load_state_dict(state_dict, strict=True)
-model.eval()
-model = model.to('cuda')
-
-if args.method=="agcam":
-    method = AGCAM(model)
-    save_name +="_agcam"
-elif args.method=="lrp":
-    model = LRP_vit_base_patch16_224(device=device, num_classes=class_num).to(device)
+def attn_method_model():
+    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.eval()
     model = model.to('cuda')
+    return model
+
+model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
+model = model.eval()
+model = model.to('cuda')
+
+if args.method=="agcam":
+    model = attn_method_model()
+    method = AGCAM(model)
+    save_name +="_agcam"
+elif args.method=="lrp":
+    # model = LRP_vit_base_patch16_224(device=device, num_classes=class_num).to(device)
+    # model.load_state_dict(state_dict, strict=True)
+    # model.eval()
+    # model = model.to('cuda')
     method = LRP(model, device=device)
     save_name+="_lrp"
 elif args.method=="rollout":
+    model = attn_method_model()
     method = VITAttentionRollout(model, device=device)
     save_name+='_rollout'
+elif args.method == 'tis':
+    method = TISWrapper(model)
 
 print("save the data in ", save_root)
 
