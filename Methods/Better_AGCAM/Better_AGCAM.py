@@ -445,7 +445,7 @@ class BetterAGC_plus1:
             agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
             
             if self.score_minmax_norm:
-                print('[DEBUG] minmax norm')
+                
                 agc_scores = (agc_scores - agc_scores.min() ) / (agc_scores.max() - agc_scores.min())
             else:
                 agc_scores = torch.sigmoid(agc_scores)
