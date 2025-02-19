@@ -602,18 +602,22 @@ class ScoreAGC_head_fusion:
                 # Normalize using min-max scaling
                 tensor_heatmaps = (tensor_heatmaps - min_vals) / (max_vals - min_vals + 1e-7)  # Add small value to avoid division by zero
             
-            # print("before multiply img with mask: ")
-            # print(torch.cuda.memory_allocated()/1024**2)
-            m = torch.mul(tensor_heatmaps, image)
-            # print("After multiply img with mask scores: ")
-            # print(torch.cuda.memory_allocated()/1024**2)
+            # -------------- add noise ------------
+            N  = tensor_heatmaps.shape[0]
+            H = tensor_heatmaps.shape[2]
+            W = tensor_heatmaps.shape[3]
+            # Generate the inverse of masks, i.e., 1-M_i
+            masks_inverse=torch.from_numpy(np.repeat((1-tensor_heatmaps.cpu().numpy())[:, :, np.newaxis,:], 3, axis=2)).cuda()
+            masks_inverse = masks_inverse.squeeze(1)
+
+            random_whole=torch.randn([N]+list((3,H,W))).cuda()* 0.1
+            noise_to_add = random_whole * masks_inverse
+
+            mask = torch.mul(tensor_heatmaps, image)
+            m = mask + noise_to_add
 
             with torch.no_grad():
                 output_mask = self.model(m)
-            
-            # print("After get output from model: ")
-            # print(torch.cuda.memory_allocated()/1024**2)
-
             
             agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
             

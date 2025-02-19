@@ -129,7 +129,7 @@ if METHOD == 'scoreagc_head_fusion':
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.eval()
-    method = ScoreAGC_head_fusion(model, score_minmax_norm=True, head_fusion='mean')
+    method = ScoreAGC_head_fusion(model, score_minmax_norm=True)
 elif METHOD == 'better_agc':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
