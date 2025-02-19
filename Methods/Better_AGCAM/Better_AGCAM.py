@@ -333,7 +333,7 @@ class BetterAGC_softmax:
 
 
 class BetterAGC_plus1:
-    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=False):
+    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=True):
         """
         Args:
             model (nn.Module): the Vision Transformer model to be explained
@@ -429,12 +429,20 @@ class BetterAGC_plus1:
                 # Normalize using min-max scaling
                 tensor_heatmaps = (tensor_heatmaps - min_vals) / (max_vals - min_vals + 1e-7)  # Add small value to avoid division by zero
             
-            # print("before multiply img with mask: ")
-            # print(torch.cuda.memory_allocated()/1024**2)
-            m = torch.mul(tensor_heatmaps, image)
-            # print("After multiply img with mask scores: ")
-            # print(torch.cuda.memory_allocated()/1024**2)
+            # -------------- add noise ------------
+            N  = tensor_heatmaps.shape[0]
+            H = tensor_heatmaps.shape[2]
+            W = tensor_heatmaps.shape[3]
+            # Generate the inverse of masks, i.e., 1-M_i
+            masks_inverse=torch.from_numpy(np.repeat((1-tensor_heatmaps.cpu().numpy())[:, :, np.newaxis,:], 3, axis=2)).cuda()
+            masks_inverse = masks_inverse.squeeze(1)
 
+            random_whole=torch.randn([N]+list((3,H,W))).cuda()* 0.1
+            noise_to_add = random_whole * masks_inverse
+
+            mask = torch.mul(tensor_heatmaps, image)
+            m = mask + noise_to_add
+            
             with torch.no_grad():
                 output_mask = self.model(m)
             
@@ -1126,7 +1134,6 @@ class BetterAGC_cluster:
         # print()
 
         return predicted_class, saliency_map
-
     
 class BetterAGC_cluster_add_noise:
     def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', thresold=0.7, num_heatmaps=30):
