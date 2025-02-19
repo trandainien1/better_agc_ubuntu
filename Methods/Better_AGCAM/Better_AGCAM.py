@@ -333,7 +333,7 @@ class BetterAGC_softmax:
 
 
 class BetterAGC_plus1:
-    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum'):
+    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True):
         """
         Args:
             model (nn.Module): the Vision Transformer model to be explained
@@ -349,6 +349,7 @@ class BetterAGC_plus1:
         self.layer_fusion = layer_fusion
         self.attn_matrix = []
         self.grad_attn = []
+        self.normalize_cam_heads = normalize_cam_heads
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
@@ -420,11 +421,14 @@ class BetterAGC_plus1:
             tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
             tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
     
-            # Compute min and max along each image
-            min_vals = tensor_heatmaps.amin(dim=(2, 3), keepdim=True)  # Min across width and height
-            max_vals = tensor_heatmaps.amax(dim=(2, 3), keepdim=True)  # Max across width and height
-            # Normalize using min-max scaling
-            tensor_heatmaps = (tensor_heatmaps - min_vals) / (max_vals - min_vals + 1e-7)  # Add small value to avoid division by zero
+            if self.normalize_cam_heads:
+                # Compute min and max along each image
+                min_vals = tensor_heatmaps.amin(dim=(2, 3), keepdim=True)  # Min across width and height
+                max_vals = tensor_heatmaps.amax(dim=(2, 3), keepdim=True)  # Max across width and height
+                # Normalize using min-max scaling
+                tensor_heatmaps = (tensor_heatmaps - min_vals) / (max_vals - min_vals + 1e-7)  # Add small value to avoid division by zero
+            else:
+                print('[DEBUG]: NO NORMALIZE CAMS OF HEADS')
             # print("before multiply img with mask: ")
             # print(torch.cuda.memory_allocated()/1024**2)
             m = torch.mul(tensor_heatmaps, image)

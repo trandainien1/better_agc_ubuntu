@@ -122,7 +122,7 @@ elif args.method=="rollout":
     method = VITAttentionRollout(model, device=device)
     save_name+='_rollout'
 elif args.method == 'tis':
-    method = TISWrapper(model)
+    method = TISWrapper(model=model)
 
 print("save the data in ", save_root)
 
