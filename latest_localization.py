@@ -34,6 +34,7 @@ from Methods.LRP.ViT_explanation_generator import LRP
 
 from Methods.AttentionRollout.AttentionRollout import VITAttentionRollout
 from Methods.TIS.tis import TISWrapper
+from Methods.ViTCX.vitcx import ViTCXWrapper
 from Methods.BT.bt import BTTWrapper, BTHWrapper
 
 import csv
@@ -192,7 +193,7 @@ elif METHOD == 'tis':
 elif METHOD == 'vitcx':
     model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
     model = model.eval()
-    method = TISWrapper(model=model)
+    method = ViTCXWrapper(model=model)
 elif METHOD == 'btt':
     model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
     model = model.eval()
