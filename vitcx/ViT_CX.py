@@ -111,5 +111,5 @@ def ViT_CX(model,image,target_layer,target_category=None,distance_threshold=0.1,
     sal = compute_causal_score(image,mask_clustering_norm, class_p)[target_category].cpu().numpy()
 
     # return sal, mask_clustering_norm
-    print('[DEBUG]', target_category)
-    return sal
+    # print('[DEBUG]', target_category)
+    return target_category, sal
