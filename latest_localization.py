@@ -205,7 +205,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD}")
+print(f"[XAI METHOD]: {METHOD} - no normalize CAM of heads")
 
 validloader = DataLoader(
     dataset = validset,
