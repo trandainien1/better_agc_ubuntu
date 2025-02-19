@@ -53,7 +53,7 @@ class ViTCXWrapper:
             saliency = saliency.detach()
 
             del model
-            return prediction, saliency
+            return saliency
     def generate(self, x, target=None):
         with torch.enable_grad():
             saliency_map = self.exec_method(x, class_idx=target)
