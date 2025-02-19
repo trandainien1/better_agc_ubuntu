@@ -661,7 +661,7 @@ class ScoreAGC_head_fusion:
             class_idx = predicted_class
             # print("class idx", class_idx)
         
-        print('[DEBUG]:'. head_cams.shape)
+        print('[DEBUG]:', head_cams.shape)
         # Generate the saliency map for image x and class_idx
         scores = self.generate_scores(
             image=x,
