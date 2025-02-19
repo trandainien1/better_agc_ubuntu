@@ -592,7 +592,7 @@ class ScoreAGC_head_fusion:
     def generate_scores(self, head_cams, prediction, output_truth, image):
         with torch.no_grad():
             tensor_heatmaps = head_cams[0]
-            tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
+            tensor_heatmaps = tensor_heatmaps.reshape(12, 1, 14, 14)
             tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
     
             if self.normalize_cam_heads:
@@ -661,7 +661,6 @@ class ScoreAGC_head_fusion:
             class_idx = predicted_class
             # print("class idx", class_idx)
         
-        print('[DEBUG]:', head_cams.shape)
         # Generate the saliency map for image x and class_idx
         scores = self.generate_scores(
             image=x,
