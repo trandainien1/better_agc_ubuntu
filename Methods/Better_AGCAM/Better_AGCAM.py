@@ -635,7 +635,7 @@ class ScoreAGC_head_fusion:
             return agc_scores
 
     def generate_saliency(self, head_cams, agc_scores):
-        mask = (agc_scores.view(12, 12, 1, 1, 1) * head_cams[0]).sum(axis=(0, 1))
+        mask = (agc_scores.view(1, 12, 1, 1, 1) * head_cams[0]).sum(axis=(0, 1))
 
         mask = mask.squeeze()
         return mask
