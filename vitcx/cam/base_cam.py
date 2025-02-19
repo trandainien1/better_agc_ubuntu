@@ -194,7 +194,7 @@ class BaseCAM:
         self.featuremap_and_grads.release()
 
     def __enter__(self):
-        return self
+        return self 
 
     def __exit__(self, exc_type, exc_value, exc_tb):
         self.featuremap_and_grads.release()
