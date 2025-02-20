@@ -128,7 +128,7 @@ if METHOD == 'scoreagc':
         plus=0, 
         vitcx_score_formula=False, 
         add_noise=False,
-        score_minmax_norm=True,
+        score_minmax_norm=False,
         normalize_cam_heads=True,
         is_head_fuse=True,
     )
@@ -219,7 +219,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - add noise + vitcx score formula + no plus + minmax norm score + head fusion")
+print(f"[XAI METHOD]: {METHOD} - head fusion + sigmoid + no plus")
 
 validloader = DataLoader(
     dataset = validset,
