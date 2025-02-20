@@ -333,7 +333,7 @@ class BetterAGC_softmax:
 
 
 class ScoreAGC:
-    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=True, add_noise=False):
+    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=True, add_noise=False, plus=1):
         """
         Args:
             model (nn.Module): the Vision Transformer model to be explained
@@ -352,6 +352,7 @@ class ScoreAGC:
         self.normalize_cam_heads = normalize_cam_heads
         self.score_minmax_norm = score_minmax_norm
         self.add_noise = add_noise
+        self.plus = plus
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
@@ -462,7 +463,7 @@ class ScoreAGC:
             else:
                 agc_scores = torch.sigmoid(agc_scores)
             
-            agc_scores += 1
+            agc_scores += self.plus
 
             agc_scores = agc_scores.reshape(head_cams[0].shape[0], head_cams[0].shape[1])
 
