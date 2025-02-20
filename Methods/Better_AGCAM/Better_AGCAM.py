@@ -333,7 +333,7 @@ class BetterAGC_softmax:
 
 
 class ScoreAGC:
-    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=True):
+    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=True, add_noise=False):
         """
         Args:
             model (nn.Module): the Vision Transformer model to be explained
@@ -351,6 +351,7 @@ class ScoreAGC:
         self.grad_attn = []
         self.normalize_cam_heads = normalize_cam_heads
         self.score_minmax_norm = score_minmax_norm
+        self.add_noise = add_noise
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
@@ -429,20 +430,23 @@ class ScoreAGC:
                 # Normalize using min-max scaling
                 tensor_heatmaps = (tensor_heatmaps - min_vals) / (max_vals - min_vals + 1e-7)  # Add small value to avoid division by zero
             
-            # -------------- add noise ------------
-            N  = tensor_heatmaps.shape[0]
-            H = tensor_heatmaps.shape[2]
-            W = tensor_heatmaps.shape[3]
-            # Generate the inverse of masks, i.e., 1-M_i
-            masks_inverse=torch.from_numpy(np.repeat((1-tensor_heatmaps.cpu().numpy())[:, :, np.newaxis,:], 3, axis=2)).cuda()
-            masks_inverse = masks_inverse.squeeze(1)
+            if self.add_noise:
+                # -------------- add noise ------------
+                N  = tensor_heatmaps.shape[0]
+                H = tensor_heatmaps.shape[2]
+                W = tensor_heatmaps.shape[3]
+                # Generate the inverse of masks, i.e., 1-M_i
+                masks_inverse=torch.from_numpy(np.repeat((1-tensor_heatmaps.cpu().numpy())[:, :, np.newaxis,:], 3, axis=2)).cuda()
+                masks_inverse = masks_inverse.squeeze(1)
 
-            random_whole=torch.randn([N]+list((3,H,W))).cuda()* 0.1
-            noise_to_add = random_whole * masks_inverse
+                random_whole=torch.randn([N]+list((3,H,W))).cuda()* 0.1
+                noise_to_add = random_whole * masks_inverse
 
-            mask = torch.mul(tensor_heatmaps, image)
-            m = mask + noise_to_add
-            
+                mask = torch.mul(tensor_heatmaps, image)
+                m = mask + noise_to_add
+            else:
+                m = torch.mul(tensor_heatmaps, image)
+
             with torch.no_grad():
                 output_mask = self.model(m)
             
