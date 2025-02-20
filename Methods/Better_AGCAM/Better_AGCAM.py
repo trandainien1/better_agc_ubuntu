@@ -354,6 +354,7 @@ class ScoreAGC:
         self.add_noise = add_noise
         self.plus = plus
         self.vitcx_score_formula = vitcx_score_formula
+        
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
