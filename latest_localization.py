@@ -128,7 +128,9 @@ if METHOD == 'scoreagc':
         plus=0, 
         vitcx_score_formula=True, 
         add_noise=True,
-        score_minmax_norm=True
+        score_minmax_norm=True,
+        normalize_cam_heads=True,
+        is_head_fuse=True,
     )
 if METHOD == 'scoreagc_head_fusion':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')

@@ -333,7 +333,7 @@ class BetterAGC_softmax:
 
 
 class ScoreAGC:
-    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=True, add_noise=False, plus=1, vitcx_score_formula=False):
+    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=True, add_noise=False, plus=1, vitcx_score_formula=False, is_head_fuse=False):
         """
         Args:
             model (nn.Module): the Vision Transformer model to be explained
@@ -354,7 +354,7 @@ class ScoreAGC:
         self.add_noise = add_noise
         self.plus = plus
         self.vitcx_score_formula = vitcx_score_formula
-        
+        self.is_head_fuse = is_head_fuse
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
@@ -416,14 +416,21 @@ class ScoreAGC:
         # print(mask.shape)
 
         # *Niên:Thay vì tính tổng theo blocks và theo head như công thức để ra 1 mask cuối cùng là CAM thì niên sẽ giữ lại tất cả các mask của các head ở mỗi block
-        mask = Rearrange('b l hd z (h w)  -> b l hd z h w', h=self.width, w=self.width)(mask) # *Niên: chỗ này tách từng token (1, 196) thành từng patch (1, 14, 14)
+        if self.is_head_fuse:
+            mask = Reduce('b l h z p -> b l z p', reduction=self.head_fusion)(mask)
+            mask = Rearrange('b l z (h w)  -> b l z h w', h=self.width, w=self.width)(mask)
+        else:
+            mask = Rearrange('b l hd z (h w)  -> b l hd z h w', h=self.width, w=self.width)(mask) # *Niên: chỗ này tách từng token (1, 196) thành từng patch (1, 14, 14)
 
         return prediction, mask, output
 
     def generate_scores(self, head_cams, prediction, output_truth, image):
         with torch.no_grad():
             tensor_heatmaps = head_cams[0]
-            tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
+            if self.is_head_fuse:
+                tensor_heatmaps = tensor_heatmaps.reshape(12, 1, 14, 14)
+            else:
+                tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
             tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
     
             if self.normalize_cam_heads:
@@ -480,7 +487,10 @@ class ScoreAGC:
             return agc_scores
 
     def generate_saliency(self, head_cams, agc_scores):
-        mask = (agc_scores.view(12, 12, 1, 1, 1) * head_cams[0]).sum(axis=(0, 1))
+        if self.is_head_fuse:
+            mask = (agc_scores.view(1, 12, 1, 1, 1) * head_cams[0]).sum(axis=(0, 1))
+        else:
+            mask = (agc_scores.view(12, 12, 1, 1, 1) * head_cams[0]).sum(axis=(0, 1))
 
         mask = mask.squeeze()
         return mask
