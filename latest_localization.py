@@ -126,8 +126,8 @@ if METHOD == 'scoreagc':
     method = ScoreAGC(
         model, 
         plus=0, 
-        vitcx_score_formula=True, 
-        add_noise=True,
+        vitcx_score_formula=False, 
+        add_noise=False,
         score_minmax_norm=True,
         normalize_cam_heads=True,
         is_head_fuse=True,
