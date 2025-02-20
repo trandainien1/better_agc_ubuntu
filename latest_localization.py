@@ -125,7 +125,7 @@ if METHOD == 'scoreagc':
     model.eval()
     method = ScoreAGC(
         model, 
-        plus=0, 
+        plus=1, 
         vitcx_score_formula=False, 
         add_noise=False,
         score_minmax_norm=False,
@@ -219,7 +219,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - head fusion + sigmoid + no plus")
+print(f"[XAI METHOD]: {METHOD} - head fusion + sigmoid + plus 1")
 
 validloader = DataLoader(
     dataset = validset,
