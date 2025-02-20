@@ -211,7 +211,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - add noise")
+print(f"[XAI METHOD]: {METHOD} - add noise and no plus 1")
 
 validloader = DataLoader(
     dataset = validset,

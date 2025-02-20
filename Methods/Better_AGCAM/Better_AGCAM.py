@@ -458,7 +458,7 @@ class ScoreAGC:
             else:
                 agc_scores = torch.sigmoid(agc_scores)
             
-            agc_scores += 1
+            # agc_scores += 1
 
             agc_scores = agc_scores.reshape(head_cams[0].shape[0], head_cams[0].shape[1])
 
