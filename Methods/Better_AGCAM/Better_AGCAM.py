@@ -333,7 +333,7 @@ class BetterAGC_softmax:
 
 
 class ScoreAGC:
-    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=True, add_noise=False, plus=1):
+    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=True, add_noise=False, plus=1, vitcx_score_formula=False):
         """
         Args:
             model (nn.Module): the Vision Transformer model to be explained
@@ -353,6 +353,7 @@ class ScoreAGC:
         self.score_minmax_norm = score_minmax_norm
         self.add_noise = add_noise
         self.plus = plus
+        self.vitcx_score_formula = vitcx_score_formula
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
@@ -450,15 +451,18 @@ class ScoreAGC:
 
             with torch.no_grad():
                 output_mask = self.model(m)
-            
+
+            if self.vitcx_score_formula:
+                p_mask_with_noise = output_mask[:, prediction.item()]
+                p_x_with_noise = self.model(image + noise_to_add)[0, prediction.item()]
+                class_p = output_truth[0, prediction.item()]
+                agc_scores = p_mask_with_noise - p_x_with_noise + class_p
+            else:
             # print("After get output from model: ")
             # print(torch.cuda.memory_allocated()/1024**2)
-
+                agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
             
-            agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
-            
-            if self.score_minmax_norm:
-                
+            if self.score_minmax_norm:   
                 agc_scores = (agc_scores - agc_scores.min() ) / (agc_scores.max() - agc_scores.min())
             else:
                 agc_scores = torch.sigmoid(agc_scores)

@@ -123,7 +123,13 @@ if METHOD == 'scoreagc':
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.eval()
-    method = ScoreAGC(model, plus=0)
+    method = ScoreAGC(
+        model, 
+        plus=1, 
+        vitcx_score_formula=True, 
+        add_noise=True,
+        score_minmax_norm=True
+    )
 if METHOD == 'scoreagc_head_fusion':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
@@ -211,7 +217,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - add noise and no plus 1")
+print(f"[XAI METHOD]: {METHOD} - add noise + vitcx score formula + plus1 + minmax norm score")
 
 validloader = DataLoader(
     dataset = validset,
