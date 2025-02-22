@@ -31,7 +31,7 @@ from Methods.ViTCX.vitcx import ViTCXWrapper
 from Methods.BT.bt import BTTWrapper, BTHWrapper
 
 parser = argparse.ArgumentParser(description='save heatmaps in h5')
-parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'tis', 'vitcx'])
+parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'tis', 'vitcx', 'btt', 'bth'])
 parser.add_argument('--save_root', type=str, required=True)
 parser.add_argument('--data_root', type=str, required=True)
 args = parser.parse_args()
