@@ -326,6 +326,8 @@ class TIS:
         print('[DEBUG] MASKS', masks.shape)
         print('[DEBUG] SCORES', scores.shape)
         # Sum the masks weighted by their scores to produce a raw saliency
+        if scores.shape == (1024, 1):
+            scores = scores.squeeze(1)
         scored_masks = scores * masks # ORIGIN
         raw_saliency = scored_masks.sum(-1)
 
