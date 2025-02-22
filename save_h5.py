@@ -90,7 +90,7 @@ def unnormalize(tensor, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
     """
     mean = torch.tensor(mean).view(3, 1, 1)  # Reshape to (C, 1, 1) for broadcasting
     std = torch.tensor(std).view(3, 1, 1)    # Reshape to (C, 1, 1) for broadcasting
-    return tensor * std + mean  # Reverse the normalization
+    return tensor * std.to('cuda') + mean.to('cuda')  # Reverse the normalization
 # unnormalize = transforms.Compose([
 #     transforms.Normalize([0., 0., 0.], [1/0.5, 1/0.5, 1/0.5]),
 #     transforms.Normalize([-0.5, -0.5, -0.5], [1., 1., 1.,])
