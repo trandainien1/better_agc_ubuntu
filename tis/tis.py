@@ -245,7 +245,6 @@ class TIS:
         """
         # initialise the list of scores of the masks
         scores = []
-        print('[DEBUG X]', x.shape)
 
         # Reset self.cur_mask_indices
         self.cur_mask_indices = None
@@ -275,7 +274,6 @@ class TIS:
                 # Concatenate the list into a tensor
                 sampled_tokens = torch.cat(sampled_tokens)
 
-                print('[DEBUG sampled tokens]', sampled_tokens.shape)
                 return sampled_tokens
                 # return torch.cat([cls, sampled_tokens], dim=1)
 
@@ -317,7 +315,7 @@ class TIS:
 
         # Concatenate all the scores into a tensor
         scores = torch.cat(scores)
-
+        print('FINAL SCORES', scores.shape)
         return scores
 
     def generate_saliency(self, x, scores, mask_list):
