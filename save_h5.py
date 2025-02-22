@@ -171,7 +171,7 @@ with torch.enable_grad():
             heatmap = heatmap.reshape(1, 1, 14, 14) 
         
         # resize the heatmap
-        print('[DEBUG]', heatmap.shape)
+      
         resize = transforms.Resize((224, 224))
         heatmap = resize(heatmap[0])
 
