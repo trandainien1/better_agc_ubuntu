@@ -307,7 +307,6 @@ class TIS:
 
             # Append the scores of the masks in the batch to the list of all scores
             scores.append(score)
-        print('DEBUG 2', len(scores))
 
         # Remove sampling hook
         if not self.ablation_study:
@@ -316,15 +315,12 @@ class TIS:
 
         # Concatenate all the scores into a tensor
         scores = torch.cat(scores)
-        print('FINAL SCORES', scores.shape)
         return scores
 
     def generate_saliency(self, x, scores, mask_list):
 
         # Stack masks into a tensor
         masks = torch.vstack(mask_list).T
-        print('[DEBUG] MASKS', masks.shape)
-        print('[DEBUG] SCORES', scores.shape)
         # Sum the masks weighted by their scores to produce a raw saliency
         if scores.shape == (1024, 1):
             scores = scores.squeeze(1)
