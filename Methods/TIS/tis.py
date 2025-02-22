@@ -21,4 +21,6 @@ class TISWrapper:
     def generate(self, x, target=None):
         with torch.enable_grad():
             prediction, saliency_map = self.method(x, class_idx=target)
-            return prediction, saliency_map.detach().cpu()
+            # return prediction, saliency_map.detach().cpu() # origin
+            return prediction, saliency_map
+            
