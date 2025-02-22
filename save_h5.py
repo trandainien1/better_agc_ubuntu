@@ -33,7 +33,7 @@ from Methods.TAM.tam import TAMWrapper
 from Methods.Chefer2.chefer2 import Chefer2Wrapper
 
 parser = argparse.ArgumentParser(description='save heatmaps in h5')
-parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'tis', 'vitcx', 'btt', 'bth', 'tam'])
+parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'tis', 'vitcx', 'btt', 'bth', 'tam', 'chefer2'])
 parser.add_argument('--save_root', type=str, required=True)
 parser.add_argument('--data_root', type=str, required=True)
 args = parser.parse_args()
