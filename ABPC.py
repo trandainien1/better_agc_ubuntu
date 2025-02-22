@@ -13,7 +13,7 @@ import torch.utils.model_zoo as model_zoo
 
 # Before calculating the ABPC score, the h5 file for the target method is required.
 parser = argparse.ArgumentParser(description='perturbation')
-parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout']) 
+parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'tis', 'vitcx', 'btt', 'bth', 'chefer2', 'tam']) 
 parser.add_argument('--h5_root', type=str, required=True)
 parser.add_argument('--csv', type=str, default="True", choices=['True', 'False'])
 parser.add_argument('--file', type=str, default="True", choices=['True', 'False'])
