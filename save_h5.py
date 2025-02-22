@@ -125,13 +125,9 @@ if args.method=="agcam":
     model = attn_method_model()
     method = AGCAM(model)
     save_name +="_agcam"
-elif args.method=="lrp":
-    # model = LRP_vit_base_patch16_224(device=device, num_classes=class_num).to(device)
-    # model.load_state_dict(state_dict, strict=True)
-    # model.eval()
-    # model = model.to('cuda')
+elif args.method=="chefer1":
     method = LRP(model, device=device)
-    save_name+="_lrp"
+    save_name+="_chefer1"
 elif args.method=="rollout":
     model = attn_method_model()
     method = VITAttentionRollout(model, device=device)
