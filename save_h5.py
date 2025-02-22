@@ -167,7 +167,7 @@ with torch.enable_grad():
         # generate heatmap
         prediction, heatmap = method.generate(image, label)
 
-         if args.method == 'tis':
+        if args.method == 'tis':
             heatmap = heatmap.reshape(1, 1, 14, 14) 
         
         # resize the heatmap
