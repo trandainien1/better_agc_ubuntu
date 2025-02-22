@@ -175,7 +175,8 @@ with torch.enable_grad():
         # generate heatmap
         prediction, heatmap = method.generate(image, label)
 
-        if args.method in ['tis', 'btt']:
+        # solve error "not pytorch image..." by below lines  
+        if args.method in ['tis', 'btt', 'bth']: 
             heatmap = heatmap.reshape(1, 1, 14, 14) 
 
         # resize the heatmap
