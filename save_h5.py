@@ -28,6 +28,7 @@ from Methods.LRP.ViT_explanation_generator import LRP
 from Methods.AttentionRollout.AttentionRollout import VITAttentionRollout
 from Methods.TIS.tis import TISWrapper
 from Methods.ViTCX.vitcx import ViTCXWrapper
+from Methods.BT.bt import BTTWrapper, BTHWrapper
 
 parser = argparse.ArgumentParser(description='save heatmaps in h5')
 parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'tis', 'vitcx'])
@@ -137,6 +138,10 @@ elif args.method == 'tis':
     method = TISWrapper(model=model)
 elif args.method == 'vitcx':
     method = ViTCXWrapper(model=model)
+elif args.method == 'btt':
+    method = BTTWrapper(model=model)
+elif args.method == 'bth':
+    method = BTHWrapper(model=model)
 
 print("save the data in ", save_root)
 
