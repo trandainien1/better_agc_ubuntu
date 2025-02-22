@@ -245,6 +245,7 @@ class TIS:
         """
         # initialise the list of scores of the masks
         scores = []
+        print('[DEBUG X]', x.shape)
 
         # Reset self.cur_mask_indices
         self.cur_mask_indices = None
@@ -274,6 +275,7 @@ class TIS:
                 # Concatenate the list into a tensor
                 sampled_tokens = torch.cat(sampled_tokens)
 
+                print('[DEBUG sampled tokens]', sampled_tokens.shape)
                 return sampled_tokens
                 # return torch.cat([cls, sampled_tokens], dim=1)
 
@@ -325,8 +327,7 @@ class TIS:
         print('[DEBUG] MASKS', masks.shape)
         print('[DEBUG] SCORES', scores.shape)
         # Sum the masks weighted by their scores to produce a raw saliency
-        # scored_masks = scores * masks # ORIGIN
-        scored_masks = masks @ scores # ORIGIN
+        scored_masks = scores * masks # ORIGIN
         raw_saliency = scored_masks.sum(-1)
 
         # Compute tokens coverage bias
