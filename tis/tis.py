@@ -289,6 +289,7 @@ class TIS:
                 exit(1)
 
         # Compute scores by batch
+        print('DEBUG 1', scores.shape)
         for idx in tqdm(range(math.ceil(len(mask_indices_list) / self.batch_size)), disable=(self.verbose)):
             # Select the masks attributed to the current batch
             selection_slice = slice(idx * self.batch_size, min((idx + 1) * self.batch_size, len(mask_indices_list)))
@@ -307,6 +308,7 @@ class TIS:
 
             # Append the scores of the masks in the batch to the list of all scores
             scores.append(score)
+        print('DEBUG 2', scores.shape)
 
         # Remove sampling hook
         if not self.ablation_study:
