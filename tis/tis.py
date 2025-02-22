@@ -322,7 +322,8 @@ class TIS:
 
         # Stack masks into a tensor
         masks = torch.vstack(mask_list).T
-
+        print('[DEBUG] MASKS', masks.shape)
+        print('[DEBUG] SCORES', scores.shape)
         # Sum the masks weighted by their scores to produce a raw saliency
         scored_masks = scores * masks
         raw_saliency = scored_masks.sum(-1)
