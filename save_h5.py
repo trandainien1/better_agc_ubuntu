@@ -61,29 +61,40 @@ save_name=""
 # root of the dataset
 data_root = args.data_root
 
-# transformation for ILSVRC
+# transformation for ILSVRC (original)
+# test_transform = transforms.Compose([
+#     transforms.Resize((224,224)),
+#     transforms.ToTensor(),
+#     # transforms.Normalize([0.5,0.5,0.5], [0.5,0.5,0.5])
+#     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+# ])
+
 test_transform = transforms.Compose([
-    transforms.Resize((224,224)),
     transforms.ToTensor(),
-    # transforms.Normalize([0.5,0.5,0.5], [0.5,0.5,0.5])
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
+# Define the unnormalize transform
+def unnormalize(tensor, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
+    """
+    Reverse the normalization applied to an image tensor.
+    
+    Args:
+        tensor (torch.Tensor): A normalized image tensor (C, H, W).
+        mean (list): Mean values used for normalization.
+        std (list): Standard deviation values used for normalization.
+    
+    Returns:
+        torch.Tensor: The unnormalized image tensor.
+    """
+    mean = torch.tensor(mean).view(3, 1, 1)  # Reshape to (C, 1, 1) for broadcasting
+    std = torch.tensor(std).view(3, 1, 1)    # Reshape to (C, 1, 1) for broadcasting
+    return tensor * std + mean  # Reverse the normalization
 # unnormalize = transforms.Compose([
 #     transforms.Normalize([0., 0., 0.], [1/0.5, 1/0.5, 1/0.5]),
 #     transforms.Normalize([-0.5, -0.5, -0.5], [1., 1., 1.,])
 # ])
-
-# Define the normalization parameters
-mean = [0.485, 0.456, 0.406]
-std = [0.229, 0.224, 0.225]
-
-# Create the unnormalize transform
-unnormalize = transforms.Compose([
-    transforms.Normalize(
-        mean=[-m/s for m, s in zip(mean, std)],  # Reverse mean: -mean/std
-        std=[1/s for s in std]                   # Reverse std: 1/std
-    )
-])
 
 validset = ImageNetDataset_val(
     root_dir=data_root,
