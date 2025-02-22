@@ -32,7 +32,7 @@ from Methods.BT.bt import BTTWrapper, BTHWrapper
 from Methods.TAM.tam import TAMWrapper
 
 parser = argparse.ArgumentParser(description='save heatmaps in h5')
-parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'tis', 'vitcx', 'btt', 'bth'])
+parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'tis', 'vitcx', 'btt', 'bth', 'tam'])
 parser.add_argument('--save_root', type=str, required=True)
 parser.add_argument('--data_root', type=str, required=True)
 args = parser.parse_args()
