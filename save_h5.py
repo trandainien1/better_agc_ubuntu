@@ -30,7 +30,7 @@ from Methods.TIS.tis import TISWrapper
 from Methods.ViTCX.vitcx import ViTCXWrapper
 
 parser = argparse.ArgumentParser(description='save heatmaps in h5')
-parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'tis'])
+parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'tis', 'vitcx'])
 parser.add_argument('--save_root', type=str, required=True)
 parser.add_argument('--data_root', type=str, required=True)
 args = parser.parse_args()
