@@ -182,7 +182,7 @@ with torch.enable_grad():
         prediction, heatmap = method.generate(image, label)
 
         # solve error "TypeError: Tensor is not a torch image." by below lines  
-        if args.method in ['tis', 'btt', 'bth', 'tam']: 
+        if args.method in ['tis', 'btt', 'bth', 'tam', 'tam']: 
             heatmap = heatmap.reshape(1, 1, 14, 14) 
 
         # resize the heatmap
