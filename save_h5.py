@@ -189,7 +189,6 @@ with torch.enable_grad():
 
         # generate heatmap
         prediction, heatmap = method.generate(image, label)
-        print('[DEBUG] Heatmap shape:', heatmap.shape)
 
         # solve error "TypeError: Tensor is not a torch image." by below lines  
         if args.method in ['tis', 'btt', 'bth', 'tam', 'chefer2', 'scoreagc']: 
