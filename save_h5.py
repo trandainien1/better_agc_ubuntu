@@ -31,6 +31,7 @@ from Methods.ViTCX.vitcx import ViTCXWrapper
 from Methods.BT.bt import BTTWrapper, BTHWrapper
 from Methods.TAM.tam import TAMWrapper
 from Methods.Chefer2.chefer2 import Chefer2Wrapper
+from Methods.Better_AGCAM.Better_AGCAM import ScoreAGC
 
 parser = argparse.ArgumentParser(description='save heatmaps in h5')
 parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'tis', 'vitcx', 'btt', 'bth', 'tam', 'chefer2'])
@@ -144,6 +145,18 @@ elif args.method == 'tam':
     method = TAMWrapper(model=model)
 elif args.method == 'chefer2':
     method = Chefer2Wrapper(model=model)
+elif args.method == 'scoreagc':
+    model = attn_method_model()
+    method = ScoreAGC(
+        model, 
+        plus=0, 
+        vitcx_score_formula=False, 
+        add_noise=True,
+        score_minmax_norm=True,
+        normalize_cam_heads=True,
+        is_head_fuse=False,
+    )
+    save_name +="_scoreagc"
 
 print("save the data in ", save_root)
 
