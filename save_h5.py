@@ -156,7 +156,6 @@ elif args.method == 'scoreagc':
         normalize_cam_heads=True,
         is_head_fuse=False,
     )
-    save_name +="_scoreagc"
 
 print("save the data in ", save_root)
 
