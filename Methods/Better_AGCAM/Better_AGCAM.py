@@ -495,6 +495,9 @@ class ScoreAGC:
         mask = mask.squeeze()
         return mask
 
+    def generate(self, x, class_idx=None):
+        return self(x, class_idx)
+        
     def __call__(self, x, class_idx=None):
 
         # Check that we get only one image
