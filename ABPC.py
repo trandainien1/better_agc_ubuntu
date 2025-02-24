@@ -91,7 +91,9 @@ for idx, name in enumerate(tqdm.tqdm(names)):
     data = torch.tensor(np.array(file['/image'][name])).to(device)    # The original input image
     vis = torch.tensor(np.array(file['/cam'][name])).to(device)       # The heatmap visualization
     target = torch.tensor(np.array(file['/label'][name])).to(device)  # The label class
-    print('[DEBUG]: ', vis.shape)
+    if args.method == 'vitcx':
+        vis = vis.unsqueeze(0)
+
     c, h, w = vis.shape
     data_norm = normalize(data).to(device)
     for i in range(len(scope)):                             # Perturbation step: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
