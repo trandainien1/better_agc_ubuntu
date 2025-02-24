@@ -192,7 +192,7 @@ with torch.enable_grad():
         print('[DEBUG] Heatmap shape:', heatmap.shape)
 
         # solve error "TypeError: Tensor is not a torch image." by below lines  
-        if args.method in ['tis', 'btt', 'bth', 'tam', 'chefer2']: 
+        if args.method in ['tis', 'btt', 'bth', 'tam', 'chefer2', 'scoreagc']: 
             heatmap = heatmap.reshape(1, 1, 14, 14) 
 
         # resize the heatmap
