@@ -164,7 +164,7 @@ validloader = DataLoader(
     shuffle = False,
 )
 
-subset_indices = pd.read_csv('/kaggle/working/better_agc_ubuntu/2000idx_ILSVRC2012.csv', header=None)[0].to_numpy()[0]
+subset_indices = pd.read_csv('/kaggle/working/better_agc_ubuntu/2000idx_ILSVRC2012.csv', header=None)[0].to_numpy()
 subset = Subset(validloader.dataset, subset_indices)
 subset_loader = torch.utils.data.DataLoader(subset, batch_size=1, shuffle=False)
 
@@ -199,4 +199,6 @@ with torch.enable_grad():
         g_image.create_dataset(filename[0], data=image)
         g_label.create_dataset(filename[0], data=label.detach().cpu().numpy())
         g_cam.create_dataset(filename[0], data=heatmap)
+
+        break
 file.close()
