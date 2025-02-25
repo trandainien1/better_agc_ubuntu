@@ -211,6 +211,6 @@ with torch.enable_grad():
         g_label.create_dataset(filename[0], data=label.detach().cpu().numpy())
         g_cam.create_dataset(filename[0], data=heatmap)
 
-        break
+        
         
 file.close()
