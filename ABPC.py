@@ -43,8 +43,10 @@ root = args.h5_root
 file_name = ""
 
 # Information for ILSVRC
-mean = [0.5, 0.5, 0.5]
-std = [0.5, 0.5, 0.5]
+# mean = [0.5, 0.5, 0.5]
+# std = [0.5, 0.5, 0.5]
+mean=[0.485, 0.456, 0.406]
+std=[0.229, 0.224, 0.225]
 normalize = transforms.Compose([
     transforms.Normalize(mean=mean, std=std)
 ])
