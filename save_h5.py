@@ -118,9 +118,17 @@ def attn_method_model():
     model = model.to('cuda')
     return model
 
+
 model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
 model = model.eval()
 model = model.to('cuda')
+
+if args.method == 'chefer1':
+    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location=device)
+    model = LRP_vit_base_patch16_224(device, num_classes=class_num).to(device)
+    model.load_state_dict(state_dict, strict=True)
+    model.eval()
+    method = LRP(model, device=device)
 
 if args.method=="agcam":
     model = attn_method_model()
