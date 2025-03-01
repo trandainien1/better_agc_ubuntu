@@ -34,7 +34,7 @@ from Methods.Chefer2.chefer2 import Chefer2Wrapper
 from Methods.Better_AGCAM.Better_AGCAM import ScoreAGC
 
 parser = argparse.ArgumentParser(description='save heatmaps in h5')
-parser.add_argument('--method', type=str, choices=['agcam', 'lrp', 'rollout', 'tis', 'vitcx', 'btt', 'bth', 'tam', 'chefer2', 'scoreagc'])
+parser.add_argument('--method', type=str, choices=['agcam', 'rollout', 'tis', 'vitcx', 'btt', 'bth', 'tam', 'chefer1', 'chefer2', 'scoreagc'])
 parser.add_argument('--save_root', type=str, required=True)
 parser.add_argument('--data_root', type=str, required=True)
 args = parser.parse_args()
