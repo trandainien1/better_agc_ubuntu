@@ -333,7 +333,15 @@ class BetterAGC_softmax:
 
 
 class ScoreAGC:
-    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', normalize_cam_heads=True, score_minmax_norm=True, add_noise=False, plus=1, vitcx_score_formula=False, is_head_fuse=False):
+    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', 
+                 normalize_cam_heads=True, 
+                 score_minmax_norm=True, 
+                 add_noise=False, 
+                 plus=1, 
+                 vitcx_score_formula=False, 
+                 is_head_fuse=False,
+                 is_binarize_cam_of_heads=False
+                 ):
         """
         Args:
             model (nn.Module): the Vision Transformer model to be explained
@@ -355,6 +363,7 @@ class ScoreAGC:
         self.plus = plus
         self.vitcx_score_formula = vitcx_score_formula
         self.is_head_fuse = is_head_fuse
+        self.is_binarize_cam_of_heads = is_binarize_cam_of_heads
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
