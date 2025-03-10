@@ -123,15 +123,17 @@ if METHOD == 'scoreagc':
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.eval()
+    # test scoreAGC with PCB, no binary
     method = ScoreAGC(
         model, 
         plus=0, 
         vitcx_score_formula=False, 
-        add_noise=False, # ! test new scoreagc with binary cams of heads
+        add_noise=True, # ! test new scoreagc with binary cams of heads
         score_minmax_norm=True,
         normalize_cam_heads=True,
         is_head_fuse=False,
-        is_binarize_cam_of_heads=True
+        is_binarize_cam_of_heads=False,
+        handle_pixel_coverage_bias=True,
     )
 if METHOD == 'scoreagc_head_fusion':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
@@ -220,7 +222,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - interpolate")
+print(f"[XAI METHOD]: {METHOD} - PCB")
 
 validloader = DataLoader(
     dataset = validset,

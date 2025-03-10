@@ -340,7 +340,8 @@ class ScoreAGC:
                  plus=1, 
                  vitcx_score_formula=False, 
                  is_head_fuse=False,
-                 is_binarize_cam_of_heads=False
+                 is_binarize_cam_of_heads=False,
+                 handle_pixel_coverage_bias=False,
                  ):
         """
         Args:
@@ -364,6 +365,7 @@ class ScoreAGC:
         self.vitcx_score_formula = vitcx_score_formula
         self.is_head_fuse = is_head_fuse
         self.is_binarize_cam_of_heads = is_binarize_cam_of_heads
+        self.handle_pixel_coverage_bias = handle_pixel_coverage_bias
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
@@ -472,7 +474,7 @@ class ScoreAGC:
                 tensor_heatmaps = torch.stack(heatmaps_list).unsqueeze(1)
                 
                 # tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)   
-                tensor_heatmaps = F.interpolate(tensor_heatmaps, size=(image.shape[2], image.shape[3]), mode='nearest')
+                # tensor_heatmaps = F.interpolate(tensor_heatmaps, size=(image.shape[2], image.shape[3]), mode='nearest')
 
                       
             elif self.normalize_cam_heads:
@@ -533,6 +535,10 @@ class ScoreAGC:
             mask = (agc_scores.view(1, 12, 1, 1, 1) * head_cams[0]).sum(axis=(0, 1))
         else:
             mask = (agc_scores.view(12, 12, 1, 1, 1) * head_cams[0]).sum(axis=(0, 1))
+
+        if self.handle_pixel_coverage_bias:
+            raw_sal = head_cams.unsqueeze().sum(axis=(0, 1)).squeeze() # (1, 14, 14)
+            mask /= raw_sal
 
         mask = mask.squeeze()
         return mask
