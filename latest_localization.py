@@ -220,7 +220,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - head fusion + minmax + plus 1 + noise + vitcx score formula")
+print(f"[XAI METHOD]: {METHOD} - interpolate")
 
 validloader = DataLoader(
     dataset = validset,
