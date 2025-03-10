@@ -128,7 +128,7 @@ if METHOD == 'scoreagc':
         model, 
         plus=0, 
         vitcx_score_formula=False, 
-        add_noise=False, # ! test new scoreagc with binary cams of heads
+        add_noise=True,
         score_minmax_norm=True,
         normalize_cam_heads=True,
         is_head_fuse=False,
@@ -222,7 +222,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - binary + PCB")
+print(f"[XAI METHOD]: {METHOD} - binary + PCB + noise")
 
 validloader = DataLoader(
     dataset = validset,
