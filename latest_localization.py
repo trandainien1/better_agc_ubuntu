@@ -222,7 +222,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - binary")
+print(f"[XAI METHOD]: {METHOD} - PCB")
 
 validloader = DataLoader(
     dataset = validset,
