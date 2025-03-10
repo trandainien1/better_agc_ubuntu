@@ -437,6 +437,7 @@ class ScoreAGC:
         head_cams = torch.squeeze(head_cams) # (1, 12, 12,1, 14, 14) -> (12, 12, 14, 14)
         cam_1_indice_list = []
         bin_cam_list = []
+        print('[DEBUG] head cam shape: ', head_cams.shape)
         for i in range(head_cams.shape(0)):
             for j in range(head_cams.shape(1)):
                 cam = head_cams[i][j]
