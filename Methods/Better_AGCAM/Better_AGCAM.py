@@ -444,6 +444,7 @@ class ScoreAGC:
                 n_tokens = int(0.5 * cam.flatten().shape[0]) # 196 // 2 = 98 tokens
 
                 # Compute the indexes of the n_tokens with the highest values in the raw mask
+                print('[DEBUG] cam shape: ', cam.shape)
                 cam_1_indices = cam.topk(n_tokens)[1]  # indices where value will be 1
 
                 # Create binary mask
