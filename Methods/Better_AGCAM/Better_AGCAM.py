@@ -473,8 +473,8 @@ class ScoreAGC:
                 heatmaps_list = self.binarize_head_cams(head_cams)
                 tensor_heatmaps = torch.stack(heatmaps_list).unsqueeze(1)
                 
-                # tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)   
-                tensor_heatmaps = F.interpolate(tensor_heatmaps, size=(image.shape[2], image.shape[3]), mode='nearest')
+                tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)   
+                # tensor_heatmaps = F.interpolate(tensor_heatmaps, size=(image.shape[2], image.shape[3]), mode='nearest')
 
                       
             elif self.normalize_cam_heads:
