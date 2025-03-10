@@ -444,16 +444,16 @@ class ScoreAGC:
                 n_tokens = int(0.5 * cam.flatten().shape[0]) # 196 // 2 = 98 tokens
 
                 # Compute the indexes of the n_tokens with the highest values in the raw mask
-                print('[DEBUG] cam shape: ', cam.shape)
-                cam_1_indices = cam.topk(n_tokens)[1]  # indices where value will be 1
+                cam_1_indices = cam.flatten().topk(n_tokens)[1]  # indices where value will be 1
 
                 # Create binary mask
-                bin_cam = torch.zeros_like(cam)
-                bin_cam[cam_1_indices] = 1
+                bin_cam_flatten = torch.zeros_like(cam.flatten())
+                bin_cam_flatten[cam_1_indices] = 1
 
                 # Append current mask to lists
                 cam_1_indice_list.append(cam_1_indices)
-                bin_cam_list.append(bin_cam)
+                bin_cam_list.append(bin_cam_flatten.reshape(14, 14))
+        print('[DEBUG] bin masks shape: ', bin_cam_list.shape)
         return bin_cam_list 
 
 
