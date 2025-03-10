@@ -537,7 +537,7 @@ class ScoreAGC:
             mask = (agc_scores.view(12, 12, 1, 1, 1) * head_cams[0]).sum(axis=(0, 1))
 
         if self.handle_pixel_coverage_bias:
-            raw_sal = head_cams.unsqueeze().sum(axis=(0, 1)).squeeze() # (1, 14, 14)
+            raw_sal = head_cams.squeeze().sum(axis=(0, 1)).unsqueeze() # (1, 14, 14)
             mask /= raw_sal
 
         mask = mask.squeeze()
