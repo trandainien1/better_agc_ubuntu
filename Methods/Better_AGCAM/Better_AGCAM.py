@@ -453,7 +453,8 @@ class ScoreAGC:
                 # Append current mask to lists
                 cam_1_indice_list.append(cam_1_indices)
                 bin_cam_list.append(bin_cam_flatten.reshape(14, 14))
-        print('[DEBUG] bin masks shape: ', bin_cam_list.shape)
+        print('[DEBUG] bin masks shape: ', len(bin_cam_list))
+        print('[DEBUG] 1 bin mask shape: ', bin_cam_list[0].shape)
         return bin_cam_list 
 
 
@@ -470,7 +471,7 @@ class ScoreAGC:
 
             if self.is_binarize_cam_of_heads:
                 head_cams = self.binarize_head_cams(head_cams)
-                tensor_heatmaps = head_cams
+                tensor_heatmaps = torch.tensor(head_cams)
             elif self.normalize_cam_heads:
                 # Compute min and max along each image
                 min_vals = tensor_heatmaps.amin(dim=(2, 3), keepdim=True)  # Min across width and height
