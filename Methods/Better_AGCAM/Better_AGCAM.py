@@ -425,18 +425,43 @@ class ScoreAGC:
         return prediction, mask, output
 
     def binarize_head_cams(self, head_cams):
-        pass
+        head_cams = torch.squeeze(head_cams) # (1, 12, 12,1, 14, 14) -> (12, 12, 14, 14)
+        cam_1_indice_list = []
+        bin_cam_list = []
+        for i in range(head_cams.shape(0)):
+            for j in range(head_cams.shape(1)):
+                cam = head_cams[i][j]
+                # Computer the number of tokens to keep based on the ratio
+                n_tokens = int(0.5 * cam.flatten().shape[0]) # 196 // 2 = 98 tokens
+
+                # Compute the indexes of the n_tokens with the highest values in the raw mask
+                cam_1_indices = cam.topk(n_tokens)[1]  # indices where value will be 1
+
+                # Create binary mask
+                bin_cam = torch.zeros_like(cam)
+                bin_cam[cam_1_indices] = 1
+
+                # Append current mask to lists
+                cam_1_indice_list.append(cam_1_indices)
+                bin_cam_list.append(bin_cam)
+        return bin_cam_list 
+
 
     def generate_scores(self, head_cams, prediction, output_truth, image):
         with torch.no_grad():
             tensor_heatmaps = head_cams[0]
+            
+
             if self.is_head_fuse:
                 tensor_heatmaps = tensor_heatmaps.reshape(12, 1, 14, 14)
             else:
                 tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
             tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)        
 
-            if self.normalize_cam_heads:
+            if self.is_binarize_cam_of_heads:
+                head_cams = self.binarize_head_cams(head_cams)
+                tensor_heatmaps = head_cams
+            elif self.normalize_cam_heads:
                 # Compute min and max along each image
                 min_vals = tensor_heatmaps.amin(dim=(2, 3), keepdim=True)  # Min across width and height
                 max_vals = tensor_heatmaps.amax(dim=(2, 3), keepdim=True)  # Max across width and height
@@ -511,7 +536,7 @@ class ScoreAGC:
             x = x.unsqueeze(dim=0)
 
         with torch.enable_grad():
-            # Head cam shape: 
+            # * Head cam shape: (1, 12, 12, 1, 14, 14) - 12 layers - 12 heads - 1 saliency of shape 14x14 = 196 tokens
             predicted_class, head_cams, output_truth = self.generate_cams_of_heads(x)
 
         # print("After generate cams: ")
@@ -519,7 +544,7 @@ class ScoreAGC:
         # print()
         
         # Define the class to explain. If not explicit, use the class predicted by the model
-        print('[DEBUG]:  head cams shape - ', head_cams.shape)
+     
         if class_idx is None:
             class_idx = predicted_class
             # print("class idx", class_idx)

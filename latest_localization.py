@@ -127,7 +127,7 @@ if METHOD == 'scoreagc':
         model, 
         plus=0, 
         vitcx_score_formula=False, 
-        add_noise=True,
+        add_noise=False, # ! test new scoreagc with binary cams of heads
         score_minmax_norm=True,
         normalize_cam_heads=True,
         is_head_fuse=False,
