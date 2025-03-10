@@ -436,7 +436,7 @@ class ScoreAGC:
     def binarize_head_cams(self, head_cams):
         head_cams = torch.squeeze(head_cams) # (1, 12, 12,1, 14, 14) -> (12, 12, 14, 14)
         cam_1_indice_list = []
-        bin_cam_list = []
+        bin_cams = torch.empty()
         for i in range(head_cams.shape[0]):
             for j in range(head_cams.shape[1]):
                 cam = head_cams[i][j]
@@ -452,10 +452,10 @@ class ScoreAGC:
 
                 # Append current mask to lists
                 cam_1_indice_list.append(cam_1_indices)
-                bin_cam_list.append(bin_cam_flatten.reshape(14, 14))
-        print('[DEBUG] bin masks shape: ', len(bin_cam_list))
-        print('[DEBUG] 1 bin mask shape: ', bin_cam_list[0].shape)
-        return bin_cam_list 
+                # bin_cam_list.append(bin_cam_flatten.reshape(14, 14))
+                bin_cams.stack(bin_cam_flatten.reshape(14, 14))
+        print('[DEBUG] bin masks shape: ', bin_cams.shape)
+        return bin_cams 
 
 
     def generate_scores(self, head_cams, prediction, output_truth, image):
