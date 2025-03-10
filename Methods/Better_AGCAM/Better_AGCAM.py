@@ -424,6 +424,9 @@ class ScoreAGC:
 
         return prediction, mask, output
 
+    def binarize_head_cams(self, head_cams):
+        pass
+
     def generate_scores(self, head_cams, prediction, output_truth, image):
         with torch.no_grad():
             tensor_heatmaps = head_cams[0]
@@ -431,8 +434,8 @@ class ScoreAGC:
                 tensor_heatmaps = tensor_heatmaps.reshape(12, 1, 14, 14)
             else:
                 tensor_heatmaps = tensor_heatmaps.reshape(144, 1, 14, 14)
-            tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)
-    
+            tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)        
+
             if self.normalize_cam_heads:
                 # Compute min and max along each image
                 min_vals = tensor_heatmaps.amin(dim=(2, 3), keepdim=True)  # Min across width and height
@@ -508,6 +511,7 @@ class ScoreAGC:
             x = x.unsqueeze(dim=0)
 
         with torch.enable_grad():
+            # Head cam shape: 
             predicted_class, head_cams, output_truth = self.generate_cams_of_heads(x)
 
         # print("After generate cams: ")
@@ -515,6 +519,7 @@ class ScoreAGC:
         # print()
         
         # Define the class to explain. If not explicit, use the class predicted by the model
+        print('[DEBUG]:  head cams shape - ', head_cams.shape)
         if class_idx is None:
             class_idx = predicted_class
             # print("class idx", class_idx)
