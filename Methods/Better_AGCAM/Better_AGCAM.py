@@ -470,8 +470,8 @@ class ScoreAGC:
             tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)        
 
             if self.is_binarize_cam_of_heads:
-                head_cams = self.binarize_head_cams(head_cams)
-                tensor_heatmaps = torch.stack(head_cams).unsqueeze(1)
+                heatmaps_list = self.binarize_head_cams(head_cams)
+                tensor_heatmaps = torch.stack(heatmaps_list).unsqueeze(1)
                 tensor_heatmaps = transforms.Resize((224, 224))(tensor_heatmaps)        
             elif self.normalize_cam_heads:
                 # Compute min and max along each image
