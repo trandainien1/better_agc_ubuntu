@@ -309,7 +309,7 @@ with torch.enable_grad():
             data["filename"][0], pixel_acc_, iou_, dice_, precision_, recall_
         )
 
-        break # --------------- for visualize heatmaps
+        # break # --------------- for visualize heatmaps
 
 
 if 'cluster' in METHOD:
