@@ -132,8 +132,8 @@ if METHOD == 'scoreagc':
         score_minmax_norm=True,
         normalize_cam_heads=True,
         is_head_fuse=False,
-        is_binarize_cam_of_heads=False,
-        handle_pixel_coverage_bias=True,
+        is_binarize_cam_of_heads=True,
+        handle_pixel_coverage_bias=False,
     )
 if METHOD == 'scoreagc_head_fusion':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
@@ -222,7 +222,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - PCB + noise")
+print(f"[XAI METHOD]: {METHOD} - binary + noise")
 
 validloader = DataLoader(
     dataset = validset,
