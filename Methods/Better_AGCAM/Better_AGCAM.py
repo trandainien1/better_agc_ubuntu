@@ -512,8 +512,9 @@ class ScoreAGC:
                 class_p = output_truth[0, prediction.item()]
                 agc_scores = p_mask_with_noise - p_x_with_noise + class_p
             else:
+                print('[DEBUG] output_mask shape', output_mask.shape)
                 if  self.score_formula == 'softmax_logit':
-                    pass
+                    pass 
                 elif self.score_formula == 'increase_in_confidence':
                     # increase in confidence
                     agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
