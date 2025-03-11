@@ -129,7 +129,7 @@ if METHOD == 'scoreagc':
         plus=0, 
         vitcx_score_formula=False, 
         add_noise=True,
-        score_minmax_norm=True,
+        score_minmax_norm=False,
         normalize_cam_heads=True,
         is_head_fuse=False,
         is_binarize_cam_of_heads=True,
