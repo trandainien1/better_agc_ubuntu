@@ -367,7 +367,7 @@ class ScoreAGC:
         self.is_head_fuse = is_head_fuse
         self.is_binarize_cam_of_heads = is_binarize_cam_of_heads
         self.handle_pixel_coverage_bias = handle_pixel_coverage_bias
-        self.score_formula = score_formula
+        self.score_formula = score_formula # ['softmax_logit', 'increase_in_confidence'] 
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
@@ -512,17 +512,18 @@ class ScoreAGC:
                 class_p = output_truth[0, prediction.item()]
                 agc_scores = p_mask_with_noise - p_x_with_noise + class_p
             else:
-                print('[DEBUG] output_mask shape', output_mask.shape)
                 if  self.score_formula == 'softmax_logit':
-                    pass 
+                    softmax_tensor = F.softmax(output_mask, dim=1)
+                    agc_scores = softmax_tensor[:, prediction.item()]
                 elif self.score_formula == 'increase_in_confidence':
                     # increase in confidence
                     agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
             
-            if self.score_minmax_norm:   
-                agc_scores = (agc_scores - agc_scores.min() ) / (agc_scores.max() - agc_scores.min())
-            else:
-                agc_scores = torch.sigmoid(agc_scores)
+            if self.score_formula == 'increase_in_confidence':
+                if self.score_minmax_norm:   
+                    agc_scores = (agc_scores - agc_scores.min() ) / (agc_scores.max() - agc_scores.min())
+                else:
+                    agc_scores = torch.sigmoid(agc_scores)
             
             agc_scores += self.plus
 
