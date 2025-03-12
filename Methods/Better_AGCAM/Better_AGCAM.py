@@ -515,15 +515,16 @@ class ScoreAGC:
                 if  self.score_formula == 'softmax_logit':
                     softmax_tensor = F.softmax(output_mask, dim=1)
                     agc_scores = softmax_tensor[:, prediction.item()]
+
                 elif self.score_formula == 'increase_in_confidence':
                     # increase in confidence
                     agc_scores = output_mask[:, prediction.item()] - output_truth[0, prediction.item()]
             
-            if self.score_formula == 'increase_in_confidence':
-                if self.score_minmax_norm:   
-                    agc_scores = (agc_scores - agc_scores.min() ) / (agc_scores.max() - agc_scores.min())
-                else:
-                    agc_scores = torch.sigmoid(agc_scores)
+            # if self.score_formula == 'increase_in_confidence':
+            if self.score_minmax_norm:   
+                agc_scores = (agc_scores - agc_scores.min() ) / (agc_scores.max() - agc_scores.min())
+            else:
+                agc_scores = torch.sigmoid(agc_scores)
             
             agc_scores += self.plus
 

@@ -128,12 +128,12 @@ if METHOD == 'scoreagc':
         model, 
         plus=0, 
         vitcx_score_formula=False, 
-        add_noise=True,
+        add_noise=False,
         score_minmax_norm=True,
         normalize_cam_heads=True,
         is_head_fuse=False,
         is_binarize_cam_of_heads=True,
-        handle_pixel_coverage_bias=True,
+        handle_pixel_coverage_bias=False,
         score_formula='softmax_logit',
     )
 if METHOD == 'scoreagc_head_fusion':
