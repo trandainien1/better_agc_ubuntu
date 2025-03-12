@@ -223,7 +223,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - logit softmax + binarize")
+print(f"[XAI METHOD]: {METHOD} - logit softmax + binarize + PCB")
 
 validloader = DataLoader(
     dataset = validset,
