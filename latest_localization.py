@@ -128,12 +128,12 @@ if METHOD == 'scoreagc':
         model, 
         plus=0, 
         vitcx_score_formula=False, 
-        add_noise=False,
+        add_noise=True,
         score_minmax_norm=True,
         normalize_cam_heads=True,
         is_head_fuse=False,
         is_binarize_cam_of_heads=True,
-        handle_pixel_coverage_bias=False,
+        handle_pixel_coverage_bias=True,
         score_formula='softmax_logit',
     )
 if METHOD == 'scoreagc_head_fusion':
@@ -223,7 +223,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - logit softmax + binarize")
+print(f"[XAI METHOD]: {METHOD} - logit softmax + binarize + PCB + noise")
 
 validloader = DataLoader(
     dataset = validset,
