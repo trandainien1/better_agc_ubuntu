@@ -133,7 +133,7 @@ if METHOD == 'scoreagc':
         normalize_cam_heads=True,
         is_head_fuse=False,
         is_binarize_cam_of_heads=True,
-        handle_pixel_coverage_bias=False,
+        handle_pixel_coverage_bias=True,
         score_formula='softmax_logit',
     )
 if METHOD == 'scoreagc_head_fusion':
