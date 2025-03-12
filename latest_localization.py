@@ -132,7 +132,7 @@ if METHOD == 'scoreagc':
         score_minmax_norm=True,
         normalize_cam_heads=True,
         is_head_fuse=False,
-        is_binarize_cam_of_heads=False,
+        is_binarize_cam_of_heads=True,
         handle_pixel_coverage_bias=False,
         score_formula='softmax_logit',
     )
@@ -223,7 +223,7 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - logit softmax")
+print(f"[XAI METHOD]: {METHOD} - logit softmax + binarize")
 
 validloader = DataLoader(
     dataset = validset,
