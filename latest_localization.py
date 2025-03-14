@@ -230,7 +230,7 @@ validloader = DataLoader(
     batch_size=1,
     shuffle = False,
 )
-subset_indices = pd.read_csv('/kaggle/working/better_agc_ubuntu/2000idx_ILSVRC2012.csv', header=None)[0].to_numpy()
+subset_indices = pd.read_csv('/kaggle/working/better_agc_ubuntu/idx_ILSVRC2012.csv', header=None)[0].to_numpy()
 subset = Subset(validloader.dataset, subset_indices)
 subset_loader = torch.utils.data.DataLoader(subset, batch_size=1, shuffle=False)
 
