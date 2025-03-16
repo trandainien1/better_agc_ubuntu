@@ -223,16 +223,19 @@ elif METHOD == 'bth':
     
 model = model.to('cuda')
 
-print(f"[XAI METHOD]: {METHOD} - logit softmax + norm min max for score")
-
 validloader = DataLoader(
     dataset = validset,
     batch_size=1,
     shuffle = False,
 )
 subset_indices = pd.read_csv('/kaggle/working/better_agc_ubuntu/idx_ILSVRC2012.csv', header=None)[0].to_numpy()
+first_index = subset_indices[0]
+last_index = subset_indices[-1]
+
 subset = Subset(validloader.dataset, subset_indices)
 subset_loader = torch.utils.data.DataLoader(subset, batch_size=1, shuffle=False)
+
+print(f"[XAI METHOD]: {METHOD} - {first_index} - {last_index}")
 
 with torch.enable_grad():      
     idx = 0
