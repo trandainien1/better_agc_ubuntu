@@ -190,7 +190,7 @@ elif METHOD == 'chefer1':
     model.load_state_dict(state_dict, strict=True)
     model.eval()
     method = LRP(model, device='cuda')
-elif METHOD == 'attention rollout':
+elif METHOD == 'rollout':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
     model.load_state_dict(state_dict, strict=True)
