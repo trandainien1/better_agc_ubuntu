@@ -330,7 +330,7 @@ class BetterAGC_softmax:
 
         return predicted_class, saliency_map
 
-
+# update date: 17/3
 # !default values is the best config to achieve the performance in the paper
 class ScoreAGC:
     def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', 
