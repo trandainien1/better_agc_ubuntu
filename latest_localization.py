@@ -135,7 +135,7 @@ if METHOD == 'scoreagc':
 
     # set up for model using in CUB
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=200).to('cuda')
+    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
     model.load_state_dict(state_dict, strict=True)
     model.head = nn.Linear(model.head.in_features, 200).to('cuda')
     model.eval()
