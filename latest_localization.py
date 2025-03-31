@@ -116,7 +116,7 @@ validset = Cub2011(
 )  
 
 # Model Parameter provided by Timm library.
-class_num=1000
+class_num=200
 
 # name = "The localization score of attention_rollout" 
 # METHOD = 'attention_rollout'
@@ -264,7 +264,7 @@ with torch.enable_grad():
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
         
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
-            prediction, saliency_map = method(image) 
+            prediction, saliency_map = method(image)
         else:
             prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
