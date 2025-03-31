@@ -126,23 +126,15 @@ export_file = METHOD + '_results.csv'
 data_file = METHOD + '_sigmoid_data.csv'
 
 if METHOD == 'scoreagc':
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
-    model.load_state_dict(state_dict, strict=False)
-    model.eval()
-    # test scoreAGC with PCB, no binary
-    method = ScoreAGC(
-        model, 
-        # plus=0, 
-        # vitcx_score_formula=False, 
-        # add_noise=False,
-        # score_minmax_norm=True,
-        # normalize_cam_heads=True,
-        # is_head_fuse=False,
-        # is_binarize_cam_of_heads=False,
-        # handle_pixel_coverage_bias=False,
-        # score_formula='softmax_logit',
-    )
+    # state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+    # model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
+    # model.load_state_dict(state_dict, strict=True)
+    # model.eval()
+
+    # set up for model using in CUB
+    model = timm.create_model(model="vit_base_patch16_224", pretrained=True, pretrained_cfg='orig_in21k_ft_in1k', class_num=200)
+
+    method = ScoreAGC(model)
 if METHOD == 'scoreagc_head_fusion':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
