@@ -132,7 +132,7 @@ if METHOD == 'scoreagc':
     # model.eval()
 
     # set up for model using in CUB
-    model = timm.create_model(model="vit_base_patch16_224", pretrained=True, pretrained_cfg='orig_in21k_ft_in1k', class_num=200)
+    model = timm.create_model(model_name="vit_base_patch16_224", pretrained=True, pretrained_cfg='orig_in21k_ft_in1k', class_num=200)
 
     method = ScoreAGC(model)
 if METHOD == 'scoreagc_head_fusion':
