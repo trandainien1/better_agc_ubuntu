@@ -24,7 +24,7 @@ import Methods.AGCAM.ViT_for_AGCAM as ViT_Ours
 import timm
 
 # dataset
-from Datasets.ILSVRC import ImageNetDataset_val
+from Datasets.ILSVRC import ImageNetDataset_val, Cub2011
 
 from torch.utils.data import Subset
 import pandas as pd
@@ -104,11 +104,16 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
-validset = ImageNetDataset_val(
-    # root_dir='./ILSVRC',
-    root_dir='/kaggle/input/ilsvrc/ILSVRC',
-    transforms=transform,
-)
+# validset = ImageNetDataset_val(
+#     # root_dir='./ILSVRC',
+#     root_dir='/kaggle/input/ilsvrc/ILSVRC',
+#     transforms=transform,
+# )
+
+validset = Cub2011(
+    root= "/kaggle/working/better_agc_ubuntu/CUB_200_2011",
+    transform=transform,
+)  
 
 # Model Parameter provided by Timm library.
 class_num=1000
