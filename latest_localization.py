@@ -117,6 +117,8 @@ validset = Cub2011(
 
 # Model Parameter provided by Timm library.
 class_num=200
+# class_num=1000 # Imagenet number of class
+
 
 # name = "The localization score of attention_rollout" 
 # METHOD = 'attention_rollout'
