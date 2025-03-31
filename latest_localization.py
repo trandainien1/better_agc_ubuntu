@@ -309,7 +309,6 @@ with torch.enable_grad():
 
         # print('[DEBUG] PREDICTION', prediction)
         # print('[DEBUG] LABEL', label.item())
-        print('[DEBUG]: ', prediction, label.item())
         if prediction!=label.item():
             continue
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
