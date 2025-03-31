@@ -75,8 +75,8 @@ from torch.utils.data import Dataset
 from PIL import Image
 import pandas as pd
 class Cub2011(Dataset):
-    base_folder = 'images'
-    annotation_folder = 'bounding_boxes'  # Assuming annotation TXT files are here
+    base_folder = 'CUB_200_2011/images'
+    annotation_folder = 'CUB_200_2011/bounding_boxes'  # Assuming annotation TXT files are here
     
     def __init__(self, root, train=True, transform=None, loader=None):
         self.root = os.path.expanduser(root)
