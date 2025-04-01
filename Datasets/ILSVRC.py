@@ -93,6 +93,7 @@ class Cub2011(Dataset):
         
         self._load_metadata()
         bounding_box_path = os.path.join(self.root, self.annotation_folder)
+        print('[DEBUG bounding box path]', bounding_box_path)
         self.bounding_boxes = self.read_bounding_boxes(bounding_box_path)
 
     def read_bounding_boxes(self, annotation_file):
