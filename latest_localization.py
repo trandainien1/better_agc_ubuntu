@@ -230,7 +230,7 @@ elif METHOD == 'agc':
 
     # CUB checkpoint
     state_dict = model_zoo.load_url(
-        'https://drive.google.com/file/d/1ZZnupk_bjFgIVbf14x-syj4JHfPLM9Ln/view?usp=sharing', 
+        '/kaggle/working/better_agc_ubuntu/CUB_b16.pth', 
         progress=True, 
         map_location='cuda'
     )
