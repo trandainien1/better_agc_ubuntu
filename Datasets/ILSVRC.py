@@ -146,6 +146,9 @@ class Cub2011(Dataset):
         #         bnd_boxes.append([xmin, ymin, xmax, ymax])
         
         bnd_box = self.bounding_boxes[str(img_id)] 
+        _, x, y, w, h = bnd_box
+        xmin, ymin, xmax, ymax = x, y, x + w, y + h
+        bnd_box = [xmin, ymin, xmax, ymax]
         return torch.tensor(bnd_box)
     
     def default_loader(self, path):
