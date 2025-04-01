@@ -22,6 +22,7 @@ from Methods.TAM.tam import TAMWrapper
 import Methods.AGCAM.ViT_for_AGCAM as ViT_Ours
 
 import timm
+import torch.nn as nn
 
 # dataset
 from Datasets.ILSVRC import ImageNetDataset_val, Cub2011
@@ -125,7 +126,34 @@ class_num=200
 export_file = METHOD + '_results.csv'
 data_file = METHOD + '_sigmoid_data.csv'
 
-import torch.nn as nn
+def create_agc_model(num_classes=1000):
+    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=num_classes).to('cuda')
+    model.load_state_dict(state_dict, strict=True)
+    model.eval()
+
+def create_model(num_classes=1000):
+    state_dict = model_zoo.load_url(
+        'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', 
+        progress=True, 
+        map_location='cuda'
+    )
+
+    # Create model with ImageNet settings (1000 classes)
+    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
+
+    # Remove the classifier head weights from the state_dict (to avoid shape mismatch)
+    state_dict.pop('head.weight', None)
+    state_dict.pop('head.bias', None)
+
+    # Load weights without classifier head
+    model.load_state_dict(state_dict, strict=False)
+
+    # Replace classifier head for CUB-200-2011 (200 classes)
+    model.head = nn.Linear(model.head.in_features, 200).to('cuda')
+
+    # Set to evaluation mode
+    model.eval()
 
 if METHOD == 'scoreagc':
     # state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')

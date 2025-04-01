@@ -116,8 +116,9 @@ class Cub2011(Dataset):
             parts = line.strip().split()
             if len(parts) == 5:
                 _, x, y, w, h = map(float, parts)
-                xmin, ymin, xmax, ymax = x, y, x + w, y + h
-                bnd_boxes.append([xmin, ymin, xmax, ymax])
+                # xmin, ymin, xmax, ymax = x, y, x + w, y + h
+                # bnd_boxes.append([xmin, ymin, xmax, ymax])
+                bnd_boxes.append([x, y, w, h])
         
         return torch.tensor(bnd_boxes)
     
