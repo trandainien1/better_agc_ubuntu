@@ -95,7 +95,7 @@ class Cub2011(Dataset):
         bounding_box_path = os.path.join(self.root, self.annotation_folder)
         self.bounding_boxes = self.read_bounding_boxes(bounding_box_path)
 
-    def read_bounding_boxes(annotation_file):
+    def read_bounding_boxes(self, annotation_file):
         """Reads bounding box data from a single text file and returns a dictionary."""
         if not os.path.exists(annotation_file):
             return {}  # Return empty dictionary if the file doesn't exist
