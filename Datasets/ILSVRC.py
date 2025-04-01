@@ -103,6 +103,7 @@ class Cub2011(Dataset):
             self.data = self.data[self.data.is_training_img == 0]
 
     def _load_bounding_boxes(self, img_id):
+        print('[DEBUG] img_id: ', img_id)
         annotation_path = os.path.join(self.root, self.annotation_folder, f'{img_id}.txt')
         
         if not os.path.exists(annotation_path):
