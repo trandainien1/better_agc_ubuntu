@@ -229,11 +229,8 @@ elif METHOD == 'agc':
     )
 
     # CUB checkpoint
-    state_dict = model_zoo.load_url(
-        '/kaggle/working/better_agc_ubuntu/CUB_b16.pth', 
-        progress=True, 
-        map_location='cuda'
-    )
+    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/CUB_b16.pth', map_location='cuda')
+
     
 
     # Create model with ImageNet settings (1000 classes)
