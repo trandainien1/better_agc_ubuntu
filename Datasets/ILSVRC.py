@@ -168,7 +168,7 @@ def read_image(file_path):
     return cv2.imread(file_path)[...,[2,1,0]]
 
 class Cub2011:
-    def __init__(self, root='data/CUB_200_2011') -> None:
+    def __init__(self, root_path='data/CUB_200_2011') -> None:
         super().__init__()
         self.image_paths = read_text(pth.join(root_path, 'images.txt'))
         self.bboxes = read_text(pth.join(root_path, 'bounding_boxes.txt')) # box means background-foreground binary segmentation
