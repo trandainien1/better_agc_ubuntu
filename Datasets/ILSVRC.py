@@ -146,7 +146,7 @@ class Cub2011(Dataset):
         #         bnd_boxes.append([xmin, ymin, xmax, ymax])
         
         print('[DEBUG]', img_id)
-        bnd_box = self.bounding_boxes[img_id] 
+        bnd_box = self.bounding_boxes[str(img_id)] 
         print('[DEBUG]', bnd_box)
         return torch.tensor(bnd_box)
     

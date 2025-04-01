@@ -15,4 +15,5 @@ def read_bounding_boxes(annotation_file="bounding_box.txt"):
     
     return bounding_boxes
 
-print(read_bounding_boxes(r"C:\Users\Asus\Downloads\CUB_200_2011\CUB_200_2011\bounding_boxes.txt"))
+a = read_bounding_boxes(r"C:\Users\Asus\Downloads\CUB_200_2011\CUB_200_2011\bounding_boxes.txt")
+print(a['2'])
