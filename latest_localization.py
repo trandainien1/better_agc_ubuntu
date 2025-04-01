@@ -229,7 +229,7 @@ elif METHOD == 'agc':
     )
 
     # CUB checkpoint
-    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/CUB_b16.pth', map_location='cuda')
+    # state_dict = torch.load('/kaggle/working/better_agc_ubuntu/CUB_b16.pth', map_location='cuda')
 
     print('DEBUG', state_dict)
     # Create model with ImageNet settings (1000 classes)
