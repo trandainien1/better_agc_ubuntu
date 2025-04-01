@@ -228,6 +228,14 @@ elif METHOD == 'agc':
         map_location='cuda'
     )
 
+    # CUB checkpoint
+    state_dict = model_zoo.load_url(
+        'https://drive.google.com/file/d/1YbAtXObtohm65ylJnSMfbo86xsHETs-H/view?usp=drive_link', 
+        progress=True, 
+        map_location='cuda'
+    )
+    
+
     # Create model with ImageNet settings (1000 classes)
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
 
