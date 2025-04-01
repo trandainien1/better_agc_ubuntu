@@ -92,10 +92,10 @@ class Cub2011(Dataset):
         self.train = train
         
         self._load_metadata()
-        print('[DEBUG]', os.path.join(self.root, self.annotation_folder))
-        self.bounding_boxes = self.read_bounding_boxes(os.path.join(self.root, self.annotation_folder))
+        bounding_box_path = os.path.join(self.root, self.annotation_folder)
+        self.bounding_boxes = self.read_bounding_boxes(bounding_box_path)
 
-    def read_bounding_boxes(annotation_file="bounding_box.txt"):
+    def read_bounding_boxes(annotation_file):
         """Reads bounding box data from a single text file and returns a dictionary."""
         if not os.path.exists(annotation_file):
             return {}  # Return empty dictionary if the file doesn't exist
