@@ -167,7 +167,7 @@ def read_text(file_path):
 def read_image(file_path):
     return cv2.imread(file_path)[...,[2,1,0]]
 
-class DataLoader:
+class Cub2011:
     def __init__(self, root_path='data/CUB_200_2011') -> None:
         super().__init__()
         self.image_paths = read_text(pth.join(root_path, 'images.txt'))
