@@ -240,7 +240,7 @@ elif METHOD == 'agc':
     # state_dict.pop('head.bias', None)
 
     # Load weights without classifier head
-    model.load_state_dict(state_dict, strict=True)
+    model.load_state_dict(state_dict)
 
     # Replace classifier head for CUB-200-2011 (200 classes)
     # model.head = nn.Linear(model.head.in_features, 200).to('cuda')
