@@ -124,7 +124,6 @@ class Cub2011(Dataset):
         else:
             self.data = self.data[self.data.is_training_img == 0]
         
-        self.bounding_box
 
     def _load_bounding_boxes(self, img_id):
         # print('[DEBUG] img_id: ', img_id)
