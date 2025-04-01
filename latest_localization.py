@@ -230,24 +230,24 @@ elif METHOD == 'agc':
 
     # CUB checkpoint
     state_dict = model_zoo.load_url(
-        'https://drive.google.com/file/d/1YbAtXObtohm65ylJnSMfbo86xsHETs-H/view?usp=drive_link', 
+        'https://drive.google.com/file/d/1ZZnupk_bjFgIVbf14x-syj4JHfPLM9Ln/view?usp=sharing', 
         progress=True, 
         map_location='cuda'
     )
     
 
     # Create model with ImageNet settings (1000 classes)
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
+    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=200).to('cuda')
 
     # Remove the classifier head weights from the state_dict (to avoid shape mismatch)
-    state_dict.pop('head.weight', None)
-    state_dict.pop('head.bias', None)
+    # state_dict.pop('head.weight', None)
+    # state_dict.pop('head.bias', None)
 
     # Load weights without classifier head
-    model.load_state_dict(state_dict, strict=False)
+    model.load_state_dict(state_dict, strict=True)
 
     # Replace classifier head for CUB-200-2011 (200 classes)
-    model.head = nn.Linear(model.head.in_features, 200).to('cuda')
+    # model.head = nn.Linear(model.head.in_features, 200).to('cuda')
 
     # Set to evaluation mode
     model.eval()
