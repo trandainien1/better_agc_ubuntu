@@ -112,7 +112,8 @@ transform = transforms.Compose([
 # )
 
 validset = Cub2011(
-    root_path= "/kaggle/working/better_agc_ubuntu/CUB_200_2011",
+    root= "/kaggle/working/better_agc_ubuntu",
+    transform=transform,
 )  
 
 # Model Parameter provided by Timm library.
