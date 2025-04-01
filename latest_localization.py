@@ -329,8 +329,6 @@ with torch.enable_grad():
         image = data['image'].to('cuda')
         label = data['label']
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
-        print('[DEBUG]', bnd_box)
-        break
         
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
             prediction, saliency_map = method(image)
