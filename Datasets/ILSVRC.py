@@ -37,6 +37,7 @@ class ImageNetDataset_val(ImageFolder):
         img = PIL.Image.open(img_path).convert('RGB')
         # img.show()
         width, height = img.size
+        print('[DEBUG] width, height: ', width, height)
         img_name = img_path.split('/')[-1].split('.')[0]
         anno_path = os.path.join(self.annotation_dir, img_name+".xml")
         with open(anno_path, 'r') as f:
