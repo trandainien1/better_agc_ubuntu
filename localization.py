@@ -92,11 +92,11 @@ elif args.method=="rollout":
     model.load_state_dict(state_dict, strict=True)
     model.eval()
     method = VITAttentionRollout(model, device=device)
-elif args.method=="better_agc_plus_5":
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to(device)
-    model.load_state_dict(state_dict, strict=True)
-    model.eval()
-    method = BetterAGC_plus1(model)
+# elif args.method=="better_agc_plus_5":
+#     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to(device)
+#     model.load_state_dict(state_dict, strict=True)
+#     model.eval()
+#     method = BetterAGC_plus1(model)
 
 name = "The localization score of " + args.method 
 
