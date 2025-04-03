@@ -304,6 +304,7 @@ with torch.enable_grad():
         xmax = int(bbox["xmax"])/int(width) * 224
         ymax = int(bbox["ymax"])/int(height) * 224
         bnd_box = torch.tensor([xmin, ymin, xmax, ymax])
+        print()
         print('[DEBUG]', xmin, ymin, xmax, ymax)
         print('[DEBUG]', width, height)
         
