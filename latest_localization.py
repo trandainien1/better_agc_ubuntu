@@ -295,7 +295,7 @@ with torch.enable_grad():
 
         # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
         obj = target[0]["annotation"]["object"][0]
-        print(target[0])
+        print(target[0]["size"])
         break
         bbox = obj["bndbox"]
         xmin = int(bbox["xmin"])
