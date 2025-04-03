@@ -295,6 +295,7 @@ with torch.enable_grad():
 
         # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
         obj = target[0]["annotation"]["object"][0]
+        print(obj)
         bbox = obj["bndbox"]
         xmin = int(bbox["xmin"])
         ymin = int(bbox["ymin"])
