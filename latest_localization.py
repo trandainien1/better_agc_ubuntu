@@ -300,7 +300,8 @@ with torch.enable_grad():
         ymin = int(bbox["ymin"])
         xmax = int(bbox["xmax"])
         ymax = int(bbox["ymax"])
-        bnd_box = [xmin, ymin, xmax, ymax]
+        bnd_box = torch.tensor([xmin, ymin, xmax, ymax]).squeeze(0)
+        print(bnd_box)
         
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
             prediction, saliency_map = method(image)
