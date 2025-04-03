@@ -22,7 +22,7 @@ from Methods.LRP.ViT_LRP import vit_base_patch16_224 as LRP_vit_base_patch16_224
 from Methods.AGCAM.AGCAM import AGCAM
 from Methods.LRP.ViT_explanation_generator import LRP
 from Methods.AttentionRollout.AttentionRollout import VITAttentionRollout
-from Methods.Better_AGCAM.Better_AGCAM import BetterAGC_plus1
+# from Methods.Better_AGCAM.Better_AGCAM import BetterAGC_plus1
 
 # dataset
 from torch.utils.data import Subset
