@@ -288,6 +288,8 @@ with torch.enable_grad():
 
     # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
     for idx, (image, target) in enumerate(tqdm(validloader)):
+        print('[DEBUG]: image', image)
+        print('[DEBUG]: target', target)
         # image = data['image'].to('cuda') # for ImageNet
         image = image.to('cuda')
         # label = data['label'] # for ImageNet
