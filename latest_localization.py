@@ -193,11 +193,13 @@ elif METHOD == 'scoreagc_no_grad':
     model.eval()
     method = ScoreAGC_no_grad(model)
 elif METHOD == 'agc':
-    state_dict = model_zoo.load_url(
-        'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', 
-        progress=True, 
-        map_location='cuda'
-    )
+    # Imagenet
+    # state_dict = model_zoo.load_url(
+    #     'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', 
+    #     progress=True, 
+    #     map_location='cuda'
+    # )
+    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc.pth')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
     model.load_state_dict(state_dict)
     model.head = nn.Linear(model.head.in_features, 20).to('cuda')
