@@ -289,14 +289,12 @@ with torch.enable_grad():
     # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
     for idx, (image, target) in enumerate(tqdm(validloader)):
         # image = data['image'].to('cuda') # for ImageNet
-        image = image[0].to('cuda')
+        image = image[0].unsqueeze(0).to('cuda')
         # label = data['label'] # for ImageNet
         label = torch.tensor(VOC_CLASSES[target[0]["annotation"]["object"][0]["name"]]).to(device)
 
         # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
         obj = target[0]["annotation"]["object"][0]
-        print('[DEBUG]', obj)
-        print('[DEBUG]', image.size())
         bbox = obj["bndbox"]
         xmin = int(bbox["xmin"])
         ymin = int(bbox["ymin"])
