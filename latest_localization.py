@@ -26,6 +26,7 @@ import torch.nn as nn
 
 # dataset
 from Datasets.ILSVRC import ImageNetDataset_val, Cub2011
+from torchvision.datasets import VOCDetection
 
 from torch.utils.data import Subset
 import pandas as pd
@@ -105,55 +106,30 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
+# ------------------------------------ SET UP DATASET ---------------------------------------
 # validset = ImageNetDataset_val(
 #     # root_dir='./ILSVRC',
 #     root_dir='/kaggle/input/ilsvrc/ILSVRC',
 #     transforms=transform,
 # )
 
-validset = Cub2011(
-    root= "/kaggle/working/better_agc_ubuntu",
-    transform=transform,
-)  
+# validloader = DataLoader(
+#     dataset = validset,
+#     batch_size=1,
+#     shuffle = False,
+# )
+
+ds = VOCDetection(root="./data", year="2012", image_set="train", download=True, transform=transform)
+validloader = DataLoader(ds, batch_size=1, shuffle=False, num_workers=2, collate_fn=lambda x: tuple(zip(*x)))
+
 
 # Model Parameter provided by Timm library.
-class_num=200
-# class_num=1000 # Imagenet number of class
-
+class_num=20 # 1000 for ImageNET
 
 # name = "The localization score of attention_rollout" 
 # METHOD = 'attention_rollout'
 export_file = METHOD + '_results.csv'
-data_file = METHOD + '_sigmoid_data.csv'
-
-def create_agc_model(num_classes=1000):
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=num_classes).to('cuda')
-    model.load_state_dict(state_dict, strict=True)
-    model.eval()
-
-def create_model(num_classes=1000):
-    state_dict = model_zoo.load_url(
-        'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', 
-        progress=True, 
-        map_location='cuda'
-    )
-
-    # Create model with ImageNet settings (1000 classes)
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
-
-    # Remove the classifier head weights from the state_dict (to avoid shape mismatch)
-    state_dict.pop('head.weight', None)
-    state_dict.pop('head.bias', None)
-
-    # Load weights without classifier head
-    model.load_state_dict(state_dict, strict=False)
-
-    # Replace classifier head for CUB-200-2011 (200 classes)
-    model.head = nn.Linear(model.head.in_features, 200).to('cuda')
-
-    # Set to evaluation mode
-    model.eval()
+data_file = METHOD + '_data.csv'
 
 if METHOD == 'scoreagc':
     # state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
@@ -217,35 +193,14 @@ elif METHOD == 'scoreagc_no_grad':
     model.eval()
     method = ScoreAGC_no_grad(model)
 elif METHOD == 'agc':
-    # state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    # model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
-    # model.load_state_dict(state_dict, strict=True)
-    # model.eval()
-
     state_dict = model_zoo.load_url(
         'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', 
         progress=True, 
         map_location='cuda'
     )
-
-    # CUB checkpoint
-    # state_dict = torch.load('/kaggle/working/better_agc_ubuntu/CUB_b16.pth', map_location='cuda')
-
-    print('DEBUG', state_dict)
-    # Create model with ImageNet settings (1000 classes)
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=200).to('cuda')
-
-    # Remove the classifier head weights from the state_dict (to avoid shape mismatch)
-    # state_dict.pop('head.weight', None)
-    # state_dict.pop('head.bias', None)
-
-    # Load weights without classifier head
+    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
     model.load_state_dict(state_dict)
-
-    # Replace classifier head for CUB-200-2011 (200 classes)
-    # model.head = nn.Linear(model.head.in_features, 200).to('cuda')
-
-    # Set to evaluation mode
+    model.head = nn.Linear(model.head.in_features, 20).to('cuda')
     model.eval()
     method = AGCAM(model)
 elif METHOD == 'better_agc_cluster':
@@ -296,14 +251,8 @@ elif METHOD == 'bth':
     model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
     model = model.eval()
     method = BTHWrapper(model=model)
-    
-model = model.to('cuda')
 
-validloader = DataLoader(
-    dataset = validset,
-    batch_size=1,
-    shuffle = False,
-)
+
 subset_indices = pd.read_csv('/kaggle/working/better_agc_ubuntu/idx_ILSVRC2012.csv', header=None)[0].to_numpy()
 first_index = subset_indices[0]
 last_index = subset_indices[-1]
@@ -312,6 +261,13 @@ last_index = subset_indices[-1]
 # subset_loader = torch.utils.data.DataLoader(subset, batch_size=1, shuffle=False)
 
 print(f"[XAI METHOD]: {METHOD} - {first_index} - {last_index}")
+
+VOC_CLASSES = {
+    "aeroplane": 0, "bicycle": 1, "bird": 2, "boat": 3, "bottle": 4,
+    "bus": 5, "car": 6, "cat": 7, "chair": 8, "cow": 9,
+    "diningtable": 10, "dog": 11, "horse": 12, "motorbike": 13, "person": 14,
+    "pottedplant": 15, "sheep": 16, "sofa": 17, "train": 18, "tvmonitor": 19
+}
 
 with torch.enable_grad():      
     idx = 0
@@ -328,11 +284,21 @@ with torch.enable_grad():
     csvUtils = csv_utils(export_file)
     csvUtils.writeFieldName()
 
-    # for idx, data in enumerate(tqdm(subset_loader)):
-    for idx, data in enumerate(tqdm(validloader)):
-        image = data['image'].to('cuda')
-        label = data['label']
-        bnd_box = data['bnd_box'].to('cuda').squeeze(0)
+    # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
+    for idx, (image, target) in enumerate(tqdm(validloader)):
+        # image = data['image'].to('cuda') # for ImageNet
+        image = image.to('cuda')
+        # label = data['label'] # for ImageNet
+        label = torch.tensor(VOC_CLASSES[target["annotation"]["object"][0]["name"]]).to(device)
+
+        # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
+        obj = target["annotation"]["object"]
+        bbox = obj["bndbox"]
+        xmin = int(bbox["xmin"])
+        ymin = int(bbox["ymin"])
+        xmax = int(bbox["xmax"])
+        ymax = int(bbox["ymax"])
+        bnd_box = [xmin, ymin, xmax, ymax]
         
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
             prediction, saliency_map = method(image)
