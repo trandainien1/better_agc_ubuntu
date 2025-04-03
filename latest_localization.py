@@ -294,9 +294,9 @@ with torch.enable_grad():
         label = torch.tensor(VOC_CLASSES[target[0]["annotation"]["object"][0]["name"]]).to(device)
 
         # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
-        obj = target[0]["annotation"]["object"]
+        obj = target[0]["annotation"]["object"][0]
         print('[DEBUG]', obj)
-        print('[DEBUG]', image.size)
+        print('[DEBUG]', image.size())
         bbox = obj["bndbox"]
         xmin = int(bbox["xmin"])
         ymin = int(bbox["ymin"])
