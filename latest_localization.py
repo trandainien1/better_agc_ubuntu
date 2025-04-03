@@ -199,7 +199,7 @@ elif METHOD == 'agc':
     #     progress=True, 
     #     map_location='cuda'
     # )
-    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc.pth')
+    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_10.pth')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
     model.load_state_dict(state_dict)
     model.head = nn.Linear(model.head.in_features, 20).to('cuda')
@@ -304,10 +304,7 @@ with torch.enable_grad():
         xmax = int(bbox["xmax"])/int(width) * 224
         ymax = int(bbox["ymax"])/int(height) * 224
         bnd_box = torch.tensor([xmin, ymin, xmax, ymax])
-        print()
-        print('[DEBUG]', xmin, ymin, xmax, ymax)
-        print('[DEBUG]', width, height)
-        
+      
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
             prediction, saliency_map = method(image)
         else:

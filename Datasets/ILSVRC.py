@@ -58,10 +58,7 @@ class ImageNetDataset_val(ImageFolder):
             ymin = int(ymin/height*224)
             xmax = int(xmax/width*224)
             ymax = int(ymax/height*224)
-            print()
-            print('[DEBUG]', xmin, ymin, xmax, ymax)
-            print('[DEBUG]', width, height)
-        
+       
             if bnd_box.dim()==1:
                 bnd_box = torch.tensor((xmin, ymin, xmax, ymax)).unsqueeze(0)
             else:
