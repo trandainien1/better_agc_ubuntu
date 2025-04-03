@@ -300,7 +300,7 @@ with torch.enable_grad():
         ymin = int(bbox["ymin"])
         xmax = int(bbox["xmax"])
         ymax = int(bbox["ymax"])
-        bnd_box = torch.tensor([xmin, ymin, xmax, ymax]).squeeze(0)
+        bnd_box = torch.tensor([xmin, ymin, xmax, ymax])
         print(bnd_box)
         
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
@@ -355,9 +355,9 @@ with torch.enable_grad():
         iou += iou_
         num_img+=1
     
-        csvUtils.appendResult(
-            data["filename"][0], pixel_acc_, iou_, dice_, precision_, recall_
-        )
+        # csvUtils.appendResult(
+        #     data["filename"][0], pixel_acc_, iou_, dice_, precision_, recall_
+        # )
 
         # --------------- for visualize heatmaps
 
