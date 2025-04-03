@@ -299,10 +299,10 @@ with torch.enable_grad():
         height = target[0]["annotation"]['size']['height']
         
         bbox = obj["bndbox"]
-        xmin = int(bbox["xmin"])/width * 224
-        ymin = int(bbox["ymin"])/height * 224
-        xmax = int(bbox["xmax"])/width * 224
-        ymax = int(bbox["ymax"])/height * 224
+        xmin = int(bbox["xmin"])/int(width) * 224
+        ymin = int(bbox["ymin"])/int(height) * 224
+        xmax = int(bbox["xmax"])/int(width) * 224
+        ymax = int(bbox["ymax"])/int(height) * 224
         bnd_box = torch.tensor([xmin, ymin, xmax, ymax])
         
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
