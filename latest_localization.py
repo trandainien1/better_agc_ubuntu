@@ -306,7 +306,7 @@ with torch.enable_grad():
         bnd_box = torch.tensor([xmin, ymin, xmax, ymax])
         print('[DEBUG]', xmin, ymin, xmax, ymax)
         print('[DEBUG]', width, height)
-        break
+        
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
             prediction, saliency_map = method(image)
         else:
