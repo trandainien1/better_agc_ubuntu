@@ -307,7 +307,6 @@ with torch.enable_grad():
         num_of_objects = target[0]["annotation"]['object']
         if len(num_of_objects) > 1:
             continue
-        print('[DEBUG] LABEL: ', label)
         
         bbox = obj["bndbox"]
         xmin = int(bbox["xmin"])/int(width) * 224
