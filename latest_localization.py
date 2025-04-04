@@ -332,7 +332,6 @@ with torch.enable_grad():
             upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
         
             mask = upsample(mask)
-
         else:
             mask = saliency_map.unsqueeze(0).unsqueeze(0)
         # Normalize the heatmap from 0 to 1
@@ -348,7 +347,9 @@ with torch.enable_grad():
         
         output = seg_mask.view(-1, )
         target = seg_label.view(-1, ).float()
-
+        print('[DEBUG] OUTPUT', output)
+        print('[DEBUG] TARGET', target)
+        break
         tp = torch.sum(output * target)  # True Positive
         fp = torch.sum(output * (1 - target))  # False Positive
         fn = torch.sum((1 - output) * target)  # False Negative
