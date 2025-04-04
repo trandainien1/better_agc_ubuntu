@@ -349,8 +349,9 @@ with torch.enable_grad():
         target = seg_label.view(-1, ).float()
         print()
         print()
-        print('[DEBUG] OUTPUT', str(output))
-        print('[DEBUG] TARGET', str(target))
+        torch.set_printoptions(threshold=10_000)
+        print('[DEBUG] OUTPUT', output)
+        print('[DEBUG] TARGET', target)
         print()
         print()
         break
