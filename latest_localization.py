@@ -347,8 +347,12 @@ with torch.enable_grad():
         
         output = seg_mask.view(-1, )
         target = seg_label.view(-1, ).float()
-        print('[DEBUG] OUTPUT', output)
-        print('[DEBUG] TARGET', target)
+        print()
+        print()
+        print('[DEBUG] OUTPUT', str(output))
+        print('[DEBUG] TARGET', str(target))
+        print()
+        print()
         break
         tp = torch.sum(output * target)  # True Positive
         fp = torch.sum(output * (1 - target))  # False Positive
