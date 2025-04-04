@@ -340,7 +340,7 @@ with torch.enable_grad():
         # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
 
         # print('------------- start bnd_box of target ---------')
-        seg_label = box_to_seg(bnd_box).to('cuda')
+        seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda')
         # print('------------- end bnd_box of target ---------')
         # break
 
@@ -348,14 +348,7 @@ with torch.enable_grad():
         
         mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
         seg_mask = box_to_seg(mask_bnd_box).to('cuda')
-        print('------------ Check shape of bounding box ----------------')
-        print(bnd_box)
-        print()
-        print(mask_bnd_box)
-        print()
-        
-        print()
-        break
+       
         output = seg_mask.view(-1, )
         target = seg_label.view(-1, ).float()
         
