@@ -352,12 +352,10 @@ with torch.enable_grad():
         print('[DEBUG] OUTPUT', output)
         print('[DEBUG] TARGET', target)
         with open('tensor1.txt', 'w') as f:
-            for row in output:
-                f.write(' '.join(map(str, row)) + '\n')
+            f.write(str(output.item()))  # .item() extracts the value from the tensor
 
         with open('tensor2.txt', 'w') as f:
-            for row in target:
-                f.write(' '.join(map(str, row)) + '\n')
+            f.write(str(target.item()))  # .item() extracts the value from the tensor
 
         print()
         print()
