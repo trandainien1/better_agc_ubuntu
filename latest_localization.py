@@ -298,8 +298,8 @@ with torch.enable_grad():
         width = target[0]["annotation"]['size']['width']
         height = target[0]["annotation"]['size']['height']
         num_of_objects = target[0]["annotation"]['object']
-        print('[DEBUG]', num_of_objects['name'])
-        break
+        if len(num_of_objects) > 1:
+            continue
         
         bbox = obj["bndbox"]
         xmin = int(bbox["xmin"])/int(width) * 224
