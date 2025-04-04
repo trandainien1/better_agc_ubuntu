@@ -355,6 +355,7 @@ with torch.enable_grad():
         print()
         
         print()
+        break
         output = seg_mask.view(-1, )
         target = seg_label.view(-1, ).float()
         
