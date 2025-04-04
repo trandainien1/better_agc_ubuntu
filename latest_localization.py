@@ -349,14 +349,8 @@ with torch.enable_grad():
         target = seg_label.view(-1, ).float()
         print()
         print()
-        print('[DEBUG] OUTPUT', output)
-        print('[DEBUG] TARGET', target)
-        with open('tensor1.txt', 'w') as f:
-            f.write(str(output.item()))  # .item() extracts the value from the tensor
-
-        with open('tensor2.txt', 'w') as f:
-            f.write(str(target.item()))  # .item() extracts the value from the tensor
-
+        print('[DEBUG] OUTPUT', output.sum())
+        print('[DEBUG] TARGET', target.sum())
         print()
         print()
         break
