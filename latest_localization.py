@@ -349,9 +349,16 @@ with torch.enable_grad():
         target = seg_label.view(-1, ).float()
         print()
         print()
-        torch.set_printoptions(threshold=10_000)
         print('[DEBUG] OUTPUT', output)
         print('[DEBUG] TARGET', target)
+        with open('tensor1.txt', 'w') as f:
+            for row in output:
+                f.write(' '.join(map(str, row)) + '\n')
+
+        with open('tensor2.txt', 'w') as f:
+            for row in target:
+                f.write(' '.join(map(str, row)) + '\n')
+
         print()
         print()
         break
