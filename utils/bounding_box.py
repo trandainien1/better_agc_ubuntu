@@ -29,6 +29,7 @@ def getBoudingBox_multi(mask, threshold=None):
 
 def box_to_seg(box_cor):
     segmask = torch.zeros((224, 224))
+    print('1. ', box_cor)
     if box_cor.dim()!=1:
         n, _ = box_cor.shape
         for i in range(n):

@@ -338,22 +338,26 @@ with torch.enable_grad():
         mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
 
         # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
+
+        # print('------------- start bnd_box of target ---------')
         seg_label = box_to_seg(bnd_box).to('cuda')
+        # print('------------- end bnd_box of target ---------')
+        # break
 
         # From the generated heatmap, we generate a bounding box and then convert it to a segmentation mask to compare with the bounding box label.
         
         mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
         seg_mask = box_to_seg(mask_bnd_box).to('cuda')
+        print('------------ Check shape of bounding box ----------------')
+        print(bnd_box)
+        print()
+        print(mask_bnd_box)
+        print()
         
+        print()
         output = seg_mask.view(-1, )
         target = seg_label.view(-1, ).float()
-        print()
-        print()
-        print('[DEBUG] OUTPUT', output.sum())
-        print('[DEBUG] TARGET', target.sum())
-        print()
-        print()
-        break
+        
         tp = torch.sum(output * target)  # True Positive
         fp = torch.sum(output * (1 - target))  # False Positive
         fn = torch.sum((1 - output) * target)  # False Negative
