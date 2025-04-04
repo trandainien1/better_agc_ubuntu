@@ -298,6 +298,7 @@ with torch.enable_grad():
         width = target[0]["annotation"]['size']['width']
         height = target[0]["annotation"]['size']['height']
         num_of_objects = target[0]["annotation"]['object']
+        print('[DEBUG]', num_of_objects)
         break
         
         bbox = obj["bndbox"]
