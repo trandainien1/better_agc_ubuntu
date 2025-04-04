@@ -309,14 +309,10 @@ with torch.enable_grad():
             continue
         
         bbox = obj["bndbox"]
-        # xmin = int(int(bbox["xmin"])/int(width) * 224)
-        # ymin = int(int(bbox["ymin"])/int(height) * 224)
-        # xmax = int(int(bbox["xmax"])/int(width) * 224)
-        # ymax = int(int(bbox["ymax"])/int(height) * 224)
-        xmin = int(bbox["xmin"])
-        ymin = int(bbox["ymin"])
-        xmax = int(bbox["xmax"])
-        ymax = int(bbox["ymax"])
+        xmin = int(int(bbox["xmin"])/int(width) * 224)
+        ymin = int(int(bbox["ymin"])/int(height) * 224)
+        xmax = int(int(bbox["xmax"])/int(width) * 224)
+        ymax = int(int(bbox["ymax"])/int(height) * 224)
         bnd_box = torch.tensor([xmin, ymin, xmax, ymax])
       
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
