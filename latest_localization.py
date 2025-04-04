@@ -339,10 +339,9 @@ with torch.enable_grad():
 
         # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
 
-        # print('------------- start bnd_box of target ---------')
-        seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda')
-        # print('------------- end bnd_box of target ---------')
-        # break
+        seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda') # PASCAL VOC
+        # seg_label = box_to_seg(bnd_box).to('cuda') # Imagenet 
+
 
         # From the generated heatmap, we generate a bounding box and then convert it to a segmentation mask to compare with the bounding box label.
         
