@@ -206,8 +206,8 @@ elif METHOD == 'agc':
     #     progress=True, 
     #     map_location='cuda'
     # )
-    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
-    model = ViT_Ours.create_model(MODEL, pretrained=False, num_classes=20).to('cuda')
+    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=True)
+    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
     model.load_state_dict(state_dict['model_state'])
     model.head = nn.Linear(model.head.in_features, 20).to('cuda')
     model.eval()
