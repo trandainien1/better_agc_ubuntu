@@ -126,7 +126,7 @@ transform = transforms.Compose([
 #     shuffle = False,
 # )
 
-ds = VOCDetection(root="./data", year="2012", image_set="val", download=True, transform=transform)
+ds = VOCDetection(root="./data", year="2012", image_set="train", download=True, transform=transform)
 validloader = DataLoader(ds, batch_size=1, shuffle=False, collate_fn=lambda x: tuple(zip(*x)))
 
 
