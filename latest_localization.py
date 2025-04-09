@@ -207,7 +207,7 @@ elif METHOD == 'agc':
     #     map_location='cuda'
     # )
     state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
+    model = ViT_Ours.create_model(MODEL, pretrained=False, num_classes=20).to('cuda')
     model.load_state_dict(state_dict['model_state'])
     model.head = nn.Linear(model.head.in_features, 20).to('cuda')
     model.eval()
@@ -322,9 +322,9 @@ with torch.enable_grad():
         else:
             prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
-        print('[DEBUG] PREDICTION', prediction)
-        print('[DEBUG] LABEL', label.item())
-        print(prediction == label.item()) 
+        # print('[DEBUG] PREDICTION', prediction)
+        # print('[DEBUG] LABEL', label.item())
+        
         if prediction!=label.item():
             continue
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
