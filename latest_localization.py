@@ -127,7 +127,7 @@ transform = transforms.Compose([
 # )
 
 ds = VOCDetection(root="./data", year="2012", image_set="val", download=True, transform=transform)
-validloader = DataLoader(ds, batch_size=1, shuffle=False, num_workers=2, collate_fn=lambda x: tuple(zip(*x)))
+validloader = DataLoader(ds, batch_size=1, shuffle=False, collate_fn=lambda x: tuple(zip(*x)))
 
 
 # Model Parameter provided by Timm library.
@@ -322,8 +322,8 @@ with torch.enable_grad():
         else:
             prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
-        # print('[DEBUG] PREDICTION', prediction)
-        # print('[DEBUG] LABEL', label.item())
+        print('[DEBUG] PREDICTION', prediction)
+        print('[DEBUG] LABEL', label.item())
         if prediction!=label.item():
             continue
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
