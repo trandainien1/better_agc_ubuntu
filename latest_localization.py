@@ -327,7 +327,7 @@ with torch.enable_grad():
         # print('[DEBUG] PREDICTION', prediction)
         # print('[DEBUG] LABEL', label.item())
         
-        if prediction!=label.item():
+        if prediction!=label.item() + 1:
             continue
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
         if METHOD != 'vitcx':
