@@ -294,6 +294,7 @@ with torch.enable_grad():
     csvUtils.writeFieldName()
 
     # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
+    total_counts = 0
     for idx, (image, target) in enumerate(tqdm(validloader)):
         # image = data['image'].to('cuda') # for ImageNet
         image = image[0].unsqueeze(0).to('cuda')
@@ -307,6 +308,7 @@ with torch.enable_grad():
         num_of_objects = target[0]["annotation"]['object']
         if len(num_of_objects) > 1:
             continue
+        total_counts += 1
         
         bbox = obj["bndbox"]
         xmin = int(int(bbox["xmin"])/int(width) * 224)
@@ -382,7 +384,8 @@ else:
     print(METHOD)
 
 print("result==================================================================")
-print("number of images: ", num_img)
+print("Total images: ", total_counts)
+print("number of images correctly predicted: ", num_img)
 print("Threshold: ", THRESHOLD)
 print("pixel_acc: {:.4f} ".format((pixel_acc/num_img).item()))
 print("iou: {:.4f} ".format((iou/num_img).item()))
