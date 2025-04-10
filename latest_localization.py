@@ -206,7 +206,7 @@ elif METHOD == 'agc':
     #     progress=True, 
     #     map_location='cuda'
     # )
-    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=True)
+    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
     model.load_state_dict(state_dict['model_state'])
     model.head = nn.Linear(model.head.in_features, 20).to('cuda')
@@ -327,7 +327,7 @@ with torch.enable_grad():
         # print('[DEBUG] PREDICTION', prediction)
         # print('[DEBUG] LABEL', label.item())
         
-        if prediction!=label.item() + 1:
+        if prediction!=label.item():
             continue
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
         if METHOD != 'vitcx':
