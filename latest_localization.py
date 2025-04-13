@@ -344,10 +344,10 @@ with torch.enable_grad():
         else:
             prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
-        print('---------------------------------------------')
-        print('[DEBUG] PREDICTION', prediction)
-        print('[DEBUG] LABEL', label)
-        print('---------------------------------------------')
+        # print('---------------------------------------------')
+        # print('[DEBUG] PREDICTION', prediction)
+        # print('[DEBUG] LABEL', label)
+        # print('---------------------------------------------')
         
         if prediction!=labels:
             continue
