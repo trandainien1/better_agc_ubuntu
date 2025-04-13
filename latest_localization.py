@@ -297,7 +297,7 @@ with torch.enable_grad():
 
     # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
     total_counts = 0
-    for idx, (image, target) in enumerate(tqdm(validloader)):
+    for idx, (images, targets) in enumerate(tqdm(validloader)):
         # image = data['image'].to('cuda') # for ImageNet
         # label = data['label'] # for ImageNet
         # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
