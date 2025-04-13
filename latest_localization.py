@@ -353,9 +353,6 @@ with torch.enable_grad():
         if prediction!=labels:
             continue
 
-        print('x:', xmin, ' ', xmax, ' ', width)
-        print('y:', ymin, ' ', ymax, ' ', height)
-
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
         if METHOD != 'vitcx':
             mask = saliency_map.reshape(1, 1, 14, 14) 
