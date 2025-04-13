@@ -297,7 +297,7 @@ with torch.enable_grad():
 
     # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
     total_counts = 0
-    for idx, (images, targets) in enumerate(tqdm(validloader)):
+    for idx, (image, targets) in enumerate(tqdm(validloader)):
         # image = data['image'].to('cuda') # for ImageNet
         # label = data['label'] # for ImageNet
         # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
@@ -305,14 +305,13 @@ with torch.enable_grad():
         # image = image[0].unsqueeze(0).to('cuda')
         # label = torch.tensor(VOC_CLASSES[target[0]["annotation"]["object"][0]["name"]]).to(device)
 
-        # obj = target[0]["annotation"]["object"][0]
         # width = target[0]["annotation"]['size']['width']
         # height = target[0]["annotation"]['size']['height']
         # num_of_objects = target[0]["annotation"]['object']
         # if len(num_of_objects) > 1:
             # continue
 
-        images = torch.stack(images).to(device)  # Stack images into batch tensor
+        image = torch.stack(image).to(device)  # Stack images into batch tensor
         labels = []
         # print('Num of objects: ', len(targets[0]['annotation']['object']))
         # print(targets)
@@ -329,6 +328,9 @@ with torch.enable_grad():
 
         total_counts += 1
         
+        obj = target[0]["annotation"]["object"][0]
+        width = target[0]["annotation"]['size']['width']
+        height = target[0]["annotation"]['size']['height']
         bbox = obj["bndbox"]
         xmin = int(int(bbox["xmin"])/int(width) * 224)
         ymin = int(int(bbox["ymin"])/int(height) * 224)
