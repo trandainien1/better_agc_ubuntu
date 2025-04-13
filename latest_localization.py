@@ -146,26 +146,17 @@ if METHOD == 'scoreagc':
 
     # set up for model using in CUB
     # Load pre-trained ImageNet model weights
-    state_dict = model_zoo.load_url(
-        'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', 
-        progress=True, 
-        map_location='cuda'
-    )
+    # state_dict = model_zoo.load_url(
+    #     'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', 
+    #     progress=True, 
+    #     map_location='cuda'
+    # )
 
     # Create model with ImageNet settings (1000 classes)
+    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
-
-    # Remove the classifier head weights from the state_dict (to avoid shape mismatch)
-    state_dict.pop('head.weight', None)
-    state_dict.pop('head.bias', None)
-
-    # Load weights without classifier head
-    model.load_state_dict(state_dict, strict=False)
-
-    # Replace classifier head for CUB-200-2011 (200 classes)
-    model.head = nn.Linear(model.head.in_features, 200).to('cuda')
-
-    # Set to evaluation mode
+    model.head = nn.Linear(model.head.in_features, 20).to('cuda')
+    model.load_state_dict(state_dict['model_state'], strict=False)
     model.eval()
 
     method = ScoreAGC(model)
