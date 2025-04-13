@@ -328,9 +328,9 @@ with torch.enable_grad():
 
         total_counts += 1
         
-        obj = target[0]["annotation"]["object"][0]
-        width = target[0]["annotation"]['size']['width']
-        height = target[0]["annotation"]['size']['height']
+        obj = targets[0]["annotation"]["object"][0]
+        width = targets[0]["annotation"]['size']['width']
+        height = targets[0]["annotation"]['size']['height']
         bbox = obj["bndbox"]
         xmin = int(int(bbox["xmin"])/int(width) * 224)
         ymin = int(int(bbox["ymin"])/int(height) * 224)
