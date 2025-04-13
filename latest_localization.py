@@ -208,8 +208,8 @@ elif METHOD == 'agc':
     # )
     state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
-    model.load_state_dict(state_dict['model_state'])
     model.head = nn.Linear(model.head.in_features, 20).to('cuda')
+    model.load_state_dict(state_dict['model_state'])
     model.eval()
     method = AGCAM(model)
 elif METHOD == 'better_agc_cluster':
@@ -325,6 +325,7 @@ with torch.enable_grad():
         multi_hot_labels = multi_hot_labels.unsqueeze(0).cuda()
         if (len(labels) != 1):
             continue
+    
 
         total_counts += 1
         
