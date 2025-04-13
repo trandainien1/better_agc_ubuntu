@@ -333,15 +333,11 @@ with torch.enable_grad():
         width = targets[0]["annotation"]['size']['width']
         height = targets[0]["annotation"]['size']['height']
         bbox = obj["bndbox"]
-        # xmin = int(int(bbox["xmin"])/int(width) * 224)
-        # ymin = int(int(bbox["ymin"])/int(height) * 224)
-        # xmax = int(int(bbox["xmax"])/int(width) * 224)
-        # ymax = int(int(bbox["ymax"])/int(height) * 224)
-        xmin = int(int(bbox["xmin"]))
-        ymin = int(int(bbox["ymin"]))
-        xmax = int(int(bbox["xmax"]))
-        ymax = int(int(bbox["ymax"]))
-
+        xmin = int(int(bbox["xmin"])/int(width) * 224)
+        ymin = int(int(bbox["ymin"])/int(height) * 224)
+        xmax = int(int(bbox["xmax"])/int(width) * 224)
+        ymax = int(int(bbox["ymax"])/int(height) * 224)
+        
         bnd_box = torch.tensor([xmin, ymin, xmax, ymax])
       
         if 'better_agc' in METHOD or METHOD == 'scoreagc':
@@ -356,6 +352,10 @@ with torch.enable_grad():
         
         if prediction!=labels:
             continue
+
+        print('x:', xmin, ' ', xmax, ' ', width)
+        print('y:', ymin, ' ', ymax, ' ', height)
+
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
         if METHOD != 'vitcx':
             mask = saliency_map.reshape(1, 1, 14, 14) 
