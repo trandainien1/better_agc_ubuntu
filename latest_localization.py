@@ -299,11 +299,12 @@ with torch.enable_grad():
     total_counts = 0
     for idx, (image, target) in enumerate(tqdm(validloader)):
         # image = data['image'].to('cuda') # for ImageNet
-        image = image[0].unsqueeze(0).to('cuda')
         # label = data['label'] # for ImageNet
+        # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
+
+        image = image[0].unsqueeze(0).to('cuda')
         label = torch.tensor(VOC_CLASSES[target[0]["annotation"]["object"][0]["name"]]).to(device)
 
-        # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
         obj = target[0]["annotation"]["object"][0]
         width = target[0]["annotation"]['size']['width']
         height = target[0]["annotation"]['size']['height']
@@ -324,8 +325,10 @@ with torch.enable_grad():
         else:
             prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
-        # print('[DEBUG] PREDICTION', prediction)
-        # print('[DEBUG] LABEL', label.item())
+        print('---------------------------------------------')
+        print('[DEBUG] PREDICTION', prediction)
+        print('[DEBUG] LABEL', label.item())
+        print('---------------------------------------------')
         
         if prediction!=label.item():
             continue
