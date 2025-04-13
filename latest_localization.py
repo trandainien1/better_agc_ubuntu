@@ -302,15 +302,31 @@ with torch.enable_grad():
         # label = data['label'] # for ImageNet
         # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
 
-        image = image[0].unsqueeze(0).to('cuda')
-        label = torch.tensor(VOC_CLASSES[target[0]["annotation"]["object"][0]["name"]]).to(device)
+        # image = image[0].unsqueeze(0).to('cuda')
+        # label = torch.tensor(VOC_CLASSES[target[0]["annotation"]["object"][0]["name"]]).to(device)
 
-        obj = target[0]["annotation"]["object"][0]
-        width = target[0]["annotation"]['size']['width']
-        height = target[0]["annotation"]['size']['height']
-        num_of_objects = target[0]["annotation"]['object']
-        if len(num_of_objects) > 1:
+        # obj = target[0]["annotation"]["object"][0]
+        # width = target[0]["annotation"]['size']['width']
+        # height = target[0]["annotation"]['size']['height']
+        # num_of_objects = target[0]["annotation"]['object']
+        # if len(num_of_objects) > 1:
+            # continue
+
+        images = torch.stack(images).to(device)  # Stack images into batch tensor
+        labels = []
+        # print('Num of objects: ', len(targets[0]['annotation']['object']))
+        # print(targets)
+        for target in targets[0]['annotation']['object']:
+            label = VOC_CLASSES[target["name"]] 
+            
+            labels.append(label)
+        labels = torch.tensor(labels).to(device)
+        multi_hot_labels = torch.zeros(20, dtype=torch.float)
+        multi_hot_labels[labels] = 1
+        multi_hot_labels = multi_hot_labels.unsqueeze(0).cuda()
+        if (len(labels) != 1):
             continue
+
         total_counts += 1
         
         bbox = obj["bndbox"]
@@ -330,7 +346,7 @@ with torch.enable_grad():
         print('[DEBUG] LABEL', label.item())
         print('---------------------------------------------')
         
-        if prediction!=label.item():
+        if prediction!=labels:
             continue
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
         if METHOD != 'vitcx':
