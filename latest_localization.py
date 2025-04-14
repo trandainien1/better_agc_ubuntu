@@ -295,10 +295,10 @@ with torch.enable_grad():
         # label = data['label'] # for ImageNet
         # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
 
-        filename = targets[0]['annotation']['filename']e
+        filename = targets[0]['annotation']['filename']
         if '2012' not in filename:
             continue
-        
+
         image = torch.stack(image).to(device)  # Stack images into batch tensor
         labels = []
         # print('Num of objects: ', len(targets[0]['annotation']['object']))
