@@ -312,8 +312,7 @@ with torch.enable_grad():
         if (len(labels) != 1):
             continue
     
-        if labels == 12:
-            print(filename)
+        
 
         total_counts += 1
         
@@ -341,7 +340,9 @@ with torch.enable_grad():
         
         if prediction!=labels:
             continue
-
+        
+        if labels == 12:
+            print(filename)
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
         if METHOD != 'vitcx':
             mask = saliency_map.reshape(1, 1, 14, 14) 
