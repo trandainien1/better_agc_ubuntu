@@ -99,19 +99,19 @@ print("device: " +  device)
 IMG_SIZE=224
 THRESHOLD = float(0.5)
 
-# transform = transforms.Compose([
-#     transforms.ToTensor(),
-#     transforms.Resize(256),
-#     transforms.CenterCrop(224),
-#     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-# ])
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
 
 # AGC transform
-transform = transforms.Compose([
-    transforms.Resize((224,224)),
-    transforms.ToTensor(),
-    transforms.Normalize([0.5,0.5,0.5], [0.5,0.5,0.5])
-])
+# transform = transforms.Compose([
+#     transforms.Resize((224,224)),
+#     transforms.ToTensor(),
+#     transforms.Normalize([0.5,0.5,0.5], [0.5,0.5,0.5])
+# ])
 
 # ------------------------------------ SET UP DATASET ---------------------------------------
 # validset = ImageNetDataset_val(
@@ -294,15 +294,6 @@ with torch.enable_grad():
         # image = data['image'].to('cuda') # for ImageNet
         # label = data['label'] # for ImageNet
         # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
-
-        # image = image[0].unsqueeze(0).to('cuda')
-        # label = torch.tensor(VOC_CLASSES[target[0]["annotation"]["object"][0]["name"]]).to(device)
-
-        # width = target[0]["annotation"]['size']['width']
-        # height = target[0]["annotation"]['size']['height']
-        # num_of_objects = target[0]["annotation"]['object']
-        # if len(num_of_objects) > 1:
-            # continue
 
         image = torch.stack(image).to(device)  # Stack images into batch tensor
         labels = []
