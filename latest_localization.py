@@ -99,19 +99,19 @@ print("device: " +  device)
 IMG_SIZE=224
 THRESHOLD = float(0.5)
 
-transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-])
+# transform = transforms.Compose([
+#     transforms.ToTensor(),
+#     transforms.Resize(256),
+#     transforms.CenterCrop(224),
+#     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+# ])
 
 # AGC transform
-# transform = transforms.Compose([
-#     transforms.Resize((224,224)),
-#     transforms.ToTensor(),
-#     transforms.Normalize([0.5,0.5,0.5], [0.5,0.5,0.5])
-# ])
+transform = transforms.Compose([
+    transforms.Resize((224,224)),
+    transforms.ToTensor(),
+    transforms.Normalize([0.5,0.5,0.5], [0.5,0.5,0.5])
+])
 
 # ------------------------------------ SET UP DATASET ---------------------------------------
 # validset = ImageNetDataset_val(
