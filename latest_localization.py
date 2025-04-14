@@ -317,7 +317,7 @@ with torch.enable_grad():
         width = targets[0]["annotation"]['size']['width']
         height = targets[0]["annotation"]['size']['height']
         bbox = obj["bndbox"]
-        print(bbox)
+        
         xmin = int(int(bbox["xmin"])/int(width) * 224)
         ymin = int(int(bbox["ymin"])/int(height) * 224)
         xmax = int(int(bbox["xmax"])/int(width) * 224)
