@@ -296,9 +296,7 @@ with torch.enable_grad():
         # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
 
         filename = targets[0]['annotation']['filename']
-        if '2012' not in filename:
-            continue
-
+        
         image = torch.stack(image).to(device)  # Stack images into batch tensor
         labels = []
         # print('Num of objects: ', len(targets[0]['annotation']['object']))
@@ -314,6 +312,8 @@ with torch.enable_grad():
         if (len(labels) != 1):
             continue
     
+        if labels == 12:
+            print(filename)
 
         total_counts += 1
         
