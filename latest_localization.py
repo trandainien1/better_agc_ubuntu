@@ -237,6 +237,7 @@ elif METHOD == 'chefer2':
     model.load_state_dict(state_dict['model_state'])
     model = model.eval()
     method = Chefer2Wrapper(model=model)
+    print("Number of heads:", model.blocks[0].attn.num_heads)
 elif METHOD == 'tam':
     model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
     model = model.eval()
