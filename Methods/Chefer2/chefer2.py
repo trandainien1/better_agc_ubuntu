@@ -69,10 +69,12 @@ def generate_relevance(model, input, index=None):
 
 class Chefer2Wrapper():
     def __init__(self, model, **kwargs):
-        # self.model = vit_base_patch16_224()
-        self.model = model
+        self.model = vit_base_patch16_224()
+        state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=False)
+        self.model.load_state_dict(state_dict['model_state'])
+
         self.model.eval()
-        # assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
+        assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
 
         print('[MODEL]')
         print('type:', type(self.model), end='\n\n')
