@@ -76,6 +76,7 @@ class Chefer2Wrapper():
         self.model.load_state_dict(state_dict['model_state'])
 
         self.model.eval()
+        self.model.to('cuda')
         assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
 
         print('[MODEL]')
