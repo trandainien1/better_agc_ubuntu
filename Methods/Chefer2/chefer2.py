@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import torch.nn as nn
 
 # try:
 from chefer.baselines.ViT.ViT_new import VisionTransformer, _conv_filter, _cfg
@@ -70,6 +71,7 @@ def generate_relevance(model, input, index=None):
 class Chefer2Wrapper():
     def __init__(self, model, **kwargs):
         self.model = vit_base_patch16_224()
+        self.model.head = nn.Linear(model.head.in_features, 20)
         state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=False)
         self.model.load_state_dict(state_dict['model_state'])
 
