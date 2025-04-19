@@ -250,7 +250,7 @@ elif METHOD == 'vitcx':
     model = model.eval()
     method = ViTCXWrapper(model=model)
 elif METHOD == 'btt':
-    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
+    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k', num_classes=20)
     state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=True)
     model.load_state_dict(state_dict['model_state'])
     model = model.eval()
