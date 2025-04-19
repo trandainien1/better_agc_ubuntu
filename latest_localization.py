@@ -339,7 +339,7 @@ with torch.enable_grad():
         # print('[DEBUG] PREDICTION', prediction)
         # print('[DEBUG] LABEL', label)
         # print('---------------------------------------------')
-
+        print("DEBUG", prediction)
         if prediction!=labels:
             continue
         
