@@ -347,7 +347,7 @@ with torch.enable_grad():
         # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
         if METHOD != 'vitcx':
             mask = saliency_map.reshape(1, 1, 14, 14) 
-        
+            
             # Reshape the mask to have the same size with the original input image (224 x 224)
             upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
         
