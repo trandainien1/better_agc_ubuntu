@@ -249,7 +249,7 @@ elif METHOD == 'tis':
 elif METHOD == 'vitcx':
     model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
     model.head = nn.Linear(model.head.in_features, 20)
-    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=False)
+    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
     model = model.eval()
     model = model.to('cuda')
     method = ViTCXWrapper(model=model)
@@ -338,8 +338,8 @@ with torch.enable_grad():
             prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
         # print('---------------------------------------------')
-        # print('[DEBUG] PREDICTION', prediction)
-        # print('[DEBUG] LABEL', label)
+        print('[DEBUG] PREDICTION', prediction)
+        print('[DEBUG] LABEL', label)
         # print('---------------------------------------------')
         if prediction!=labels:
             continue
