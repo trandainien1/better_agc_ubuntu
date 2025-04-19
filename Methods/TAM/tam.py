@@ -1,5 +1,6 @@
 # From https://github.com/XianrenYty/Transition_Attention_Maps
 import torch
+import torch.nn as nn
 
 try:
     from tam.baselines.ViT.interpret_methods import InterpretTransformer
@@ -26,6 +27,12 @@ class TAMWrapper:
     def __init__(self, model, start_layer=0, steps=20, **kwargs):
 
         self.model = vit_base_patch16_224()
+        self.model.head = nn.Linear(model.head.in_features, 20)
+        state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=False)
+        self.model.load_state_dict(state_dict['model_state'])
+        self.model.eval()
+        self.model.to('cuda')
+
         self.model.eval()
         assert isinstance(self.model, VisionTransformer), '[ASSERT] Transformer architecture not recognised.'
 
