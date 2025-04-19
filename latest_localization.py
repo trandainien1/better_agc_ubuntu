@@ -250,6 +250,7 @@ elif METHOD == 'vitcx':
     model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
     model.head = nn.Linear(model.head.in_features, 20)
     state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
+    model.load_state_dict(state_dict['model_state'])
     model = model.eval()
     model = model.to('cuda')
     method = ViTCXWrapper(model=model)
@@ -350,7 +351,7 @@ with torch.enable_grad():
 
             # Reshape the mask to have the same size with the original input image (224 x 224)
             upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
-        
+
             mask = upsample(mask)
         else:
             mask = saliency_map.unsqueeze(0).unsqueeze(0)
