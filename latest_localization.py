@@ -315,8 +315,6 @@ with torch.enable_grad():
         multi_hot_labels = multi_hot_labels.unsqueeze(0).cuda()
         if (len(labels) != 1):
             continue
-    
-        
 
         total_counts += 1
         
@@ -341,6 +339,8 @@ with torch.enable_grad():
         # print('[DEBUG] PREDICTION', prediction)
         # print('[DEBUG] LABEL', label)
         # print('---------------------------------------------')
+
+        print('[DEBUG]: ', prediction, ' - ' , labels)
         
         if prediction!=labels:
             continue
