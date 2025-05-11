@@ -219,7 +219,7 @@ elif METHOD == 'agc':
         model.load_state_dict(state_dict['model_state'])
     model.eval()
     
-    method = AGCAM(model, start_layer=4)
+    method = AGCAM(model)
     print('CUSTOM CONFIG: original')
 elif METHOD == 'better_agc_cluster':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
