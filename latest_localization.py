@@ -211,10 +211,11 @@ elif METHOD == 'agc':
         )
     else:
         state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
     if DATASET == 'imagenet':
+        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
         model.load_state_dict(state_dict)
     else:
+        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
         model.load_state_dict(state_dict['model_state'])
     model.eval()
     
