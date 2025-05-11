@@ -63,31 +63,24 @@ class AGCAM:
         self.attn_matrix.reverse()
         attn = self.attn_matrix[0]
         gradient = self.grad_attn[0]
-        identity_matrix_list = []
-        identity_matrix = torch.eye(attn.shape[-1]).to(attn.device)
 
         for i in range(self.start_layer, len(self.attn_matrix)):
             attn = torch.concat((attn, self.attn_matrix[i]), dim=0)
             gradient = torch.concat((gradient, self.grad_attn[i]), dim=0)
-            # create identity matrix with shape same as attn and add to a list
-            identity_matrix_list.append(identity_matrix)
-        # convert identity matrix as list to pytorch tensor
-        identity_matrix_list.append(identity_matrix)
-        identity_matrix_list = torch.stack(identity_matrix_list)
 
         # As stated in Methodology, only positive gradients are used to reflect the positive contributions of each patch.
         # The self-attention score matrices are normalized with sigmoid and combined with the gradients.
         gradient = torch.nn.functional.relu(gradient) # Here, the variable gradient is the gradients alpha^{k,c}_h in Equation 7 in the methodology part.
         attn = torch.sigmoid(attn) # Here, the variable attn is the attention score matrices newly normalized with sigmoid, which are eqaul to the feature maps F^k_h in Equation 2 in the methodology part.
         mask = gradient * attn
-        if self.add_identity_matrix:
-            mask += identity_matrix_list
-
+        
         # aggregation of CAM of all heads and all layers and reshape the final CAM.
         mask = mask[:, :, :, 1:].unsqueeze(0)
         mask = Reduce('b l h z p -> b l z p', reduction=self.head_fusion)(mask)
         mask = Reduce('b l z p -> b z p', reduction=self.layer_fusion)(mask)
         mask = Rearrange('b z (h w) -> b z h w', h=self.width, w=self.width)(mask)
+
+        
         
         return prediction, mask
 
