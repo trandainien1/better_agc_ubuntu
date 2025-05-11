@@ -81,9 +81,9 @@ class AGCAM:
 
         # aggregation of CAM of all heads and all layers and reshape the final CAM.
         mask = mask[:, :, :, 1:].unsqueeze(0)
-        print("BEFORE: ", mask)
+        # print("BEFORE: ", mask)
         mask = Reduce('b l h z p -> b l z p', reduction=self.head_fusion)(mask)
-        print("AFTER: ", mask)
+        # print("AFTER: ", mask)
         mask = Reduce('b l z p -> b z p', reduction=self.layer_fusion)(mask)
         mask = Rearrange('b z (h w) -> b z h w', h=self.width, w=self.width)(mask)
         
