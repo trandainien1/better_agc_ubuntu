@@ -64,14 +64,15 @@ class AGCAM:
         attn = self.attn_matrix[0]
         gradient = self.grad_attn[0]
         identity_matrix_list = []
+        identity_matrix = torch.eye(attn.shape[-1]).to(attn.device)
 
         for i in range(self.start_layer, len(self.attn_matrix)):
             attn = torch.concat((attn, self.attn_matrix[i]), dim=0)
             gradient = torch.concat((gradient, self.grad_attn[i]), dim=0)
             # create identity matrix with shape same as attn and add to a list
-            identity_matrix = torch.eye(attn.shape[-1]).to(attn.device)
             identity_matrix_list.append(identity_matrix)
         # convert identity matrix as list to pytorch tensor
+        identity_matrix_list.append(identity_matrix)
         identity_matrix_list = torch.stack(identity_matrix_list)
 
         # As stated in Methodology, only positive gradients are used to reflect the positive contributions of each patch.
