@@ -212,10 +212,13 @@ elif METHOD == 'agc':
     else:
         state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
-    model.load_state_dict(state_dict['model_state'])
+    if DATASET == 'imagenet':
+        model.load_state_dict(state_dict)
+    else:
+        model.load_state_dict(state_dict['model_state'])
     model.eval()
     
-    method = AGCAM(model)
+    method = AGCAM(model, start_layer=4)
 elif METHOD == 'better_agc_cluster':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
@@ -379,8 +382,8 @@ with torch.enable_grad():
                 prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
             # print('---------------------------------------------')
-            print('[DEBUG] PREDICTION', prediction)
-            print('[DEBUG] LABEL', label)
+            # print('[DEBUG] PREDICTION', prediction)
+            # print('[DEBUG] LABEL', label)
             # print('---------------------------------------------')
             if prediction!=labels:
                 continue

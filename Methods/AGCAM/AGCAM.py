@@ -3,7 +3,7 @@ from einops.layers.torch import Reduce, Rearrange
 
 class AGCAM:
     """ Implementation of our method."""
-    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum'):
+    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', start_layer=1):
         """
         Args:
             model (nn.Module): the Vision Transformer model to be explained
@@ -19,6 +19,7 @@ class AGCAM:
         self.layer_fusion = layer_fusion
         self.attn_matrix = []
         self.grad_attn = []
+        self.start_layer =  start_layer
         print('[DEBUG] Init')
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
@@ -61,7 +62,7 @@ class AGCAM:
         self.attn_matrix.reverse()
         attn = self.attn_matrix[0]
         gradient = self.grad_attn[0]
-        for i in range(1, len(self.attn_matrix)):
+        for i in range(self.start_layer, len(self.attn_matrix)):
             attn = torch.concat((attn, self.attn_matrix[i]), dim=0)
             gradient = torch.concat((gradient, self.grad_attn[i]), dim=0)
 
