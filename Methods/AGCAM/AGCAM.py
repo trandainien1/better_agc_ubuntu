@@ -3,7 +3,7 @@ from einops.layers.torch import Reduce, Rearrange
 
 class AGCAM:
     """ Implementation of our method."""
-    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', start_layer=1):
+    def __init__(self, model, attention_matrix_layer = 'before_softmax', attention_grad_layer = 'after_softmax', head_fusion='sum', layer_fusion='sum', start_layer=1, add_identity_matrix=False):
         """
         Args:
             model (nn.Module): the Vision Transformer model to be explained
@@ -20,6 +20,7 @@ class AGCAM:
         self.attn_matrix = []
         self.grad_attn = []
         self.start_layer =  start_layer
+        self.add_identity_matrix = add_identity_matrix
         # print('[DEBUG] Init')
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
@@ -62,15 +63,21 @@ class AGCAM:
         self.attn_matrix.reverse()
         attn = self.attn_matrix[0]
         gradient = self.grad_attn[0]
+        identity_matrix_list = []
         for i in range(self.start_layer, len(self.attn_matrix)):
             attn = torch.concat((attn, self.attn_matrix[i]), dim=0)
             gradient = torch.concat((gradient, self.grad_attn[i]), dim=0)
+            # create identity matrix with shape same as attn and add to a list
+            identity_matrix = torch.eye(attn.shape[-1]).to(attn.device)
+            identity_matrix_list.append(identity_matrix)
 
         # As stated in Methodology, only positive gradients are used to reflect the positive contributions of each patch.
         # The self-attention score matrices are normalized with sigmoid and combined with the gradients.
         gradient = torch.nn.functional.relu(gradient) # Here, the variable gradient is the gradients alpha^{k,c}_h in Equation 7 in the methodology part.
         attn = torch.sigmoid(attn) # Here, the variable attn is the attention score matrices newly normalized with sigmoid, which are eqaul to the feature maps F^k_h in Equation 2 in the methodology part.
         mask = gradient * attn
+        if self.add_identity_matrix:
+            mask += identity_matrix_list
 
         # aggregation of CAM of all heads and all layers and reshape the final CAM.
         mask = mask[:, :, :, 1:].unsqueeze(0)

@@ -219,7 +219,7 @@ elif METHOD == 'agc':
         model.load_state_dict(state_dict['model_state'])
     model.eval()
     
-    method = AGCAM(model, head_fusion='mean')
+    method = AGCAM(model)
 elif METHOD == 'better_agc_cluster':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
@@ -343,8 +343,8 @@ with torch.enable_grad():
 
             # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
 
-            # seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda') # PASCAL VOC
-            seg_label = box_to_seg(bnd_box).to('cuda') # Imagenet 
+            seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda') # PASCAL VOC
+            # seg_label = box_to_seg(bnd_box).to('cuda') # Imagenet 
 
 
             # From the generated heatmap, we generate a bounding box and then convert it to a segmentation mask to compare with the bounding box label.
