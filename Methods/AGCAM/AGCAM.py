@@ -16,6 +16,7 @@ class AGCAM:
         self.head = None
         self.width = None
         self.head_fusion = head_fusion
+        print(self.head_fusion)
         self.layer_fusion = layer_fusion
         self.attn_matrix = []
         self.grad_attn = []
