@@ -286,8 +286,8 @@ subset_indices = pd.read_csv('/kaggle/working/better_agc_ubuntu/idx_ILSVRC2012.c
 first_index = subset_indices[0]
 last_index = subset_indices[-1]
 
-# subset = Subset(validloader.dataset, subset_indices)
-# subset_loader = torch.utils.data.DataLoader(subset, batch_size=1, shuffle=False)
+subset = Subset(validloader.dataset, subset_indices)
+subset_loader = torch.utils.data.DataLoader(subset, batch_size=1, shuffle=False)
 
 print(f"[CURRENT DATASET]: {DATASET}")
 print(f"[XAI METHOD]: {METHOD} - {first_index} - {last_index}")
@@ -314,7 +314,7 @@ with torch.enable_grad():
     csvUtils = csv_utils(export_file)
     csvUtils.writeFieldName()
     if DATASET == 'imagenet':
-        for idx, data in enumerate(tqdm(validloader)):
+        for idx, data in enumerate(tqdm(subset_loader)):
             image = data['image'].to('cuda')
             label = data['label']
             bnd_box = data['bnd_box'].to('cuda').squeeze(0)
@@ -374,8 +374,6 @@ with torch.enable_grad():
             iou += iou_
             num_img+=1
 
-            if num_img == 2000:
-                break
     else:
         # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
         total_counts = 0
