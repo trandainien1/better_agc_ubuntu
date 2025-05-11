@@ -282,7 +282,7 @@ elif METHOD == 'bth':
     method = BTHWrapper(model=model)
 
 
-subset_indices = pd.read_csv('/kaggle/working/better_agc_ubuntu/idx_ILSVRC2012.csv', header=None)[0].to_numpy()
+subset_indices = pd.read_csv('/kaggle/working/better_agc_ubuntu/2000idx_ILSVRC2012.csv', header=None)[0].to_numpy()
 first_index = subset_indices[0]
 last_index = subset_indices[-1]
 
