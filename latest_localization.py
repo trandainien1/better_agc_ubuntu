@@ -338,6 +338,43 @@ with torch.enable_grad():
 
             else:
                 mask = saliency_map.unsqueeze(0).unsqueeze(0)
+                 # Normalize the heatmap from 0 to 1
+            mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
+
+            # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
+
+            seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda') # PASCAL VOC
+            # seg_label = box_to_seg(bnd_box).to('cuda') # Imagenet 
+
+
+            # From the generated heatmap, we generate a bounding box and then convert it to a segmentation mask to compare with the bounding box label.
+            
+            mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
+            seg_mask = box_to_seg(mask_bnd_box).to('cuda')
+        
+            output = seg_mask.view(-1, )
+            target = seg_label.view(-1, ).float()
+            
+            tp = torch.sum(output * target)  # True Positive
+            fp = torch.sum(output * (1 - target))  # False Positive
+            fn = torch.sum((1 - output) * target)  # False Negative
+            tn = torch.sum((1 - output) * (1 - target))  # True Negative
+            eps = 1e-5
+            pixel_acc_ = (tp + tn + eps) / (tp + tn + fp + fn + eps)
+            dice_ = (2 * tp + eps) / (2 * tp + fp + fn + eps)
+            precision_ = (tp + eps) / (tp + fp + eps)
+            recall_ = (tp + eps) / (tp + fn + eps)
+            iou_ = (tp + eps) / (tp + fp + fn + eps)
+            
+            pixel_acc += pixel_acc_
+            dice += dice_
+            precision += precision_
+            recall += recall_
+            iou += iou_
+            num_img+=1
+
+            if num_img == 2000:
+                break
     else:
         # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
         total_counts = 0
@@ -399,40 +436,44 @@ with torch.enable_grad():
                 mask = upsample(mask)
             else:
                 mask = saliency_map.unsqueeze(0).unsqueeze(0)
-        # Normalize the heatmap from 0 to 1
-        mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
+            
+            # Normalize the heatmap from 0 to 1
+            mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
 
-        # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
+            # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
 
-        seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda') # PASCAL VOC
-        # seg_label = box_to_seg(bnd_box).to('cuda') # Imagenet 
+            seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda') # PASCAL VOC
+            # seg_label = box_to_seg(bnd_box).to('cuda') # Imagenet 
 
 
-        # From the generated heatmap, we generate a bounding box and then convert it to a segmentation mask to compare with the bounding box label.
+            # From the generated heatmap, we generate a bounding box and then convert it to a segmentation mask to compare with the bounding box label.
+            
+            mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
+            seg_mask = box_to_seg(mask_bnd_box).to('cuda')
         
-        mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
-        seg_mask = box_to_seg(mask_bnd_box).to('cuda')
-       
-        output = seg_mask.view(-1, )
-        target = seg_label.view(-1, ).float()
-        
-        tp = torch.sum(output * target)  # True Positive
-        fp = torch.sum(output * (1 - target))  # False Positive
-        fn = torch.sum((1 - output) * target)  # False Negative
-        tn = torch.sum((1 - output) * (1 - target))  # True Negative
-        eps = 1e-5
-        pixel_acc_ = (tp + tn + eps) / (tp + tn + fp + fn + eps)
-        dice_ = (2 * tp + eps) / (2 * tp + fp + fn + eps)
-        precision_ = (tp + eps) / (tp + fp + eps)
-        recall_ = (tp + eps) / (tp + fn + eps)
-        iou_ = (tp + eps) / (tp + fp + fn + eps)
-        
-        pixel_acc += pixel_acc_
-        dice += dice_
-        precision += precision_
-        recall += recall_
-        iou += iou_
-        num_img+=1
+            output = seg_mask.view(-1, )
+            target = seg_label.view(-1, ).float()
+            
+            tp = torch.sum(output * target)  # True Positive
+            fp = torch.sum(output * (1 - target))  # False Positive
+            fn = torch.sum((1 - output) * target)  # False Negative
+            tn = torch.sum((1 - output) * (1 - target))  # True Negative
+            eps = 1e-5
+            pixel_acc_ = (tp + tn + eps) / (tp + tn + fp + fn + eps)
+            dice_ = (2 * tp + eps) / (2 * tp + fp + fn + eps)
+            precision_ = (tp + eps) / (tp + fp + eps)
+            recall_ = (tp + eps) / (tp + fn + eps)
+            iou_ = (tp + eps) / (tp + fp + fn + eps)
+            
+            pixel_acc += pixel_acc_
+            dice += dice_
+            precision += precision_
+            recall += recall_
+            iou += iou_
+            num_img+=1
+
+            if num_img == 2000:
+                break
     
         # csvUtils.appendResult(
         #     data["filename"][0], pixel_acc_, iou_, dice_, precision_, recall_
@@ -447,7 +488,8 @@ else:
     print(METHOD)
 
 print("result==================================================================")
-print("Total images: ", total_counts)
+if DATASET != 'imagenet':
+    print("Total images: ", total_counts)
 print("number of images correctly predicted: ", num_img)
 print("Threshold: ", THRESHOLD)
 print("pixel_acc: {:.4f} ".format((pixel_acc/num_img).item()))
