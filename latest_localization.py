@@ -49,12 +49,13 @@ import argparse
 parser = argparse.ArgumentParser(description='Generate xai maps')
 parser.add_argument('--method',   type=str, default='agc',                       help='method name')
 parser.add_argument('--num_heatmaps',   type=str, default=30,                       help='number of heatmaps after clustering')
+parser.add_argument('--dataset',   type=str, default='imagenet',                       help='imagenet or PASCAL VOC')
 # parser.add_argument('--npz_checkpoint',   type=str, default='',                       help='folder path storing heatmaps')
 # parser.add_argument('--load_prediction',   type=str, default='true',                       help='load predictions of ViT')
 args = parser.parse_args()
 
 METHOD = args.method
-
+DATASET = args.dataset
 class csv_utils:
     def __init__(self, fileName):
         self.fileName = fileName
@@ -114,24 +115,28 @@ transform = transforms.Compose([
 # ])
 
 # ------------------------------------ SET UP DATASET ---------------------------------------
-# validset = ImageNetDataset_val(
-#     # root_dir='./ILSVRC',
-#     root_dir='/kaggle/input/ilsvrc/ILSVRC',
-#     transforms=transform,
-# )
+if DATASET == 'imagenet':
+    validset = ImageNetDataset_val(
+        # root_dir='./ILSVRC',
+        root_dir='/kaggle/input/ilsvrc/ILSVRC',
+        transforms=transform,
+    )
 
-# validloader = DataLoader(
-#     dataset = validset,
-#     batch_size=1,
-#     shuffle = False,
-# )
-
-ds = VOCDetection(root="./data", year="2012", image_set="val", download=True, transform=transform)
-validloader = DataLoader(ds, batch_size=1, shuffle=False, collate_fn=lambda x: tuple(zip(*x)))
+    validloader = DataLoader(
+        dataset = validset,
+        batch_size=1,
+        shuffle = False,
+    )
+else:
+    ds = VOCDetection(root="./data", year="2012", image_set="val", download=True, transform=transform)
+    validloader = DataLoader(ds, batch_size=1, shuffle=False, collate_fn=lambda x: tuple(zip(*x)))
 
 
 # Model Parameter provided by Timm library.
-class_num=20 # 1000 for ImageNET
+if DATASET == 'imagenet':
+    class_num = 1000
+else:    
+    class_num=20
 
 # name = "The localization score of attention_rollout" 
 # METHOD = 'attention_rollout'
@@ -153,13 +158,19 @@ if METHOD == 'scoreagc':
     # )
 
     # Create model with ImageNet settings (1000 classes)
-    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
-    model.head = nn.Linear(model.head.in_features, 20).to('cuda')
-    model.load_state_dict(state_dict['model_state'], strict=False)
-    model.eval()
+    if DATASET == 'imagenet':
+        state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
+        model.load_state_dict(state_dict, strict=True)
+        model.eval()
+    else:
+        state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
+        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
+        model.head = nn.Linear(model.head.in_features, 20).to('cuda')
+        model.load_state_dict(state_dict['model_state'], strict=False)
+        model.eval()
 
-    method = ScoreAGC(model)
+        method = ScoreAGC(model)
 if METHOD == 'scoreagc_head_fusion':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
@@ -192,16 +203,18 @@ elif METHOD == 'scoreagc_no_grad':
     method = ScoreAGC_no_grad(model)
 elif METHOD == 'agc':
     # Imagenet
-    # state_dict = model_zoo.load_url(
-    #     'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', 
-    #     progress=True, 
-    #     map_location='cuda'
-    # )
-    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
+    if DATASET == 'imagenet':
+        state_dict = model_zoo.load_url(
+            'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', 
+            progress=True, 
+            map_location='cuda'
+        )
+    else:
+        state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
-    # model.head = nn.Linear(model.head.in_features, 20).to('cuda')
     model.load_state_dict(state_dict['model_state'])
     model.eval()
+    
     method = AGCAM(model)
 elif METHOD == 'better_agc_cluster':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
@@ -271,6 +284,7 @@ last_index = subset_indices[-1]
 # subset = Subset(validloader.dataset, subset_indices)
 # subset_loader = torch.utils.data.DataLoader(subset, batch_size=1, shuffle=False)
 
+print(f"[CURRENT DATASET]: {DATASET}")
 print(f"[XAI METHOD]: {METHOD} - {first_index} - {last_index}")
 
 VOC_CLASSES = {
@@ -294,67 +308,93 @@ with torch.enable_grad():
     fieldnames_data = ['idx', 'num_img', 'pixel_acc', 'iou', 'dice', 'precision', 'recall']
     csvUtils = csv_utils(export_file)
     csvUtils.writeFieldName()
-
-    # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
-    total_counts = 0
-    for idx, (image, targets) in enumerate(tqdm(validloader)):
-        # image = data['image'].to('cuda') # for ImageNet
-        # label = data['label'] # for ImageNet
-        # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
-
-        filename = targets[0]['annotation']['filename']
-        
-        image = torch.stack(image).to(device)  # Stack images into batch tensor
-        labels = []
-        # print('Num of objects: ', len(targets[0]['annotation']['object']))
-        # print(targets)
-        for target in targets[0]['annotation']['object']:
-            label = VOC_CLASSES[target["name"]] 
+    if DATASET == 'imagenet':
+        for idx, data in enumerate(tqdm(validloader)):
+            image = data['image'].to('cuda')
+            label = data['label']
+            bnd_box = data['bnd_box'].to('cuda').squeeze(0)
             
-            labels.append(label)
-        labels = torch.tensor(labels).to(device)
-        multi_hot_labels = torch.zeros(20, dtype=torch.float)
-        multi_hot_labels[labels] = 1
-        multi_hot_labels = multi_hot_labels.unsqueeze(0).cuda()
-        if (len(labels) != 1):
-            continue
+            if 'better_agc' in METHOD or METHOD == 'scoreagc':
+                prediction, saliency_map = method(image)
+            else:
+                prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
-        total_counts += 1
-        
-        obj = targets[0]["annotation"]["object"][0]
-        width = targets[0]["annotation"]['size']['width']
-        height = targets[0]["annotation"]['size']['height']
-        bbox = obj["bndbox"]
-        
-        xmin = int(int(bbox["xmin"])/int(width) * 224)
-        ymin = int(int(bbox["ymin"])/int(height) * 224)
-        xmax = int(int(bbox["xmax"])/int(width) * 224)
-        ymax = int(int(bbox["ymax"])/int(height) * 224)
-        
-        bnd_box = torch.tensor([xmin, ymin, xmax, ymax])
-      
-        if 'better_agc' in METHOD or METHOD == 'scoreagc':
-            prediction, saliency_map = method(image)
-        else:
-            prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
+            # print('[DEBUG] PREDICTION', prediction)
+            # print('[DEBUG] LABEL', label.item())
+            if prediction!=label.item():
+                continue
+            # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
+            if METHOD != 'vitcx':
+                mask = saliency_map.reshape(1, 1, 14, 14) 
+            
+                # Reshape the mask to have the same size with the original input image (224 x 224)
+                upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
+            
+                mask = upsample(mask)
 
-        # print('---------------------------------------------')
-        print('[DEBUG] PREDICTION', prediction)
-        print('[DEBUG] LABEL', label)
-        # print('---------------------------------------------')
-        if prediction!=labels:
-            continue
+            else:
+                mask = saliency_map.unsqueeze(0).unsqueeze(0)
+    else:
+        # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
+        total_counts = 0
+        for idx, (image, targets) in enumerate(tqdm(validloader)):
+            # image = data['image'].to('cuda') # for ImageNet
+            # label = data['label'] # for ImageNet
+            # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
+
+            filename = targets[0]['annotation']['filename']
+            
+            image = torch.stack(image).to(device)  # Stack images into batch tensor
+            labels = []
+            # print('Num of objects: ', len(targets[0]['annotation']['object']))
+            # print(targets)
+            for target in targets[0]['annotation']['object']:
+                label = VOC_CLASSES[target["name"]] 
+                
+                labels.append(label)
+            labels = torch.tensor(labels).to(device)
+            multi_hot_labels = torch.zeros(20, dtype=torch.float)
+            multi_hot_labels[labels] = 1
+            multi_hot_labels = multi_hot_labels.unsqueeze(0).cuda()
+            if (len(labels) != 1):
+                continue
+
+            total_counts += 1
+            
+            obj = targets[0]["annotation"]["object"][0]
+            width = targets[0]["annotation"]['size']['width']
+            height = targets[0]["annotation"]['size']['height']
+            bbox = obj["bndbox"]
+            
+            xmin = int(int(bbox["xmin"])/int(width) * 224)
+            ymin = int(int(bbox["ymin"])/int(height) * 224)
+            xmax = int(int(bbox["xmax"])/int(width) * 224)
+            ymax = int(int(bbox["ymax"])/int(height) * 224)
+            
+            bnd_box = torch.tensor([xmin, ymin, xmax, ymax])
         
-        # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
-        if METHOD != 'vitcx':
-            mask = saliency_map.reshape(1, 1, 14, 14) 
+            if 'better_agc' in METHOD or METHOD == 'scoreagc':
+                prediction, saliency_map = method(image)
+            else:
+                prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
-            # Reshape the mask to have the same size with the original input image (224 x 224)
-            upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
+            # print('---------------------------------------------')
+            print('[DEBUG] PREDICTION', prediction)
+            print('[DEBUG] LABEL', label)
+            # print('---------------------------------------------')
+            if prediction!=labels:
+                continue
+            
+            # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
+            if METHOD != 'vitcx':
+                mask = saliency_map.reshape(1, 1, 14, 14) 
 
-            mask = upsample(mask)
-        else:
-            mask = saliency_map.unsqueeze(0).unsqueeze(0)
+                # Reshape the mask to have the same size with the original input image (224 x 224)
+                upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
+
+                mask = upsample(mask)
+            else:
+                mask = saliency_map.unsqueeze(0).unsqueeze(0)
         # Normalize the heatmap from 0 to 1
         mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
 
