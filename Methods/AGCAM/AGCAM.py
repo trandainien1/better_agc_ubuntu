@@ -20,7 +20,7 @@ class AGCAM:
         self.attn_matrix = []
         self.grad_attn = []
         self.start_layer =  start_layer
-        print('[DEBUG] Init')
+        # print('[DEBUG] Init')
 
         for layer_num, (name, module) in enumerate(self.model.named_modules()):
             if attention_matrix_layer in name:
