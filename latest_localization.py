@@ -50,6 +50,7 @@ parser = argparse.ArgumentParser(description='Generate xai maps')
 parser.add_argument('--method',   type=str, default='agc',                       help='method name')
 parser.add_argument('--num_heatmaps',   type=str, default=30,                       help='number of heatmaps after clustering')
 parser.add_argument('--dataset',   type=str, default='imagenet',                       help='imagenet or PASCAL VOC')
+parser.add_argument('--start_layer',   type=str, default=1,                       help='layer for early stopping')
 # parser.add_argument('--npz_checkpoint',   type=str, default='',                       help='folder path storing heatmaps')
 # parser.add_argument('--load_prediction',   type=str, default='true',                       help='load predictions of ViT')
 args = parser.parse_args()
@@ -219,8 +220,8 @@ elif METHOD == 'agc':
         model.load_state_dict(state_dict['model_state'])
     model.eval()
     
-    method = AGCAM(model, start_layer=1)
-    print('CUSTOM CONFIG: start layer = 1')
+    method = AGCAM(model, start_layer=args.start_layer)
+    print(f'CUSTOM CONFIG: start layer =  {args.start_layer}')
 elif METHOD == 'better_agc_cluster':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')

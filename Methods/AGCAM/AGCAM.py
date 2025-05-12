@@ -62,7 +62,6 @@ class AGCAM:
         # put all matrices from each layer into one tensor
         self.attn_matrix.reverse()
         attn = self.attn_matrix[0]
-        # print('[DEBUG] Attn shape: ', self.attn_matrix.shape)
         gradient = self.grad_attn[0]
 
         for i in range(self.start_layer, len(self.attn_matrix)):
