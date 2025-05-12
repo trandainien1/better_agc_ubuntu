@@ -242,11 +242,17 @@ elif METHOD == 'chefer1':
     model.eval()
     method = LRP(model, device='cuda')
 elif METHOD == 'rollout':
-    # state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=True)
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
-    model.head = nn.Linear(model.head.in_features, 20).to('cuda')
-    model.load_state_dict(state_dict['model_state'])
+    if DATASET == 'imagenet':
+        state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+    else:
+        state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=True)
+    if DATASET == 'imagenet':
+        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
+        model.load_state_dict(state_dict, strict=True)
+    else:
+        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
+        model.head = nn.Linear(model.head.in_features, 20).to('cuda')
+        model.load_state_dict(state_dict['model_state'])
     model.eval()
     method = VITAttentionRollout(model, device=device)
 elif METHOD == 'chefer2':
