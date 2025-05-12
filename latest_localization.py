@@ -301,7 +301,7 @@ VOC_CLASSES = {
 
 
 method = AGCAM(model, start_layer=2)
-print('CUSTOM CONFIG: add_identity_matrix=True')
+print('CUSTOM CONFIG: start_layer = 2')
 with torch.enable_grad():      
     idx = 0
     data_idx = -1
