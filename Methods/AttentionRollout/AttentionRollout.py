@@ -8,7 +8,8 @@ import torch
 def rollout(attentions, discard_ratio, head_fusion, device='cpu'):
     result = torch.eye(attentions[0].size(-1)).to(device)
     with torch.no_grad():
-        print('DEBUG ROLLOUT attentions: ', attentions.shape)
+        print('DEBUG ROLLOUT num attentions: ', len(attentions))
+        print('DEBUG ROLLOUT attention shape: ', attentions[0].shape)
         for attention in attentions: 
             if head_fusion == "mean":
                 attention_heads_fused = attention.mean(axis=1)
