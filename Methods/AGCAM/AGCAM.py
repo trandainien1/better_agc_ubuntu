@@ -64,11 +64,11 @@ class AGCAM:
         attn = self.attn_matrix[0]
         gradient = self.grad_attn[0]
 
+        print('[DEBUG] attn matrix', self.attn_matrix.shape)
         for i in range(self.start_layer, len(self.attn_matrix)):
             attn = torch.concat((attn, self.attn_matrix[i]), dim=0)
             gradient = torch.concat((gradient, self.grad_attn[i]), dim=0)
 
-        print('[DEBUG] attn shape', attn.shape)
 
         # As stated in Methodology, only positive gradients are used to reflect the positive contributions of each patch.
         # The self-attention score matrices are normalized with sigmoid and combined with the gradients.
