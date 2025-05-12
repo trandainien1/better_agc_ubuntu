@@ -376,7 +376,8 @@ for i in range(12):
                 recall += recall_
                 iou += iou_
                 num_img+=1
-
+                if num_img == 1000:
+                    break
         else:
             # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
             total_counts = 0
