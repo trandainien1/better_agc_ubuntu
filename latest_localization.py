@@ -299,214 +299,214 @@ VOC_CLASSES = {
     "pottedplant": 15, "sheep": 16, "sofa": 17, "train": 18, "tvmonitor": 19
 }
 
-for i in range(12):
-    method = AGCAM(model, start_layer=i)
-    print('CUSTOM CONFIG: add_identity_matrix=True')
-    with torch.enable_grad():      
-        idx = 0
-        data_idx = -1
-        num_img = 0
-        pixel_acc = 0.0
-        dice = 0.0
-        precision = 0.0
-        recall = 0.0
-        iou = 0.0
-        
-        fieldnames = ['num_img', 'pixel_acc', 'iou', 'dice', 'precision', 'recall']
-        fieldnames_data = ['idx', 'num_img', 'pixel_acc', 'iou', 'dice', 'precision', 'recall']
-        csvUtils = csv_utils(export_file)
-        csvUtils.writeFieldName()
-        if DATASET == 'imagenet':
-            for idx, data in enumerate(tqdm(subset_loader)):
-                image = data['image'].to('cuda')
-                label = data['label']
-                bnd_box = data['bnd_box'].to('cuda').squeeze(0)
-                
-                if 'better_agc' in METHOD or METHOD == 'scoreagc':
-                    prediction, saliency_map = method(image)
-                else:
-                    prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
-                # print('[DEBUG] PREDICTION', prediction)
-                # print('[DEBUG] LABEL', label.item())
-                if prediction!=label.item():
-                    continue
-                # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
-                if METHOD != 'vitcx':
-                    mask = saliency_map.reshape(1, 1, 14, 14) 
-                
-                    # Reshape the mask to have the same size with the original input image (224 x 224)
-                    upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
-                
-                    mask = upsample(mask)
-
-                else:
-                    mask = saliency_map.unsqueeze(0).unsqueeze(0)
-                    # Normalize the heatmap from 0 to 1
-                mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
-
-                # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
-
-                # seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda') # PASCAL VOC
-                seg_label = box_to_seg(bnd_box).to('cuda') # Imagenet 
-
-
-                # From the generated heatmap, we generate a bounding box and then convert it to a segmentation mask to compare with the bounding box label.
-                
-                mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
-                seg_mask = box_to_seg(mask_bnd_box).to('cuda')
+method = AGCAM(model, start_layer=2)
+print('CUSTOM CONFIG: add_identity_matrix=True')
+with torch.enable_grad():      
+    idx = 0
+    data_idx = -1
+    num_img = 0
+    pixel_acc = 0.0
+    dice = 0.0
+    precision = 0.0
+    recall = 0.0
+    iou = 0.0
+    
+    fieldnames = ['num_img', 'pixel_acc', 'iou', 'dice', 'precision', 'recall']
+    fieldnames_data = ['idx', 'num_img', 'pixel_acc', 'iou', 'dice', 'precision', 'recall']
+    csvUtils = csv_utils(export_file)
+    csvUtils.writeFieldName()
+    if DATASET == 'imagenet':
+        for idx, data in enumerate(tqdm(subset_loader)):
+            image = data['image'].to('cuda')
+            label = data['label']
+            bnd_box = data['bnd_box'].to('cuda').squeeze(0)
             
-                output = seg_mask.view(-1, )
-                target = seg_label.view(-1, ).float()
-                
-                tp = torch.sum(output * target)  # True Positive
-                fp = torch.sum(output * (1 - target))  # False Positive
-                fn = torch.sum((1 - output) * target)  # False Negative
-                tn = torch.sum((1 - output) * (1 - target))  # True Negative
-                eps = 1e-5
-                pixel_acc_ = (tp + tn + eps) / (tp + tn + fp + fn + eps)
-                dice_ = (2 * tp + eps) / (2 * tp + fp + fn + eps)
-                precision_ = (tp + eps) / (tp + fp + eps)
-                recall_ = (tp + eps) / (tp + fn + eps)
-                iou_ = (tp + eps) / (tp + fp + fn + eps)
-                
-                pixel_acc += pixel_acc_
-                dice += dice_
-                precision += precision_
-                recall += recall_
-                iou += iou_
-                num_img+=1
-                if num_img == 1000:
-                    break
-        else:
-            # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
-            total_counts = 0
-            for idx, (image, targets) in enumerate(tqdm(validloader)):
-                # image = data['image'].to('cuda') # for ImageNet
-                # label = data['label'] # for ImageNet
-                # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
+            if 'better_agc' in METHOD or METHOD == 'scoreagc':
+                prediction, saliency_map = method(image)
+            else:
+                prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
 
-                filename = targets[0]['annotation']['filename']
-                
-                image = torch.stack(image).to(device)  # Stack images into batch tensor
-                labels = []
-                # print('Num of objects: ', len(targets[0]['annotation']['object']))
-                # print(targets)
-                for target in targets[0]['annotation']['object']:
-                    label = VOC_CLASSES[target["name"]] 
-                    
-                    labels.append(label)
-                labels = torch.tensor(labels).to(device)
-                multi_hot_labels = torch.zeros(20, dtype=torch.float)
-                multi_hot_labels[labels] = 1
-                multi_hot_labels = multi_hot_labels.unsqueeze(0).cuda()
-                if (len(labels) != 1):
-                    continue
-
-                total_counts += 1
-                
-                obj = targets[0]["annotation"]["object"][0]
-                width = targets[0]["annotation"]['size']['width']
-                height = targets[0]["annotation"]['size']['height']
-                bbox = obj["bndbox"]
-                
-                xmin = int(int(bbox["xmin"])/int(width) * 224)
-                ymin = int(int(bbox["ymin"])/int(height) * 224)
-                xmax = int(int(bbox["xmax"])/int(width) * 224)
-                ymax = int(int(bbox["ymax"])/int(height) * 224)
-                
-                bnd_box = torch.tensor([xmin, ymin, xmax, ymax])
+            # print('[DEBUG] PREDICTION', prediction)
+            # print('[DEBUG] LABEL', label.item())
+            if prediction!=label.item():
+                continue
+            # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
+            if METHOD != 'vitcx':
+                mask = saliency_map.reshape(1, 1, 14, 14) 
             
-                if 'better_agc' in METHOD or METHOD == 'scoreagc':
-                    prediction, saliency_map = method(image)
-                else:
-                    prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
+                # Reshape the mask to have the same size with the original input image (224 x 224)
+                upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
+            
+                mask = upsample(mask)
 
-                # print('---------------------------------------------')
-                # print('[DEBUG] PREDICTION', prediction)
-                # print('[DEBUG] LABEL', label)
-                # print('---------------------------------------------')
-                if prediction!=labels:
-                    continue
-                
-                # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
-                if METHOD != 'vitcx':
-                    mask = saliency_map.reshape(1, 1, 14, 14) 
-
-                    # Reshape the mask to have the same size with the original input image (224 x 224)
-                    upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
-
-                    mask = upsample(mask)
-                else:
-                    mask = saliency_map.unsqueeze(0).unsqueeze(0)
-                
+            else:
+                mask = saliency_map.unsqueeze(0).unsqueeze(0)
                 # Normalize the heatmap from 0 to 1
-                mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
+            mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
 
-                # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
+            # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
 
-                seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda') # PASCAL VOC
-                # seg_label = box_to_seg(bnd_box).to('cuda') # Imagenet 
+            # seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda') # PASCAL VOC
+            seg_label = box_to_seg(bnd_box).to('cuda') # Imagenet 
 
 
-                # From the generated heatmap, we generate a bounding box and then convert it to a segmentation mask to compare with the bounding box label.
-                
-                mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
-                seg_mask = box_to_seg(mask_bnd_box).to('cuda')
+            # From the generated heatmap, we generate a bounding box and then convert it to a segmentation mask to compare with the bounding box label.
             
-                output = seg_mask.view(-1, )
-                target = seg_label.view(-1, ).float()
-                
-                tp = torch.sum(output * target)  # True Positive
-                fp = torch.sum(output * (1 - target))  # False Positive
-                fn = torch.sum((1 - output) * target)  # False Negative
-                tn = torch.sum((1 - output) * (1 - target))  # True Negative
-                eps = 1e-5
-                pixel_acc_ = (tp + tn + eps) / (tp + tn + fp + fn + eps)
-                dice_ = (2 * tp + eps) / (2 * tp + fp + fn + eps)
-                precision_ = (tp + eps) / (tp + fp + eps)
-                recall_ = (tp + eps) / (tp + fn + eps)
-                iou_ = (tp + eps) / (tp + fp + fn + eps)
-                
-                pixel_acc += pixel_acc_
-                dice += dice_
-                precision += precision_
-                recall += recall_
-                iou += iou_
-                num_img+=1
-
-                if num_img == 2000:
-                    break
+            mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
+            seg_mask = box_to_seg(mask_bnd_box).to('cuda')
         
-            # csvUtils.appendResult(
-            #     data["filename"][0], pixel_acc_, iou_, dice_, precision_, recall_
-            # )
-
-            # --------------- for visualize heatmaps
-
-
-    if 'cluster' in METHOD:
-        print(f'{METHOD} - num of heatmaps: {args.num_heatmaps}')
-    else:
-        print(METHOD)
-
-    print("result==================================================================")
-    if DATASET != 'imagenet':
-        print("Total images: ", total_counts)
-    print("number of images correctly predicted: ", num_img)
-    print("Threshold: ", THRESHOLD)
-    print("pixel_acc: {:.4f} ".format((pixel_acc/num_img).item()))
-    print("iou: {:.4f} ".format((iou/num_img).item()))
-    print("dice: {:.4f} ".format((dice/num_img).item()))
-    print("precision: {:.4f} ".format((precision/num_img).item()))
-    print("recall: {:.4f} ".format((recall/num_img).item()))
-
-    # --------- For visualize heatmap --------------
-
-    # print('[AFTER CLUSTERING] heatmaps shape', saliency_maps.shape)
-    # npz_name = args.method
+            output = seg_mask.view(-1, )
+            target = seg_label.view(-1, ).float()
             
-    # # saliencies_maps = torch.stack(saliency_maps) #saliency_maps.shape = [num_images, 1, 224, 224]
-    # np.savez(os.path.join('npz', npz_name), saliency_maps.detach().cpu().numpy())
+            tp = torch.sum(output * target)  # True Positive
+            fp = torch.sum(output * (1 - target))  # False Positive
+            fn = torch.sum((1 - output) * target)  # False Negative
+            tn = torch.sum((1 - output) * (1 - target))  # True Negative
+            eps = 1e-5
+            pixel_acc_ = (tp + tn + eps) / (tp + tn + fp + fn + eps)
+            dice_ = (2 * tp + eps) / (2 * tp + fp + fn + eps)
+            precision_ = (tp + eps) / (tp + fp + eps)
+            recall_ = (tp + eps) / (tp + fn + eps)
+            iou_ = (tp + eps) / (tp + fp + fn + eps)
+            
+            pixel_acc += pixel_acc_
+            dice += dice_
+            precision += precision_
+            recall += recall_
+            iou += iou_
+            num_img+=1
+            if num_img == 1000:
+                break
+    else:
+        # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
+        total_counts = 0
+        for idx, (image, targets) in enumerate(tqdm(validloader)):
+            # image = data['image'].to('cuda') # for ImageNet
+            # label = data['label'] # for ImageNet
+            # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
 
-    # print('Saliency maps saved to npz.')
+            filename = targets[0]['annotation']['filename']
+            
+            image = torch.stack(image).to(device)  # Stack images into batch tensor
+            labels = []
+            # print('Num of objects: ', len(targets[0]['annotation']['object']))
+            # print(targets)
+            for target in targets[0]['annotation']['object']:
+                label = VOC_CLASSES[target["name"]] 
+                
+                labels.append(label)
+            labels = torch.tensor(labels).to(device)
+            multi_hot_labels = torch.zeros(20, dtype=torch.float)
+            multi_hot_labels[labels] = 1
+            multi_hot_labels = multi_hot_labels.unsqueeze(0).cuda()
+            if (len(labels) != 1):
+                continue
+
+            total_counts += 1
+            
+            obj = targets[0]["annotation"]["object"][0]
+            width = targets[0]["annotation"]['size']['width']
+            height = targets[0]["annotation"]['size']['height']
+            bbox = obj["bndbox"]
+            
+            xmin = int(int(bbox["xmin"])/int(width) * 224)
+            ymin = int(int(bbox["ymin"])/int(height) * 224)
+            xmax = int(int(bbox["xmax"])/int(width) * 224)
+            ymax = int(int(bbox["ymax"])/int(height) * 224)
+            
+            bnd_box = torch.tensor([xmin, ymin, xmax, ymax])
+        
+            if 'better_agc' in METHOD or METHOD == 'scoreagc':
+                prediction, saliency_map = method(image)
+            else:
+                prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
+
+            # print('---------------------------------------------')
+            # print('[DEBUG] PREDICTION', prediction)
+            # print('[DEBUG] LABEL', label)
+            # print('---------------------------------------------')
+            if prediction!=labels:
+                continue
+            
+            # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
+            if METHOD != 'vitcx':
+                mask = saliency_map.reshape(1, 1, 14, 14) 
+
+                # Reshape the mask to have the same size with the original input image (224 x 224)
+                upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
+
+                mask = upsample(mask)
+            else:
+                mask = saliency_map.unsqueeze(0).unsqueeze(0)
+            
+            # Normalize the heatmap from 0 to 1
+            mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
+
+            # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
+
+            seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda') # PASCAL VOC
+            # seg_label = box_to_seg(bnd_box).to('cuda') # Imagenet 
+
+
+            # From the generated heatmap, we generate a bounding box and then convert it to a segmentation mask to compare with the bounding box label.
+            
+            mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
+            seg_mask = box_to_seg(mask_bnd_box).to('cuda')
+        
+            output = seg_mask.view(-1, )
+            target = seg_label.view(-1, ).float()
+            
+            tp = torch.sum(output * target)  # True Positive
+            fp = torch.sum(output * (1 - target))  # False Positive
+            fn = torch.sum((1 - output) * target)  # False Negative
+            tn = torch.sum((1 - output) * (1 - target))  # True Negative
+            eps = 1e-5
+            pixel_acc_ = (tp + tn + eps) / (tp + tn + fp + fn + eps)
+            dice_ = (2 * tp + eps) / (2 * tp + fp + fn + eps)
+            precision_ = (tp + eps) / (tp + fp + eps)
+            recall_ = (tp + eps) / (tp + fn + eps)
+            iou_ = (tp + eps) / (tp + fp + fn + eps)
+            
+            pixel_acc += pixel_acc_
+            dice += dice_
+            precision += precision_
+            recall += recall_
+            iou += iou_
+            num_img+=1
+
+            if num_img == 2000:
+                break
+    
+        # csvUtils.appendResult(
+        #     data["filename"][0], pixel_acc_, iou_, dice_, precision_, recall_
+        # )
+
+        # --------------- for visualize heatmaps
+
+
+if 'cluster' in METHOD:
+    print(f'{METHOD} - num of heatmaps: {args.num_heatmaps}')
+else:
+    print(METHOD)
+
+print("result==================================================================")
+if DATASET != 'imagenet':
+    print("Total images: ", total_counts)
+print("number of images correctly predicted: ", num_img)
+print("Threshold: ", THRESHOLD)
+print("pixel_acc: {:.4f} ".format((pixel_acc/num_img).item()))
+print("iou: {:.4f} ".format((iou/num_img).item()))
+print("dice: {:.4f} ".format((dice/num_img).item()))
+print("precision: {:.4f} ".format((precision/num_img).item()))
+print("recall: {:.4f} ".format((recall/num_img).item()))
+
+# --------- For visualize heatmap --------------
+
+# print('[AFTER CLUSTERING] heatmaps shape', saliency_maps.shape)
+# npz_name = args.method
+        
+# # saliencies_maps = torch.stack(saliency_maps) #saliency_maps.shape = [num_images, 1, 224, 224]
+# np.savez(os.path.join('npz', npz_name), saliency_maps.detach().cpu().numpy())
+
+# print('Saliency maps saved to npz.')
