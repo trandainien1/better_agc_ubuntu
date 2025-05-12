@@ -300,9 +300,6 @@ VOC_CLASSES = {
     "pottedplant": 15, "sheep": 16, "sofa": 17, "train": 18, "tvmonitor": 19
 }
 
-
-
-print('CUSTOM CONFIG: start_layer = 2')
 with torch.enable_grad():      
     idx = 0
     data_idx = -1
