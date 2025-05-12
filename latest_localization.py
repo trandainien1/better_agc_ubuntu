@@ -219,7 +219,7 @@ elif METHOD == 'agc':
         model.load_state_dict(state_dict['model_state'])
     model.eval()
     
-    method = AGCAM(model, add_identity_matrix=True)
+    method = AGCAM(model, start_layer=2)
     print('CUSTOM CONFIG: add_identity_matrix=True')
 elif METHOD == 'better_agc_cluster':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
@@ -300,7 +300,7 @@ VOC_CLASSES = {
 }
 
 
-method = AGCAM(model, start_layer=2)
+
 print('CUSTOM CONFIG: start_layer = 2')
 with torch.enable_grad():      
     idx = 0
