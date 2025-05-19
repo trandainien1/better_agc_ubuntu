@@ -5,7 +5,7 @@ import numpy as np
 import timm 
 import torch.nn.functional as F
 from sklearn.cluster import AgglomerativeClustering
-from fast_pytorch_kmeans import KMeans
+# from fast_pytorch_kmeans import KMeans
 
 
 class BetterAGC:

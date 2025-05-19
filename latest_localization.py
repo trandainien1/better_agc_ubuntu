@@ -216,8 +216,8 @@ elif METHOD == 'agc':
         model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
         model.load_state_dict(state_dict)
     else:
-        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
-        model.load_state_dict(state_dict['model_state'])
+        model.load_state_dict(state_dict['model_state'])        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
+
     model.eval()
     
     method = AGCAM(model, layer_fusion='prod', head_fusion='mean')
