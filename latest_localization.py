@@ -216,12 +216,12 @@ elif METHOD == 'agc':
         model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
         model.load_state_dict(state_dict)
     else:
-        model.load_state_dict(state_dict['model_state'])        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
+        model.load_state_dict(state_dict['model_state'])        
+        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
 
     model.eval()
     
-    method = AGCAM(model, layer_fusion='prod', head_fusion='mean')
-    print(f'CUSTOM CONFIG: Multiply layers, Mean heads')
+    method = AGCAM(model)
 elif METHOD == 'better_agc_cluster':
     state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
