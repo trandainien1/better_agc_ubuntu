@@ -26,11 +26,11 @@ def vit_base_patch16_224(pretrained=True, model_name="vit_base_patch16_224", pre
 class TAMWrapper:
     def __init__(self, model, start_layer=0, steps=20, **kwargs):
 
-        # self.model = vit_base_patch16_224()
+        self.model = vit_base_patch16_224()
         # self.model.head = nn.Linear(model.head.in_features, 20)
         # state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=False)
-        # self.model.load_state_dict(state_dict)
-        self.model = model
+        state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+        self.model.load_state_dict(state_dict)
         self.model.eval()
         self.model.to('cuda')
 
