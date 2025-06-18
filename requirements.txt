@@ -12,5 +12,5 @@ matplotlib == 3.7.1
 openpyxl == 3.0.10
 Pillow == 9.4.0
 opencv-python == 4.7.0.72
-fast-pytorch-kmeans==0.1.6
+fast-pytorch-kmeans
 
