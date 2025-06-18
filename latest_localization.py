@@ -270,9 +270,9 @@ elif METHOD == 'tis':
     model.load_state_dict(state_dict)
     model = model.eval()
     model = model.to('cuda')
-    method = TISWrapper(                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 model=model)
+    method = TISWrapper(model=model)
 elif METHOD == 'vitcx':
-    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
+    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k', num_classes=1000)
     # model.head = nn.Linear(model.head.in_features, 20)
     # state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
     model.load_state_dict(state_dict)
