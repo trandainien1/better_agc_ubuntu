@@ -235,10 +235,10 @@ elif METHOD == 'better_agc_cluster_add_noise':
     model.eval()
     method = BetterAGC_cluster_add_noise(model, num_heatmaps=30)
 elif METHOD == 'chefer1':
-    state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=True)
-    # state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+    # state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=True)
+    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
     model = LRP_vit_base_patch16_224('cuda', num_classes=20).to('cuda')
-    model.load_state_dict(state_dict['model_state'], strict=True)
+    model.load_state_dict(state_dict)
     model.eval()
     method = LRP(model, device='cuda')
 elif METHOD == 'rollout':
