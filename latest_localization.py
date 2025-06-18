@@ -261,6 +261,8 @@ elif METHOD == 'chefer2':
     method = Chefer2Wrapper(model=model)
 elif METHOD == 'tam':
     model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
+    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+    model.load_state_dict(state_dict)
     model = model.eval()
     model = model.to('cuda')
     method = TAMWrapper(model=model)
