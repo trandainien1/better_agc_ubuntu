@@ -325,8 +325,6 @@ with torch.enable_grad():
     csvUtils.writeFieldName()
     if DATASET == 'imagenet':
         for idx, data in enumerate(tqdm(subset_loader)):
-            if num_img == 1:
-                break
             image = data['image'].to('cuda')
             label = data['label']
             bnd_box = data['bnd_box'].to('cuda').squeeze(0)
