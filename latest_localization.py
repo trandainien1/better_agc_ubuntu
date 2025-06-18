@@ -260,6 +260,8 @@ def normalize_mask(mask):
     return (mask - mask.min() + 1e-5) / (mask.max() - mask.min() + 1e-5)
 
 def compute_metrics(output, target):
+    output = output.cuda()
+    target = target.cuda()
     eps = 1e-5
     tp = torch.sum(output * target)
     fp = torch.sum(output * (1 - target))
