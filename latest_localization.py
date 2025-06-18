@@ -287,7 +287,9 @@ def process_image(image, label, bnd_box, method):
         mask = saliency_map.unsqueeze(0).unsqueeze(0)
 
     mask = normalize_mask(mask)
-    seg_label = box_to_seg(bnd_box.unsqueeze(0).to('cuda'))
+    if bnd_box.ndim == 1:
+        bnd_box = bnd_box.unsqueeze(0)  # make it (1, 4)
+    seg_label = box_to_seg(bnd_box.to('cuda'))
     mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
     seg_mask = box_to_seg(mask_bnd_box).to('cuda')
 
