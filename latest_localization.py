@@ -256,188 +256,108 @@ VOC_CLASSES = {
     "pottedplant": 15, "sheep": 16, "sofa": 17, "train": 18, "tvmonitor": 19
 }
 
-with torch.enable_grad():      
-    idx = 0
-    data_idx = -1
-    num_img = 0
-    pixel_acc = 0.0
-    dice = 0.0
-    precision = 0.0
-    recall = 0.0
-    iou = 0.0
+def normalize_mask(mask):
+    return (mask - mask.min() + 1e-5) / (mask.max() - mask.min() + 1e-5)
+
+def compute_metrics(output, target):
+    eps = 1e-5
+    tp = torch.sum(output * target)
+    fp = torch.sum(output * (1 - target))
+    fn = torch.sum((1 - output) * target)
+    tn = torch.sum((1 - output) * (1 - target))
     
-    fieldnames = ['num_img', 'pixel_acc', 'iou', 'dice', 'precision', 'recall']
-    fieldnames_data = ['idx', 'num_img', 'pixel_acc', 'iou', 'dice', 'precision', 'recall']
-    csvUtils = csv_utils(export_file)
-    csvUtils.writeFieldName()
-    if DATASET == 'imagenet':
-        for idx, data in enumerate(tqdm(subset_loader)):
-            if num_img == 1:
-                break
-            image = data['image'].to('cuda')
-            label = data['label']
-            bnd_box = data['bnd_box'].to('cuda').squeeze(0)
-            
-            if 'better_agc' in METHOD or METHOD == 'scoreagc':
-                prediction, saliency_map = method(image)
-            else:
-                prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
+    pixel_acc = (tp + tn + eps) / (tp + tn + fp + fn + eps)
+    dice = (2 * tp + eps) / (2 * tp + fp + fn + eps)
+    precision = (tp + eps) / (tp + fp + eps)
+    recall = (tp + eps) / (tp + fn + eps)
+    iou = (tp + eps) / (tp + fp + fn + eps)
+    
+    return pixel_acc, dice, precision, recall, iou
 
-            # print('[DEBUG] PREDICTION', prediction)
-            # print('[DEBUG] LABEL', label.item())
-            if prediction!=label.item():
-                continue
-            # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
-            if METHOD != 'vitcx':
-                mask = saliency_map.reshape(1, 1, 14, 14) 
-            
-                # Reshape the mask to have the same size with the original input image (224 x 224)
-                upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
-            
-                mask = upsample(mask)
+def process_image(image, label, bnd_box, method):
+    prediction, saliency_map = method(image) if 'better_agc' in METHOD or METHOD == 'scoreagc' else method.generate(image)
+    if prediction != label:
+        return None
 
-            else:
-                mask = saliency_map.unsqueeze(0).unsqueeze(0)
-                # Normalize the heatmap from 0 to 1
-            mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
-
-            # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
-
-            # seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda') # PASCAL VOC
-            seg_label = box_to_seg(bnd_box).to('cuda') # Imagenet 
-
-
-            # From the generated heatmap, we generate a bounding box and then convert it to a segmentation mask to compare with the bounding box label.
-            
-            mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
-            seg_mask = box_to_seg(mask_bnd_box).to('cuda')
-        
-            output = seg_mask.view(-1, )
-            target = seg_label.view(-1, ).float()
-            
-            tp = torch.sum(output * target)  # True Positive
-            fp = torch.sum(output * (1 - target))  # False Positive
-            fn = torch.sum((1 - output) * target)  # False Negative
-            tn = torch.sum((1 - output) * (1 - target))  # True Negative
-            eps = 1e-5
-            pixel_acc_ = (tp + tn + eps) / (tp + tn + fp + fn + eps)
-            dice_ = (2 * tp + eps) / (2 * tp + fp + fn + eps)
-            precision_ = (tp + eps) / (tp + fp + eps)
-            recall_ = (tp + eps) / (tp + fn + eps)
-            iou_ = (tp + eps) / (tp + fp + fn + eps)
-            
-            pixel_acc += pixel_acc_
-            dice += dice_
-            precision += precision_
-            recall += recall_
-            iou += iou_
-            num_img+=1
-            
+    if METHOD != 'vitcx':
+        mask = torch.nn.Upsample(224, mode='bilinear', align_corners=False)(
+            saliency_map.reshape(1, 1, 14, 14)
+        )
     else:
-        # for idx, data in enumerate(tqdm(subset_loader)): # for ImageNet
-        total_counts = 0
-        for idx, (image, targets) in enumerate(tqdm(validloader)):
-            # image = data['image'].to('cuda') # for ImageNet
-            # label = data['label'] # for ImageNet
-            # bnd_box = data['bnd_box'].to('cuda').squeeze(0) # for Image Net
+        mask = saliency_map.unsqueeze(0).unsqueeze(0)
 
-            filename = targets[0]['annotation']['filename']
-            
-            image = torch.stack(image).to(device)  # Stack images into batch tensor
-            labels = []
-            # print('Num of objects: ', len(targets[0]['annotation']['object']))
-            # print(targets)
-            for target in targets[0]['annotation']['object']:
-                label = VOC_CLASSES[target["name"]] 
-                
-                labels.append(label)
-            labels = torch.tensor(labels).to(device)
-            multi_hot_labels = torch.zeros(20, dtype=torch.float)
-            multi_hot_labels[labels] = 1
-            multi_hot_labels = multi_hot_labels.unsqueeze(0).cuda()
-            if (len(labels) != 1):
-                continue
+    mask = normalize_mask(mask)
+    seg_label = box_to_seg(bnd_box.unsqueeze(0).to('cuda'))
+    mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
+    seg_mask = box_to_seg(mask_bnd_box).to('cuda')
 
-            total_counts += 1
-            
-            obj = targets[0]["annotation"]["object"][0]
-            width = targets[0]["annotation"]['size']['width']
-            height = targets[0]["annotation"]['size']['height']
-            bbox = obj["bndbox"]
-            
-            xmin = int(int(bbox["xmin"])/int(width) * 224)
-            ymin = int(int(bbox["ymin"])/int(height) * 224)
-            xmax = int(int(bbox["xmax"])/int(width) * 224)
-            ymax = int(int(bbox["ymax"])/int(height) * 224)
-            
-            bnd_box = torch.tensor([xmin, ymin, xmax, ymax])
-        
-            if 'better_agc' in METHOD or METHOD == 'scoreagc':
-                prediction, saliency_map = method(image)
-            else:
-                prediction, saliency_map = method.generate(image) # [1, 1, 14, 14]
-
-            # print('---------------------------------------------')
-            # print('[DEBUG] PREDICTION', prediction)
-            # print('[DEBUG] LABEL', label)
-            # print('---------------------------------------------')
-            if prediction!=labels:
-                continue
-            
-            # If the model produces the wrong predication, the heatmap is unreliable and therefore is excluded from the evaluation.
-            if METHOD != 'vitcx':
-                mask = saliency_map.reshape(1, 1, 14, 14) 
-
-                # Reshape the mask to have the same size with the original input image (224 x 224)
-                upsample = torch.nn.Upsample(224, mode = 'bilinear', align_corners=False)
-
-                mask = upsample(mask)
-            else:
-                mask = saliency_map.unsqueeze(0).unsqueeze(0)
-            
-            # Normalize the heatmap from 0 to 1
-            mask = (mask-mask.min() + 1e-5)/(mask.max()-mask.min() + 1e-5)
-
-            # To avoid the overlapping problem of the bounding box labels, we generate a 0-1 segmentation mask from the bounding box label.
-
-            seg_label = box_to_seg(bnd_box.unsqueeze(0)).to('cuda') # PASCAL VOC
-            # seg_label = box_to_seg(bnd_box).to('cuda') # Imagenet 
-
-
-            # From the generated heatmap, we generate a bounding box and then convert it to a segmentation mask to compare with the bounding box label.
-            
-            mask_bnd_box = getBoudingBox_multi(mask, threshold=THRESHOLD).to('cuda')
-            seg_mask = box_to_seg(mask_bnd_box).to('cuda')
-        
-            output = seg_mask.view(-1, )
-            target = seg_label.view(-1, ).float()
-            
-            tp = torch.sum(output * target)  # True Positive
-            fp = torch.sum(output * (1 - target))  # False Positive
-            fn = torch.sum((1 - output) * target)  # False Negative
-            tn = torch.sum((1 - output) * (1 - target))  # True Negative
-            eps = 1e-5
-            pixel_acc_ = (tp + tn + eps) / (tp + tn + fp + fn + eps)
-            dice_ = (2 * tp + eps) / (2 * tp + fp + fn + eps)
-            precision_ = (tp + eps) / (tp + fp + eps)
-            recall_ = (tp + eps) / (tp + fn + eps)
-            iou_ = (tp + eps) / (tp + fp + fn + eps)
-            
-            pixel_acc += pixel_acc_
-            dice += dice_
-            precision += precision_
-            recall += recall_
-            iou += iou_
-            num_img+=1
-
-            if num_img == 2000:
-                break
+    output = seg_mask.view(-1)
+    target = seg_label.view(-1).float()
     
-        # csvUtils.appendResult(
-        #     data["filename"][0], pixel_acc_, iou_, dice_, precision_, recall_
-        # )
+    return compute_metrics(output, target)
 
-        # --------------- for visualize heatmaps
+def evaluate_imagenet():
+    results = {'pixel_acc': 0.0, 'dice': 0.0, 'precision': 0.0, 'recall': 0.0, 'iou': 0.0}
+    num_img = 0
+    for idx, data in enumerate(tqdm(subset_loader)):
+        if num_img >= 1:
+            break
+        image = data['image'].to('cuda')
+        label = data['label'].item()
+        bnd_box = data['bnd_box'].to('cuda').squeeze(0)
+
+        metrics = process_image(image, label, bnd_box, method)
+        if metrics:
+            for key, val in zip(results.keys(), metrics):
+                results[key] += val
+            num_img += 1
+    return results, num_img
+
+def evaluate_voc():
+    results = {'pixel_acc': 0.0, 'dice': 0.0, 'precision': 0.0, 'recall': 0.0, 'iou': 0.0}
+    num_img = 0
+    for idx, (image, targets) in enumerate(tqdm(validloader)):
+        obj_list = targets[0]['annotation']['object']
+        if len(obj_list) != 1:
+            continue
+        obj = obj_list[0]
+
+        width = targets[0]['annotation']['size']['width']
+        height = targets[0]['annotation']['size']['height']
+        bbox = obj['bndbox']
+        label = VOC_CLASSES[obj['name']]
+        bnd_box = torch.tensor([
+            int(int(bbox['xmin']) / width * 224),
+            int(int(bbox['ymin']) / height * 224),
+            int(int(bbox['xmax']) / width * 224),
+            int(int(bbox['ymax']) / height * 224),
+        ]).to('cuda')
+
+        image_tensor = torch.stack(image).to('cuda')
+
+        metrics = process_image(image_tensor, label, bnd_box, method)
+        if metrics:
+            for key, val in zip(results.keys(), metrics):
+                results[key] += val
+            num_img += 1
+        if num_img == 2000:
+            break
+    return results, num_img
+
+# Main execution block
+with torch.enable_grad():
+    if DATASET == 'imagenet':
+        results, num_img = evaluate_imagenet()
+    else:
+        results, num_img = evaluate_voc()
+
+    if num_img > 0:
+        print(f"[INFO] Evaluated {num_img} images")
+        print(f"Pixel Accuracy: {results['pixel_acc'] / num_img:.4f}")
+        print(f"IoU: {results['iou'] / num_img:.4f}")
+        print(f"Dice: {results['dice'] / num_img:.4f}")
+        print(f"Precision: {results['precision'] / num_img:.4f}")
+        print(f"Recall: {results['recall'] / num_img:.4f}")
 
 
 if 'cluster' in METHOD:
