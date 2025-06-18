@@ -266,6 +266,7 @@ elif METHOD == 'tam':
     model = model.eval()
     model = model.to('cuda')
     method = TAMWrapper(model=model)
+    print('DAY NE')
 elif METHOD == 'tis':
     model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k', num_classes=1000)
     # model.head = nn.Linear(model.head.in_features, 20)
