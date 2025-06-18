@@ -260,13 +260,10 @@ elif METHOD == 'chefer2':
     model = model.eval()
     method = Chefer2Wrapper(model=model)
 elif METHOD == 'tam':
-    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k', num_classes=1000)
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model.load_state_dict(state_dict)
+    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
     model = model.eval()
     model = model.to('cuda')
     method = TAMWrapper(model=model)
-    print('DAY NE')
 elif METHOD == 'tis':
     model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k', num_classes=1000)
     # model.head = nn.Linear(model.head.in_features, 20)
