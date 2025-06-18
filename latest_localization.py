@@ -51,8 +51,6 @@ parser.add_argument('--method',   type=str, default='agc',                      
 parser.add_argument('--num_heatmaps',   type=str, default=30,                       help='number of heatmaps after clustering')
 parser.add_argument('--dataset',   type=str, default='imagenet',                       help='imagenet or PASCAL VOC')
 parser.add_argument('--start_layer',   type=str, default=1,                       help='layer for early stopping')
-# parser.add_argument('--npz_checkpoint',   type=str, default='',                       help='folder path storing heatmaps')
-# parser.add_argument('--load_prediction',   type=str, default='true',                       help='load predictions of ViT')
 args = parser.parse_args()
 
 METHOD = args.method
@@ -144,151 +142,100 @@ else:
 export_file = METHOD + '_results.csv'
 data_file = METHOD + '_data.csv'
 
+def load_state_dict(dataset, path_imagenet, path_custom):
+    if dataset == 'imagenet':
+        return model_zoo.load_url(path_imagenet, progress=True, map_location='cuda')
+    else:
+        return torch.load(path_custom)
+
+def create_vit_model(model_name, num_classes, state_dict, strict=True):
+    model = ViT_Ours.create_model(model_name, pretrained=True, num_classes=num_classes).to('cuda')
+    model.load_state_dict(state_dict if isinstance(state_dict, dict) else state_dict['model_state'], strict=strict)
+    return model.eval()
+
+def create_timm_model(model_name='vit_base_patch16_224', num_classes=1000):
+    model = timm.create_model(model_name=model_name, pretrained=True, pretrained_cfg='orig_in21k_ft_in1k', num_classes=num_classes)
+    return model.eval().to('cuda')
+
+path_imagenet = 'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth'
+path_custom = '/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth'
+
 if METHOD == 'scoreagc':
-    # state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    # model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
-    # model.load_state_dict(state_dict, strict=True)
-    # model.eval()
-
-    # set up for model using in CUB
-    # Load pre-trained ImageNet model weights
-    # state_dict = model_zoo.load_url(
-    #     'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', 
-    #     progress=True, 
-    #     map_location='cuda'
-    # )
-
-    # Create model with ImageNet settings (1000 classes)
     if DATASET == 'imagenet':
-        state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
-        model.load_state_dict(state_dict, strict=True)
-        model.eval()
+        state_dict = load_state_dict(DATASET, path_imagenet, path_custom)
+        model = create_vit_model(MODEL, 1000, state_dict)
     else:
-        state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
-        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
+        state_dict = torch.load(path_custom)
+        model = create_vit_model(MODEL, 20, state_dict, strict=False)
         model.head = nn.Linear(model.head.in_features, 20).to('cuda')
-        model.load_state_dict(state_dict['model_state'], strict=False)
-        model.eval()
-
     method = ScoreAGC(model)
-if METHOD == 'scoreagc_head_fusion':
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
-    model.load_state_dict(state_dict, strict=True)
-    model.eval()
-    method = ScoreAGC_head_fusion(model, score_minmax_norm=True, head_fusion='mean')
-elif METHOD == 'better_agc':
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
-    model.load_state_dict(state_dict, strict=True)
-    model.eval()
-    method = BetterAGC(model)
-elif METHOD == 'better_agc_ver2':
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
-    model.load_state_dict(state_dict, strict=True)
-    model.eval()
-    method = BetterAGC_ver2(model)
-elif METHOD == 'better_agc_softmax':
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
-    model.load_state_dict(state_dict, strict=True)
-    model.eval()
-    method = BetterAGC_softmax(model)
-elif METHOD == 'scoreagc_no_grad':
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
-    model.load_state_dict(state_dict, strict=True)
-    model.eval()
-    method = ScoreAGC_no_grad(model)
-elif METHOD == 'agc':
-    # Imagenet
-    if DATASET == 'imagenet':
-        state_dict = model_zoo.load_url(
-            'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', 
-            progress=True, 
-            map_location='cuda'
-        )
-    else:
-        state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
-    if DATASET == 'imagenet':
-        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
-        model.load_state_dict(state_dict)
-    else:
-        model.load_state_dict(state_dict['model_state'])        
-        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
 
-    model.eval()
-    
+elif METHOD in ['scoreagc_head_fusion', 'better_agc', 'better_agc_ver2', 'better_agc_softmax', 'scoreagc_no_grad', 'better_agc_cluster', 'better_agc_cluster_add_noise']:
+    state_dict = load_state_dict('imagenet', path_imagenet, path_custom)
+    model = create_vit_model(MODEL, class_num, state_dict)
+    if METHOD == 'scoreagc_head_fusion':
+        method = ScoreAGC_head_fusion(model, score_minmax_norm=True, head_fusion='mean')
+    elif METHOD == 'better_agc':
+        method = BetterAGC(model)
+    elif METHOD == 'better_agc_ver2':
+        method = BetterAGC_ver2(model)
+    elif METHOD == 'better_agc_softmax':
+        method = BetterAGC_softmax(model)
+    elif METHOD == 'scoreagc_no_grad':
+        method = ScoreAGC_no_grad(model)
+    elif METHOD == 'better_agc_cluster':
+        method = BetterAGC_cluster(model, num_heatmaps=int(args.num_heatmaps))
+    elif METHOD == 'better_agc_cluster_add_noise':
+        method = BetterAGC_cluster_add_noise(model, num_heatmaps=30)
+
+elif METHOD == 'agc':
+    state_dict = load_state_dict(DATASET, path_imagenet, path_custom)
+    num_classes = 1000 if DATASET == 'imagenet' else 20
+    model = create_vit_model(MODEL, num_classes, state_dict, strict=DATASET == 'imagenet')
     method = AGCAM(model)
-elif METHOD == 'better_agc_cluster':
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
-    model.load_state_dict(state_dict, strict=True)
-    model.eval()
-    method = BetterAGC_cluster(model, num_heatmaps=int(args.num_heatmaps))
-elif METHOD == 'better_agc_cluster_add_noise':
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=class_num).to('cuda')
-    model.load_state_dict(state_dict, strict=True)
-    model.eval()
-    method = BetterAGC_cluster_add_noise(model, num_heatmaps=30)
+
 elif METHOD == 'chefer1':
-    # state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=True)
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+    state_dict = load_state_dict('imagenet', path_imagenet, path_custom)
     model = LRP_vit_base_patch16_224('cuda').to('cuda')
     model.load_state_dict(state_dict)
-    model.eval()
     method = LRP(model, device='cuda')
+
 elif METHOD == 'rollout':
-    if DATASET == 'imagenet':
-        state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
-    else:
-        state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=True)
-    if DATASET == 'imagenet':
-        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=1000).to('cuda')
-        model.load_state_dict(state_dict, strict=True)
-    else:
-        model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=20).to('cuda')
+    state_dict = load_state_dict(DATASET, path_imagenet, path_custom)
+    num_classes = 1000 if DATASET == 'imagenet' else 20
+    model = ViT_Ours.create_model(MODEL, pretrained=True, num_classes=num_classes).to('cuda')
+    if DATASET != 'imagenet':
         model.head = nn.Linear(model.head.in_features, 20).to('cuda')
-        model.load_state_dict(state_dict['model_state'])
+    model.load_state_dict(state_dict if DATASET == 'imagenet' else state_dict['model_state'], strict=DATASET == 'imagenet')
     model.eval()
     method = VITAttentionRollout(model, device=device)
+
 elif METHOD == 'chefer2':
-    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
-    model = model.eval()
+    model = create_timm_model()
     method = Chefer2Wrapper(model=model)
+
 elif METHOD == 'tam':
-    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
-    model = model.eval()
-    model = model.to('cuda')
+    model = create_timm_model()
     method = TAMWrapper(model=model)
+
 elif METHOD == 'tis':
-    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k', num_classes=1000)
-    # model.head = nn.Linear(model.head.in_features, 20)
-    # state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth', weights_only=False)
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+    model = create_timm_model()
+    state_dict = model_zoo.load_url(path_imagenet, progress=True, map_location='cuda')
     model.load_state_dict(state_dict)
-    model = model.eval()
-    model = model.to('cuda')
     method = TISWrapper(model=model)
+
 elif METHOD == 'vitcx':
-    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k', num_classes=1000)
-    # model.head = nn.Linear(model.head.in_features, 20)
-    # state_dict = torch.load('/kaggle/working/better_agc_ubuntu/vit_pascal_voc_60.pth')
-    state_dict = model_zoo.load_url('https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_base_p16_224-80ecf9dd.pth', progress=True, map_location='cuda')
+    model = create_timm_model()
+    state_dict = model_zoo.load_url(path_imagenet, progress=True, map_location='cuda')
     model.load_state_dict(state_dict)
-    model = model.eval()
-    model = model.to('cuda')
     method = ViTCXWrapper(model=model)
+
 elif METHOD == 'btt':
-    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
-    model = model.eval()
+    model = create_timm_model()
     method = BTTWrapper(model=model)
+
 elif METHOD == 'bth':
-    model = timm.create_model(model_name='vit_base_patch16_224', pretrained=True, pretrained_cfg='orig_in21k_ft_in1k')
-    model = model.eval()
+    model = create_timm_model()
     method = BTHWrapper(model=model)
 
 
