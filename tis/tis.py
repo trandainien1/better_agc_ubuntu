@@ -3,7 +3,7 @@ import torch.nn.functional as F
 from torchvision.models import VisionTransformer as VisionVIT
 from timm.models.vision_transformer import VisionTransformer as TimmVIT
 
-from fast_pytorch_kmeans import KMeans
+# from fast_pytorch_kmeans import KMeans
 
 from tqdm import tqdm
 
