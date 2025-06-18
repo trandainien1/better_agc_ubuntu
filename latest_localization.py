@@ -363,29 +363,3 @@ with torch.enable_grad():
         print(f"Precision: {results['precision'] / num_img:.4f}")
         print(f"Recall: {results['recall'] / num_img:.4f}")
 
-
-# if 'cluster' in METHOD:
-#     print(f'{METHOD} - num of heatmaps: {args.num_heatmaps}')
-# else:
-#     print(METHOD)
-
-# print("result==================================================================")
-# if DATASET != 'imagenet':
-#     print("Total images: ", total_counts)
-# print("number of images correctly predicted: ", num_img)
-# print("Threshold: ", THRESHOLD)
-# print("pixel_acc: {:.4f} ".format((pixel_acc/num_img).item()))
-# print("iou: {:.4f} ".format((iou/num_img).item()))
-# print("dice: {:.4f} ".format((dice/num_img).item()))
-# print("precision: {:.4f} ".format((precision/num_img).item()))
-# print("recall: {:.4f} ".format((recall/num_img).item()))
-
-# --------- For visualize heatmap --------------
-
-# print('[AFTER CLUSTERING] heatmaps shape', saliency_maps.shape)
-# npz_name = args.method
-        
-# # saliencies_maps = torch.stack(saliency_maps) #saliency_maps.shape = [num_images, 1, 224, 224]
-# np.savez(os.path.join('npz', npz_name), saliency_maps.detach().cpu().numpy())
-
-# print('Saliency maps saved to npz.')
