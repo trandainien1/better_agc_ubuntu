@@ -304,8 +304,6 @@ def evaluate_imagenet():
     results = {'pixel_acc': 0.0, 'dice': 0.0, 'precision': 0.0, 'recall': 0.0, 'iou': 0.0}
     num_img = 0
     for idx, data in enumerate(tqdm(subset_loader)):
-        if num_img >= 1:
-            break
         image = data['image'].to('cuda')
         label = data['label'].item()
         bnd_box = data['bnd_box'].to('cuda').squeeze(0)
