@@ -535,7 +535,7 @@ class ScoreAGC:
             # print("After deleted output from model: ")
             # print(torch.cuda.memory_allocated()/1024**2)
             
-            return agc_scores
+            return agc_scores, noise_to_add
 
     def generate_saliency(self, head_cams, agc_scores):
         if self.is_head_fuse:
